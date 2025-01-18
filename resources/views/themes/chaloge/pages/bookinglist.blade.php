@@ -269,11 +269,11 @@ $as = json_encode($flightStatus);
                 }
                 if (i ==  3) {
                     // $('.booking-lists').html(loader);
-                    URL = 'api/GetFlightsAirblue';
+                     URL = 'api/GetFlightsAirblue';
                 }
                 if (i ==  4) {
                     // $('.booking-lists').html(loader);
-                    URL = 'api/GetAllFlights';
+                     URL = 'api/GetAllFlights';
                 }
 
                 $.ajax({
@@ -324,9 +324,15 @@ $as = json_encode($flightStatus);
                                                 </div>
                                                 <div class="col-md-6 left-border-flight">
                                                     <h5><i class="fa fa-light fa-globe text-muted"></i> ${flight.ORGN} <i class="fa fa-plane" aria-hidden="true"></i> ${flight.DEST}</h5>
-                                                    <h6>Flight Number: <b>${flight.FLIGHT_NO}</b> <i class="fa fa-plane-departure" style="color: #808080cc;"></i></h6>
-                                                    <h6>Baggage: <i class="fa fa-suitcase-rolling" style="color: #808080cc;"></i>${flight.BAGGAGE_FARE !== undefined && flight.BAGGAGE_FARE.length > 0   ? `<b> ${flight.BAGGAGE_FARE[0].no_of_bags} of ${flight.BAGGAGE_FARE[0].weight}</b>` : 'Flight Is Completely Booked' }</h6>
-                                                    ${flight.STATUS === "DELAYED" ? `<h6>Status: <i class="fas fa-shield-check"></i><b>${flight.STATUS}</b> </h6>` : ''}
+                                                    <h6>Flight Number: <b>${flight.FLIGHT_NO}</b> <i class="fa fa-plane-departure" style="color: #808080cc;"></i></h6>`;
+                                                    
+                                                    if(flight.AIRLINE == 'Air Serene'){
+                                                        HTML += `<h6>Baggage: <i class="fa fa-suitcase-rolling" style="color: #808080cc;"></i>${flight.BAGGAGE_FARE !== undefined && flight.BAGGAGE_FARE.length > 0   ? `<b> ${flight.BAGGAGE_FARE[0].weight}</b> Kg Checked Baggage` : 'Flight Is Completely Booked' }</h6>`;
+                                                    }else{
+                                                        HTML += `<h6>Baggage: <i class="fa fa-suitcase-rolling" style="color: #808080cc;"></i>${flight.BAGGAGE_FARE !== undefined && flight.BAGGAGE_FARE.length > 0   ? `<b> ${flight.BAGGAGE_FARE[0].no_of_bags} of ${flight.BAGGAGE_FARE[0].weight}</b>` : 'Flight Is Completely Booked' }</h6>`;
+                                                    }
+                                                    
+                                                    HTML += `${flight.STATUS === "DELAYED" ? `<h6>Status: <i class="fas fa-shield-check"></i><b>${flight.STATUS}</b> </h6>` : ''}
                                                     <h6><u>${flight.TYPE.toUpperCase()}</u>:</h6>
                                                     <ul class="flight-info" style="font-size: 12px;">
                                                         <li>${moment(flight.DEPARTURE_DATE).format('DD')}, ${moment(flight.DEPARTURE_DATE).format("MM-YYYY")}</li>
@@ -424,21 +430,33 @@ $as = json_encode($flightStatus);
                                                     <img src="https://s3.ap-south-1.amazonaws.com/st-airline-images/${flight.AIRLINE_CODE}.png" alt="${flight.AIRLINE_CODE}" width="80">
                                                     <ul>
                                                         <li>Operated by ${flight.AIRLINE}</li>
-                                                        <li>Economy | Flight ${flight.FLIGHT_NO} | Aircraft ${flight.FLIGHT_NO}</li>
-                                                        ${flight.BAGGAGE_FARE.length > 0 
-                                                        ?
-                                                            `<li>Bag(s): ${flight.BAGGAGE_FARE[0].no_of_bags} of ${flight.BAGGAGE_FARE[0].weight} luggage</li>
-                                                        ${meal !== undefined ? `<li>Meal : ${meal}</li>` : ''}
-                                                        ${seat !== undefined ? `<li>Seat : ${seat}</li>` : ''}
-                                                        ${cancel !== undefined ? `<li>Cancellation : ${cancel}</li>` : ''}` 
-                                                        :
-                                                        "Flight is Completely Booked"
-                                                            }
+                                                        <li>Economy | Flight ${flight.FLIGHT_NO} | Aircraft ${flight.FLIGHT_NO}</li>`;
                                                         
-
-                                                        
-                                                        
-                                                    </ul>
+                                                        if(flight.AIRLINE == 'Air Serene') {
+                                                            HTML += `
+                                                            ${flight.BAGGAGE_FARE.length > 0 
+                                                            ?
+                                                                `<li>Bag(s): ${flight.BAGGAGE_FARE[0].weight} Checked Baggage Luggage</li>
+                                                            ${meal !== undefined ? `<li>Meal : ${meal}</li>` : ''}
+                                                            ${seat !== undefined ? `<li>Seat : ${seat}</li>` : ''}
+                                                            ${cancel !== undefined ? `<li>Cancellation : ${cancel}</li>` : ''}` 
+                                                            :
+                                                            "Flight is Completely Booked"
+                                                            }`;
+                                                        } else {
+                                                            HTML += `
+                                                            ${flight.BAGGAGE_FARE.length > 0 
+                                                            ?
+                                                                `<li>Bag(s): ${flight.BAGGAGE_FARE[0].no_of_bags} of ${flight.BAGGAGE_FARE[0].weight} Luggage</li>
+                                                            ${meal !== undefined ? `<li>Meal : ${meal}</li>` : ''}
+                                                            ${seat !== undefined ? `<li>Seat : ${seat}</li>` : ''}
+                                                            ${cancel !== undefined ? `<li>Cancellation : ${cancel}</li>` : ''}` 
+                                                            :
+                                                            "Flight is Completely Booked"
+                                                            }`;
+                                                        }
+                                                           
+                                                    HTML += `</ul>
                                                 </div>
                                                 <h4 class="title title-two">${flight.DEST} - ${json.destination.airport}, ${json.destination.country}</h4>
                                             </div>
@@ -469,12 +487,14 @@ $as = json_encode($flightStatus);
                                                         if(flight.AIRLINE !== 'Airsial' && flight.AIRLINE !== 'Air Serene'){
                                                             HTML += `<p>${flight.AIRLINE !== 'Fly Jinnah' ? 'Meals: Included' : ''}</p>`;                                                    
                                                         }
-                                                        if(flight.AIRLINE !== 'Fly Jinnah'){
+                                                        if(flight.AIRLINE !== 'Fly Jinnah' && flight.AIRLINE !== 'Air Serene'){
                                                             HTML += `<p><span>Bags:</span> ${bag.no_of_bags} Bag</p>`;
                                                         }
                                                         if(flight.AIRLINE == 'Fly Jinnah' && bag.weight == null){
                                                             HTML += `<p><span>Weight:</span> 0</p>`;
-                                                        }else{
+                                                        }else if(flight.AIRLINE == 'Air Serene'){
+                                                            HTML += `<p><span>Weight:</span> ${bag.weight} Kg Checked Baggage</p>`;
+                                                        } else{
                                                             HTML += `<p><span>Weight:</span> ${bag.weight}</p>`;
                                                         }
                                                         var Discount = 0;
@@ -712,7 +732,7 @@ $as = json_encode($flightStatus);
                  console.log(flightType, _data.type)
                  $.post('{{ url('flight/checkFlight') }}', {flight: JSON.stringify(_data), type: _data.type}, function (json) {
                      if((flightType === 'Round Trip' && _data.type === 'inbound') || flightType === 'One Way'){
-                         window.location = '{!! url('manage-booking?' . http_build_query(request()->all())) !!}';
+                        //  window.location = '{!! url('manage-booking?' . http_build_query(request()->all())) !!}';
                      } else {
                          $('.flight-type-outbound').hide();
                          //$('.flight-type-inbound.airline-' + _data.airline).show();

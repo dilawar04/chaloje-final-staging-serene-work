@@ -15,6 +15,10 @@
 
 Route::get('/', 'IndexController@index');
 
+Route::get('/testingserenee', 'FlightController@testingserenee');
+Route::get('/testingsereneereq', 'FlightController@testingsereneereq');
+
+
 
 Route::get('/getTimeLeft', function () {
     $currentTime = Carbon\Carbon::now();

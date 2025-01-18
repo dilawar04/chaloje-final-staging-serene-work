@@ -176,32 +176,60 @@ class FlightController extends Controller
     }
 
    
-    public static function GetFlightsAirserene()
+    public static function GetFlightsAirSerene()
     {
 
         $origin = Airport::where('IATA_code', req('LocationDep'))->select('IATA_code', 'airport', 'city', 'country')->first();
         $destination = Airport::where('IATA_code', req('LocationArr'))->select('IATA_code', 'airport', 'city', 'country')->first();
        
         if(empty(request('ReturningOn'))){
-            $_airserene_response = \App\AirSerene::getSingleFlight();
+            $_flyJinnah_response = \App\AirSerene::getSingleFlight();
         }else{
-            $_airserenemul_response = \App\AirSerene::getSingleFlightMUl();
-            $_airserene_response = \App\AirSerene::getSingleFlight();  
+            $_flyJinnah_response = \App\AirSerene::getSingleFlight();
+            // $Inbound_flyJinnah_response = \App\AirSerene::OTA_AirAvailInBoundRQ();
         }
 
+        
         if(empty(request('ReturningOn'))){
-            $merge_flights = array_merge_recursive($_airserene_response);
+            $merge_flights = array_merge_recursive($_flyJinnah_response);
         }else{
-            $merge_flights = array_merge_recursive($_airserene_response , $_airserenemul_response);
+            $merge_flights = array_merge_recursive($_flyJinnah_response, $Inbound_flyJinnah_response);
         }
 
 
         $merge_flights['origin'] = $origin;
         $merge_flights['destination'] = $destination;
         // dd($merge_flights);
-        // dd($_airsial_response);
-        return $merge_flights;
+        return $merge_flights;  
     }
+
+    // old seren code
+    // public static function GetFlightsAirserene()
+    // {
+
+    //     $origin = Airport::where('IATA_code', req('LocationDep'))->select('IATA_code', 'airport', 'city', 'country')->first();
+    //     $destination = Airport::where('IATA_code', req('LocationArr'))->select('IATA_code', 'airport', 'city', 'country')->first();
+       
+    //     if(empty(request('ReturningOn'))){
+    //         $_airserene_response = \App\AirSerene::getSingleFlight();
+    //     }else{
+    //         $_airserenemul_response = \App\AirSerene::getSingleFlightMUl();
+    //         $_airserene_response = \App\AirSerene::getSingleFlight();  
+    //     }
+
+    //     if(empty(request('ReturningOn'))){
+    //         $merge_flights = array_merge_recursive($_airserene_response);
+    //     }else{
+    //         $merge_flights = array_merge_recursive($_airserene_response , $_airserenemul_response);
+    //     }
+
+
+    //     $merge_flights['origin'] = $origin;
+    //     $merge_flights['destination'] = $destination;
+    //     // dd($merge_flights);
+    //     // dd($_airsial_response);
+    //     return $merge_flights;
+    // }
 
     public static function GetFlightsAirblue()
     {

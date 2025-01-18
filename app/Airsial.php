@@ -59,7 +59,7 @@ class Airsial {
         // exit;
         if ($response->ok()) {
             $json = $response->json();
-            // dd($json['Success']);
+            // dd($json);
             // exit;
 
             if ($json['Success']) {
@@ -98,6 +98,7 @@ class Airsial {
 
                     return $item;
                 })->toArray();
+                // dd($FLIGHTS);
                 /*---------------------------------------------------------------------------------------*/
                 $FLIGHTS['inbound'] = collect($data['inbound'])->map(function ($item, $key) use ($data) {
                     $item['AIRLINE'] = 'Airsial';

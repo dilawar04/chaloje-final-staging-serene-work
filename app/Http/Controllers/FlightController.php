@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Session;
+use App\Utils\SignatureUtil;
+
 
 
 class FlightController extends Controller
@@ -74,6 +76,79 @@ class FlightController extends Controller
         //$clean_xml = str_replace('htt//', 'http://', preg_replace(self::$search, self::$replace, $xml));
         $clean_xml = str_ireplace(['soap:', 'ns1:', 'ns2:', '@attributes'], ['', '', '', 'attributes'], $xml);
         return simplexml_load_string($clean_xml);
+    }
+
+    public static function testingserenee(){
+        
+        // Including SignatureUtil Logic
+        $ServiceName = "NDC_AIRSHOPPING_SERVICE";
+        $AuthUserID = "CHALOJE";
+        $AuthAppID = "CHALOJE";
+        $Version = "20.1";
+        $Language = "en_US";
+        $Timestamp = "20250106133112222";
+        $TimeZone = "+00:00";
+        $ClientIP = "127.0.0.1";
+        $ContentType = "application/xml;charset=UTF-8";
+    
+        $Body = '<IATA_AirShoppingRQ xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRQ"><Party><Sender><Aggregator><AggregatorID>CHALOJE</AggregatorID></Aggregator></Sender></Party><Request><ShoppingCriteria><FlightCriteria><FlightCharacteristicsCriteria><PrefLevel><PrefContextText>OUTBOUND</PrefContextText></PrefLevel></FlightCharacteristicsCriteria></FlightCriteria></ShoppingCriteria><FlightRequest><OriginDestCriteria><OriginDepCriteria><IATA_LocationCode>KHI</IATA_LocationCode><Date>2025-01-28</Date></OriginDepCriteria><DestArrivalCriteria><IATA_LocationCode>ISB</IATA_LocationCode></DestArrivalCriteria></OriginDestCriteria></FlightRequest><ResponseParameters><CurParameter><RequestedCurCode>PKR</RequestedCurCode></CurParameter></ResponseParameters><Paxs><Pax><PaxID>PAX1</PaxID><PTC>ADT</PTC></Pax></Paxs></Request></IATA_AirShoppingRQ>';
+    
+        // Corrected Signature String
+        $Signature_String = $AuthAppID . "|" . $AuthUserID . "|" . $ServiceName . "|" . $Language . "|" . $AuthAppID . "|" . $Timestamp . "|" . $Body . "|" . $Version . "|" . $ClientIP;
+    
+        echo "Signature String: " . htmlspecialchars($Signature_String) . '<br>';
+    
+        // Replace 'your_signature_key' with your actual signature key
+        $signature_key = 'cmop8Betyf7HuBDiu176L6niwnRntYd8';
+    
+        // Generate the signature using SignatureUtil
+        $signature = SignatureUtil::newEncodeSHA($Signature_String, $signature_key);
+    
+        echo "Generated Signature: " . htmlspecialchars($signature);
+    }
+    
+    public static function testingsereneereq(){
+        
+        $client = new Client();
+
+        $headers = [
+            'ServiceName' => 'NDC_AIRSHOPPING_SERVICE',
+            'AuthUserID' => 'CHALOJE',
+            'AuthAppID' => 'CHALOJE',
+            'AuthTktdeptid' => 'OT11521',
+            'Version' => '20.1',
+            'Language' => 'en_US',
+            // 'Token' => 'CHALOJE',
+            'Timestamp' => '20250106133112222',
+            'TimeZone' => '+00:00',
+            'ClientIP' => '127.0.0.1',
+            'Content-Type' => 'application/xml;charset=UTF-8',
+            'Sign' => '5jvqOYEL2vTD9lJxiwIFpC8v4w+NQH/2deKI1O4kStE='
+        ];
+    
+        $body = '<IATA_AirShoppingRQ xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRQ"><Party><Sender><Aggregator><AggregatorID>CHALOJE</AggregatorID></Aggregator></Sender></Party><Request><ShoppingCriteria><FlightCriteria><FlightCharacteristicsCriteria><PrefLevel><PrefContextText>OUTBOUND</PrefContextText></PrefLevel></FlightCharacteristicsCriteria></FlightCriteria></ShoppingCriteria><FlightRequest><OriginDestCriteria><OriginDepCriteria><IATA_LocationCode>KHI</IATA_LocationCode><Date>2025-01-28</Date></OriginDepCriteria><DestArrivalCriteria><IATA_LocationCode>ISB</IATA_LocationCode></DestArrivalCriteria></OriginDestCriteria></FlightRequest><ResponseParameters><CurParameter><RequestedCurCode>PKR</RequestedCurCode></CurParameter></ResponseParameters><Paxs><Pax><PaxID>PAX1</PaxID><PTC>ADT</PTC></Pax></Paxs></Request></IATA_AirShoppingRQ>';
+        // dd($body);
+        // exit; 
+        // $client = new Client();
+
+        
+        $response = $client->request('POST', 'https://uater.quickprs.com/api/ndcServlet', [
+            'headers' => $headers,
+            'body' => $body
+        ]);
+        // dd($response);
+        $xml = $response->getBody()->getContents();
+        dd($xml);
+        exit;
+        if(req('c')){
+            \File::put( "{$action}-RS.txt", $xml);
+        }
+
+        $json_data = self::parseXML($xml);
+        dd($json_data);
+        exit;
+
+        return $json_data->Body->{"{$action}Response"}->{"{$action}Result"}->SecurityToken;
     }
 
     public static function PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight)
@@ -717,9 +792,9 @@ class FlightController extends Controller
                 $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                // dump($SeatMapResponse);
-                // dump($HasMealsResponse);
-                // exit;
+                dump($SeatMapResponse);
+                dump($HasMealsResponse);
+                exit;
                 // dump('SeatMapResponse',$SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow);
                 // exit;
                 $SeatMapOutboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow;

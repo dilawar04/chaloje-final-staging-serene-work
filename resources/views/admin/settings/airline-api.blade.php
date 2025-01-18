@@ -4,7 +4,7 @@
     'airsial' => ['title' => 'Airsial', 'inputs' => ['URL', 'Username' => ['type' => 'text'], 'Password' => ['type' => 'password']]],
     'airblue' => ['title' => 'AirBlue', 'inputs' => ['URL', 'ID' => ['title' => 'ID','type' => 'text'], 'Password' => ['type' => 'password'], 'key', 'Type', 'Version', 'Target']],
     'flyjinnah' => ['title' => 'FlyJinnah', 'inputs' => ['URL', 'USERNAME' => ['type' => 'text'], 'PASSWORD' => ['type' => 'password'], 'AGENT_CODE', 'Version', 'TerminalID' => ['title' => 'Terminal ID'], 'Payment_CompanyName']],
-    'airserene' => ['title' => 'AirSerene', 'inputs' => ['CarrierCode', 'Username' => ['type' => 'text'], 'Password' => ['type' => 'password'], 'IATANum' => ['title' => 'IATA Num']]],
+    'airserene' => ['title' => 'AirSerene', 'inputs' => ['CarrierCode', 'EndPoint', 'IP', 'AuthAppID', 'AuthUserID', 'AuthTktdeptid', 'SignatureKey', 'Token', 'PlannedActiveTime', 'Username' => ['type' => 'text'] ]],
     'hblgateway' => ['title' => 'Hbl Payment Gateway', 'inputs' => ['URL', 'USER_ID' => ['type' => 'text'] , 'PASSWORD' => ['type' => 'password'], 'public_key' => ['type' => 'textarea'], 'private_key' => ['type' => 'textarea'], 'CHANNEL', 'CLIENT_NAME']],
     ];
 
@@ -19,7 +19,7 @@
 <div class="row">
     @foreach($modes as $mode)
         <div class="col-lg-6">
-            <div class="form-group m-form__group row">
+            <div class="form-group m-form__group row ass">
                 <div class="col-lg-12">
                     <label class="col-form-label">{{ $mode }}:</label>
                     <input type="radio" name="opt[{{ $airline }}][mode]" value="{{ $mode }}" {{ _checked($mode, $airline_opt->mode) }}>
