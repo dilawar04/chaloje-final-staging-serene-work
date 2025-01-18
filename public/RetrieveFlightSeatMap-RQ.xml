@@ -1,0 +1,30 @@
+URI : https://srn.app.radixx.com/SRN/Radixx.ConnectPoint/ConnectPoint.Flight.svc
+Content-Type : text/xml
+SOAPAction : http://tempuri.org/IConnectPoint_Flight/RetrieveFlightSeatMap
+-------------------------------------------------------------------------- 
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Body>
+        <RetrieveFlightSeatMap xmlns="http://tempuri.org/">
+            <!-- Optional -->
+            <RetrieveFlightSeatMapRequest>
+                <SecurityGUID xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">9f219b7996zgy7y7h46eg49b69hci3xa1cc4bf7d38ea</SecurityGUID>
+                <CarrierCodes xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">
+                    <!-- Optional -->
+                    <CarrierCode>
+                        <AccessibleCarrierCode>ER</AccessibleCarrierCode>
+                    </CarrierCode>
+                </CarrierCodes>
+                <ClientIPAddress xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">103.184.0.84</ClientIPAddress>
+                <HistoricUserName xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request"></HistoricUserName>
+                <CabinName xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">ECONOMY</CabinName>
+                <Currency xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">PKR</Currency>
+                <DepartureDate xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">2023-02-27</DepartureDate>
+                <!--<ExcludePricing xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">[boolean?]</ExcludePricing>
+                <FareBasisCode xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">[string?]</FareBasisCode>-->
+                <LogicalFlightID xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">78119</LogicalFlightID>
+                <UTCOffset xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Flight.Request">0</UTCOffset>
+            </RetrieveFlightSeatMapRequest>
+        </RetrieveFlightSeatMap>
+    </Body>
+</Envelope>

@@ -1,0 +1,146 @@
+URI : http://srn.app.radixx.com/SRN/Radixx.ConnectPoint/ConnectPoint.Reservation.svc
+Content-Type : text/xml
+SOAPAction : http://tempuri.org/IConnectPoint_Reservation/SummaryPNR
+-------------------------------------------------------------------------- 
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:tem="http://tempuri.org/"
+    xmlns:rad="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request"
+    xmlns:rad1="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Reservation.Request">
+<soapenv:Header/>
+<soapenv:Body>
+  <tem:SummaryPNR>
+     <tem:SummaryPnrRequest>
+        <rad:SecurityGUID>dc74d0730e7xe4s4e51f9b6eheq862a6k08f9f68e374</rad:SecurityGUID>
+        <rad:CarrierCodes>
+          <rad:CarrierCode>
+              <rad:AccessibleCarrierCode>ER</rad:AccessibleCarrierCode>
+          </rad:CarrierCode>
+        </rad:CarrierCodes>
+        <rad:HistoricUserName xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <rad1:ActionType>GetSummary</rad1:ActionType>
+        <rad1:ReservationInfo>
+          <rad:SeriesNumber>671293</rad:SeriesNumber>
+          <rad:ConfirmationNumber>252365</rad:ConfirmationNumber>
+        </rad1:ReservationInfo>
+        <rad1:SecurityToken>dc74d0730e7xe4s4e51f9b6eheq862a6k08f9f68e374</rad1:SecurityToken>
+
+        <rad1:CarrierCurrency>PKR</rad1:CarrierCurrency>
+        <rad1:DisplayCurrency>PKR</rad1:DisplayCurrency>
+        <rad1:IATANum xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <rad1:User>chalojeota</rad1:User>
+        <rad1:ReceiptLanguageID>1</rad1:ReceiptLanguageID>
+        <rad1:PromoCode></rad1:PromoCode>
+        <rad1:ExternalBookingID></rad1:ExternalBookingID>
+        <rad1:Address>
+          <rad1:Address1>malir</rad1:Address1>
+          <rad1:Address2>malir</rad1:Address2>
+          <rad1:City>malir</rad1:City>
+          <rad1:State>malir</rad1:State>
+          <rad1:Postal>75050</rad1:Postal>
+          <rad1:Country>PK</rad1:Country>
+          <rad1:CountryCode>92</rad1:CountryCode>
+          <rad1:AreaCode>92</rad1:AreaCode>
+          <rad1:PhoneNumber>333333333</rad1:PhoneNumber>
+          <rad1:Display>${empty}</rad1:Display>
+        </rad1:Address>
+        <rad1:ContactInfos>
+          <rad1:ContactInfo>
+              <rad1:ContactID>11</rad1:ContactID>
+              <rad1:PersonOrgID>-2141</rad1:PersonOrgID>
+              <rad1:ContactField>admin@admin.com</rad1:ContactField>
+              <rad1:ContactType>Email</rad1:ContactType>
+              <rad1:Extension>92</rad1:Extension>
+              <rad1:CountryCode>92</rad1:CountryCode>
+              <rad1:AreaCode>92</rad1:AreaCode>
+              <rad1:PhoneNumber>333333333</rad1:PhoneNumber>
+              <rad1:Display>${empty}</rad1:Display>
+              <rad1:PreferredContactMethod>true</rad1:PreferredContactMethod>
+          </rad1:ContactInfo>
+        </rad1:ContactInfos>
+        <rad1:Passengers>
+          <rad1:Person>
+  <rad1:PersonOrgID>-2141</rad1:PersonOrgID>
+  <rad1:FirstName>Zayn</rad1:FirstName>
+  <rad1:LastName>Khan</rad1:LastName>
+  <rad1:MiddleName></rad1:MiddleName>
+  <rad1:Age>40</rad1:Age>
+  <rad1:DOB>1990-01-01</rad1:DOB>
+  <rad1:Gender>Male</rad1:Gender>
+  <rad1:Title>Mr</rad1:Title>
+  <rad1:NationalityLaguageID>1</rad1:NationalityLaguageID>
+  <rad1:RelationType>Self</rad1:RelationType>
+  <rad1:WBCID>-2147483648</rad1:WBCID>
+  <rad1:PTCID>1</rad1:PTCID>
+  <rad1:PTC>1</rad1:PTC>
+  <rad1:TravelsWithPersonOrgID>-2147483648</rad1:TravelsWithPersonOrgID>
+  <rad1:RedressNumber>${empty}</rad1:RedressNumber>
+  <rad1:KnownTravelerNumber>${empty}</rad1:KnownTravelerNumber>
+  <rad1:MarketingOptIn>true</rad1:MarketingOptIn>
+  <rad1:UseInventory>false</rad1:UseInventory>
+  <rad1:Address>
+     <rad1:Address1>malir</rad1:Address1>
+     <rad1:Address2></rad1:Address2>
+     <rad1:City>malir</rad1:City>
+     <rad1:State>malir</rad1:State>
+     <rad1:Postal>75050</rad1:Postal>
+     <rad1:Country>PK</rad1:Country>
+     <rad1:CountryCode>92</rad1:CountryCode>
+     <rad1:AreaCode>92</rad1:AreaCode>
+     <rad1:PhoneNumber>333333333</rad1:PhoneNumber>
+     <rad1:Display>${empty}</rad1:Display>
+  </rad1:Address>
+  <rad1:Company>${empty}</rad1:Company>
+  <rad1:Comments>${empty}</rad1:Comments>
+  <rad1:Passport>123456</rad1:Passport>
+  <rad1:Nationality>PK</rad1:Nationality>
+  <rad1:ProfileId>-2147483648</rad1:ProfileId>
+  <rad1:IsPrimaryPassenger>true</rad1:IsPrimaryPassenger>
+  <rad1:ContactInfos>
+     <rad1:ContactInfo>
+        <rad1:ContactID>11</rad1:ContactID>
+        <rad1:PersonOrgID>-2141</rad1:PersonOrgID>
+        <rad1:ContactField>admin@admin.com</rad1:ContactField>
+        <rad1:ContactType>Email</rad1:ContactType>
+        <rad1:Extension>92</rad1:Extension>
+        <rad1:CountryCode>92</rad1:CountryCode>
+        <rad1:AreaCode>92</rad1:AreaCode>
+        <rad1:PhoneNumber>333333333</rad1:PhoneNumber>
+        <rad1:Display>${empty}</rad1:Display>
+        <rad1:PreferredContactMethod>false</rad1:PreferredContactMethod>
+     </rad1:ContactInfo>
+     <rad1:ContactInfo>
+        <rad1:ContactID>11</rad1:ContactID>
+        <rad1:PersonOrgID>-2141</rad1:PersonOrgID>
+        <rad1:ContactField>333333333</rad1:ContactField>
+        <rad1:ContactType>MobilePhone</rad1:ContactType>
+        <rad1:Extension>92</rad1:Extension>
+        <rad1:CountryCode>92</rad1:CountryCode>
+        <rad1:AreaCode>92</rad1:AreaCode>
+        <rad1:PhoneNumber>333333333</rad1:PhoneNumber>
+        <rad1:Display>${empty}</rad1:Display>
+        <rad1:PreferredContactMethod>false</rad1:PreferredContactMethod>
+     </rad1:ContactInfo>
+  </rad1:ContactInfos>
+  <rad1:FrequentFlyerNumber>${empty}</rad1:FrequentFlyerNumber>
+  <rad1:Suffix>${empty}</rad1:Suffix>
+</rad1:Person></rad1:Passengers>
+          <rad1:Segments>
+            <rad1:Segment>
+                <rad1:PersonOrgID>-2141</rad1:PersonOrgID>
+                <rad1:FareInformationID>1</rad1:FareInformationID>
+                <rad1:MarketingCode>${empty}</rad1:MarketingCode>
+                <rad1:StoreFrontID>${empty}</rad1:StoreFrontID>
+                <rad1:RecordLocator>${empty}</rad1:RecordLocator>
+                <rad1:SpecialServices xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                <rad1:Seats xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                <rad1:CRSCode>0</rad1:CRSCode>
+            </rad1:Segment>
+          </rad1:Segments>
+          <rad1:Payments xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+          <rad1:Comment>${empty}</rad1:Comment>
+          <rad1:ReferralID>${empty}</rad1:ReferralID>
+       </tem:SummaryPnrRequest>
+    </tem:SummaryPNR>
+</soapenv:Body>
+</soapenv:Envelope>

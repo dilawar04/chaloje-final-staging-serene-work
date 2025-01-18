@@ -1,0 +1,55 @@
+.booking-list-item .booking-list-bottom ul li.baggage-detail {
+    font-size: 16px;
+    color: #000000cf;
+    cursor: pointer;
+}
+.booking-list-item .booking-list-bottom ul li.baggage-detail.show i {
+    transform: rotate(180deg) !important;
+}
+.booking-list-item .booking-list-bottom ul li.baggage-detail i {
+    margin-right: 5px !important;
+    transition: all .3s ease !important;
+}
+.baggage-detail-wrap {
+    background: #fff;
+    border-radius: 5px;
+    padding: 30px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    /* flex-direction: row-reverse; */
+    justify-content: flex-end;
+}
+.select-baggage {
+    padding: 13px;
+}
+.select-baggage-flight-price {
+    margin: auto !important;
+    padding-left: 0px !important;
+}
+
+.select-baggage-flight-price a{
+    padding: 9px 12px !important;
+}
+.baggage-detail-wrap {
+    margin-left: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    margin-right: 0px !important;
+}
+button.select-me.select-ticket{
+    margin: 2px 0px 5px 0px;
+    padding: 3px 10px 3px 10px;
+    background-color: #ed2624;
+    border: none;
+    border-radius: 5px;
+    color: white;
+}
+.payment-failed {
+    background: #585a5c !important;
+    padding: 70px !important;
+    margin: 100px !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+}

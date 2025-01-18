@@ -1,0 +1,61 @@
+uri : http://srn.app.radixx.com/SRN/Radixx.ConnectPoint/ConnectPoint.Pricing.svc
+Content-Type : text/xml
+SOAPAction : http://tempuri.org/IConnectPoint_Pricing/RetrieveFareQuote
+-------------------------------------------------------------------------- 
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Body>
+        <RetrieveFareQuote xmlns="http://tempuri.org/">
+            <!-- Optional -->
+            <RetrieveFareQuoteRequest>
+                <SecurityGUID xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">dc74d0730e7xe4s4e51f9b6eheq862a6k08f9f68e374</SecurityGUID>
+                <CarrierCodes xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">
+                    <!-- Optional -->
+                    <CarrierCode>
+                        <AccessibleCarrierCode>ER</AccessibleCarrierCode>
+                    </CarrierCode>
+                </CarrierCodes>
+                <ClientIPAddress xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request"></ClientIPAddress>
+                <HistoricUserName xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request"></HistoricUserName>
+                <CurrencyOfFareQuote xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">PKR</CurrencyOfFareQuote>
+                <PromotionalCode xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote"></PromotionalCode>
+                <IataNumberOfRequestor xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote"></IataNumberOfRequestor>
+                <CorporationID xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">0</CorporationID>
+                <FareFilterMethod xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">NoCombinabilityRoundtripLowestFarePerFareType</FareFilterMethod>
+                <FareGroupMethod xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">WebFareTypes</FareGroupMethod>
+                <InventoryFilterMethod xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">Available</InventoryFilterMethod>
+                <FareQuoteDetails xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote"><FareQuoteDetail>
+                        <Origin>KHI</Origin>
+                        <Destination>ISB</Destination>
+                        <UseAirportsNotMetroGroups>false</UseAirportsNotMetroGroups>
+                        <UseAirportsNotMetroGroupsAsRule>false</UseAirportsNotMetroGroupsAsRule>
+                        <UseAirportsNotMetroGroupsForFrom>false</UseAirportsNotMetroGroupsForFrom>
+                        <UseAirportsNotMetroGroupsForTo>false</UseAirportsNotMetroGroupsForTo>
+                        <DateOfDeparture>2023-08-22T13:30:00</DateOfDeparture>
+                        <FareTypeCategory>1</FareTypeCategory>
+                        <FareClass>Y</FareClass> <!--Get from RetrieveFareQuoteShop-->
+                        <FareBasisCode>YELBPK</FareBasisCode> <!--Get from RetrieveFareQuoteShop-->
+                         <Cabin>ECONOMY</Cabin> <!--Get from RetrieveFareQuoteShop-->
+                         <LFID>84596</LFID> <!--Get from RetrieveFareQuoteShop-->
+
+                        <OperatingCarrierCode></OperatingCarrierCode>
+                        <MarketingCarrierCode></MarketingCarrierCode>
+                        <NumberOfDaysBefore>0</NumberOfDaysBefore>
+                        <NumberOfDaysAfter>0</NumberOfDaysAfter>
+                        <LanguageCode>1</LanguageCode>
+                        <TicketPackageID>1</TicketPackageID>
+                        <FareQuoteRequestInfos><FareQuoteRequestInfo>
+                                    <PassengerTypeID>1</PassengerTypeID>
+                                    <TotalSeatsRequired>1</TotalSeatsRequired>
+                                </FareQuoteRequestInfo></FareQuoteRequestInfos>
+                        <OverrideEffectiveDate>2023-08-22T13:30:00</OverrideEffectiveDate>
+                        <!-- Optional -->
+                        <FareTypeCategories>
+                            <!--<int xmlns="http://schemas.microsoft.com/2003/10/Serialization/Arrays">1</int>-->
+                        </FareTypeCategories>
+                    </FareQuoteDetail></FareQuoteDetails>
+                <ProfileId xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Pricing.Request.FareQuote">0</ProfileId>
+            </RetrieveFareQuoteRequest>
+        </RetrieveFareQuote>
+    </Body>
+</Envelope>

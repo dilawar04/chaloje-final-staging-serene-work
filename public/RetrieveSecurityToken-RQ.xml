@@ -1,0 +1,22 @@
+URI : http://srn.app.radixx.com/SRN/Radixx.ConnectPoint/ConnectPoint.Security.svc
+Content-Type : text/xml
+SOAPAction : http://tempuri.org/IConnectPoint_Security/RetrieveSecurityToken
+-------------------------------------------------------------------------- 
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Body>
+        <RetrieveSecurityToken xmlns="http://tempuri.org/">
+            <!-- Optional -->
+            <RetrieveSecurityTokenRequest>
+                <CarrierCodes xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">
+                    <!-- Optional -->
+                    <CarrierCode>
+                        <AccessibleCarrierCode>ER</AccessibleCarrierCode>
+                    </CarrierCode>
+                </CarrierCodes>
+                <LogonID xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Security.Request">CHALOJE_ER_P</LogonID>
+                <Password xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Security.Request">RGO$PRD!</Password>
+            </RetrieveSecurityTokenRequest>
+        </RetrieveSecurityToken>
+    </Body>
+</Envelope>
