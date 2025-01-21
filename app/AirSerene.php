@@ -161,6 +161,10 @@ class AirSerene
             'CHD' => request('ChildNo', 0),
             'INF' => request('InfantNo', 0),
         ];
+        // if($Passengers['INF']) {
+        //     echo 'asdasd';
+        // }
+        // dd($Passengers);
 
         $headers = [
             'ServiceName' => 'NDC_AIRSHOPPING_SERVICE',
@@ -195,7 +199,7 @@ class AirSerene
         
 
         $json_data = self::parseXML($xml);
-
+        
         // dd($json_data);
         // dd($json_data->Response->DataLists->PaxSegmentList->PaxSegment);
         // dd($json_data->Response->OffersGroup->CarrierOffers);
@@ -248,9 +252,23 @@ class AirSerene
             $counter = 0;
             // dd($json_data->Response->DataLists->PaxSegmentList->PaxSegment);
             foreach($mergedOffers as $Key => $Offer) {
+                // dd($PaxJourneyList->PaxJourney);
                 // dd($key);
                 // dd($Offer);
-                $SegmentDetail = $json_data->Response->DataLists->PaxSegmentList->PaxSegment[$counter];
+                // dd($json_data->Response->DataLists->PaxSegmentList->PaxSegment);
+                if( is_array($json_data->Response->DataLists->PaxSegmentList->PaxSegment) ) {
+                    // echo 'is array';
+                    // exit;
+                    $DURATION = substr($PaxJourneyList->PaxJourney[$counter]->Duration,2);
+                    $SegmentDetail = $json_data->Response->DataLists->PaxSegmentList->PaxSegment[$counter];
+                } else if($json_data->Response->DataLists->PaxSegmentList->PaxSegment) {
+                    // echo 'one';
+                    // exit;
+                    $DURATION = $PaxJourneyList->PaxJourney->Duration;
+                    $SegmentDetail = $json_data->Response->DataLists->PaxSegmentList->PaxSegment;
+                }
+                // dd($SegmentDetail);
+                // $SegmentDetail = $json_data->Response->DataLists->PaxSegmentList->PaxSegment[$counter];
                 $TYPE = 'outbound';
                 $FLIGHT = [
                     'AIRLINE' => 'Air Serene',
@@ -267,7 +285,7 @@ class AirSerene
                     "CURRENCY" => 'PKR',
                     "STOPS" => 0,
                     // "DURATION" => \Carbon\Carbon::parse('00:00:00')->addMinutes($PaxJourneyList[$counter]->PaxJourney[$counter]->Duration)->format('H\h i\m'),
-                    "DURATION" => substr($PaxJourneyList->PaxJourney[$counter]->Duration,2),
+                    "DURATION" => $DURATION,
                     "STATUS" => "ONTIME",
                 ];
                 $counter++;
@@ -287,7 +305,7 @@ class AirSerene
                     // dd($PassengersDetails->OfferItem->FareDetail);
                     // dd($PassengersDetails);
                     foreach($PassengersDetails->OfferItem->FareDetail as $FareDetails) {
-                        // dd($FareDetails);
+                        // dump(($Passengers['ADT'] + $Passengers['CHD'] + $Passengers['INF']));
                         // dd($FareDetails->FareComponent->PriceClassRefID);   
                         // dd($Passengers['ADT']);
                         // dd($FareDetails->PaxRefID);
@@ -300,7 +318,7 @@ class AirSerene
     
                         // $farePaxWise = [];
                         // dd('PAX' . $Passengers['ADT'] + $Passengers['CHD']);
-                        if ($FareDetails->PaxRefID == 'PAX' . $Passengers['ADT']) {
+                        if ($Passengers['ADT']) {
                             $farePaxWise['ADULT'] = [
                                 "BAGGAGE_NAME" => $FareDetails->FareComponent->PriceClassRefID,
                                 "BASIC_FARE" => $FareDetails->Price->BaseAmount,
@@ -312,7 +330,7 @@ class AirSerene
                         }
                         
                         // Check for CHILD fares
-                        if ($FareDetails->PaxRefID == 'PAX' . ($Passengers['ADT'] + $Passengers['CHD']) ) {
+                        if ($Passengers['CHD']) {
                             $farePaxWise['CHILD'] = [
                                 "BAGGAGE_NAME" => $FareDetails->FareComponent->PriceClassRefID,
                                 "BASIC_FARE" => $FareDetails->Price->BaseAmount,
@@ -322,7 +340,7 @@ class AirSerene
                                 "SURCHARGE" => 0,
                             ];
                         }
-                        if ($FareDetails->PaxRefID == 'PAX' . ($Passengers['ADT'] + $Passengers['CHD'] + $Passengers['INF']) ) {
+                        if ($Passengers['INF']) {
                             $farePaxWise['INFANT'] = [
                                 "BAGGAGE_NAME" => $FareDetails->FareComponent->PriceClassRefID,
                                 "BASIC_FARE" => $FareDetails->Price->BaseAmount,
@@ -367,9 +385,10 @@ class AirSerene
 
             }
 
-        } else {
-            return ['status' => false, 'response' => ['serverError' => $response->serverError(), 'clientError' => $response->clientError()]];
-        }
+        } 
+        // else {
+        //     return ['status' => false, 'response' => ['serverError' => $response->serverError(), 'clientError' => $response->clientError()]];
+        // }
 
         if(empty($FLIGHTS)){
             $FLIGHTS['FLIGHT_AirSerene_STATUS'][] = 'UnSuccess';
