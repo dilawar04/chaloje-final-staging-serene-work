@@ -73,6 +73,7 @@
  @php
     //$pnr = request()->segment(2) ?? '1Q5VRG';
     $pnr = req('pnr', '1Q5VRG');
+    //dd($pnr);
     $booking = \App\Booking::with('details')->where('pnr', $pnr)->first();
     $travelers = json_decode($booking->travelers);
     $_flight = json_decode($booking->flight_summary);

@@ -27,10 +27,11 @@ class PaymentController extends Controller
         self::$credential = $crd;
     }
 
-    public static function hbl($booking_id = 0, $retry = false)
+    public static function hbl($booking_id, $retry = false)
     {
         self::set_credential();
-
+        // dump($booking_id);
+        // dd(\req('booking_id'));
         $data = null;
 
         if (\request()->has('retry')) {
@@ -54,8 +55,9 @@ class PaymentController extends Controller
 
 
         $booking = \DB::table('booking')->where(['id' => $booking_id])->first();
+        // dd($booking);
         $summary = json_decode($booking->summary);
-
+        // dd($summary);
         $OrderSummaryDescription = [];
         foreach ($summary as $item) {
             if ($item->quantity > 0) {
@@ -223,9 +225,11 @@ class PaymentController extends Controller
 
     public function payment_details()
     {
-        $data = DB_FormFields('payment_details');
-        $booking_id = \req('order_number');
 
+        $data = DB_FormFields('payment_details');
+        // dd(\req('order_number'));
+        $booking_id = \req('order_number');
+        // dd($booking_id);
         save($data['table'], $data['data']);
 
         return self::hbl($booking_id);

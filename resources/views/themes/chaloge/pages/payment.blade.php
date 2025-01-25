@@ -3,9 +3,17 @@
 
 @php
     //$pnr = request()->segment(2) ?? '1Q5VRG';
-    //$pnr = req('pnr', '1Q5VRG');
-    $OrderID = $_GET['order_id'];
-    $booking = \App\Booking::with('details')->where('order_id', $OrderID)->first();
+    $pnr = req('pnr', '1Q5VRG');
+    //dd($pnr);
+    //$OrderID = $_GET['order_id'];
+    //dd($OrderID);
+    //dd(\request());
+    //$OrderID = $_GET['pnr'];
+    //dd($OrderID);
+    //$booking = \App\Booking::with('details')->where('order_id', $OrderID)->first();
+    $booking = \App\Booking::with('details')->where('pnr', $pnr)->first();
+    //dd($booking);
+    //dd($booking->id);
     $travelers = json_decode($booking->travelers);
     $_flight = json_decode($booking->flight_summary);
     if(isset($_flight->outbound)){

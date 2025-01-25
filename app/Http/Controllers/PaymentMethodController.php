@@ -33,8 +33,10 @@ class PaymentMethodController extends Controller
     public function hbl($status)
     {
         $response = Api\PaymentController::hbl_status($status);
+        // dd($response);
         if($response['Order_Ref_Number'] > 0){
             $booking = Booking::find($response['Order_Ref_Number']);
+            // dd($booking);
             $booking->status = ($response['status']) ? 'paid' : 'unpaid';
             // dd($booking->airline);
             // exit;
