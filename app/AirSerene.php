@@ -626,7 +626,7 @@ class AirSerene
     public static function getSingleFlightOutBound(){
         
         $makeSigningKeyNTimeXml = self::makeSigningKeyOutBound();
-        dd($makeSigningKeyNTimeXml);
+        // dump($makeSigningKeyNTimeXml);
         $client = new Client();
 
         self::set_credential();
@@ -673,6 +673,8 @@ class AirSerene
         // org
         $json_data = self::parseXML($xml);
 
+        // dd($json_data);
+
         $mergedOffers = [];
 
         foreach ($json_data->Response->OffersGroup->CarrierOffers->Offer as $flightOffer) {
@@ -689,8 +691,9 @@ class AirSerene
 
         $PriceClasses = $json_data->Response->DataLists->PriceClassList->PriceClass;
         $BaggageAllowances = $json_data->Response->DataLists->BaggageAllowanceList->BaggageAllowance;
-        $MergedData = [];
         $BaggageAllowances = self::convertToArrayIfNotExists($BaggageAllowances);
+        $MergedData = [];
+
         foreach ($PriceClasses as $index => $PriceClass) {
             if (isset($BaggageAllowances[$index])) {
                 $BaggageAllowance = $BaggageAllowances[$index];
@@ -824,12 +827,13 @@ class AirSerene
         return array_map('array_values', $FLIGHTS);
     }
 
-    public static function makeSigningKeyInBound(){
+    
+    public static function makeSigningKeyInBound($_airserene_response){
 
+        // dd($_airserene_response['outbound'][0]['ShoppingResponseRefID']);
         self::set_credential();
-
         $params = [
-            "Departure" => request('DepartingOn', date('Y-m-d', strtotime('+0 days'))),
+            "Departure" => request('ReturningOn', date('Y-m-d', strtotime('+0 days'))),
             "Origin" => request('LocationDep'),
             "Destination" => request('LocationArr'),
             "AdultNo" => request('AdultNo', 1),
@@ -848,10 +852,18 @@ class AirSerene
         $AuthAppID = self::$credential['AuthAppID'];
         $Version = "20.1";
         $Language = "en_US";
-        $Timestamp = self::TimeFormate();
+        
+        $Timestamp = $_airserene_response['outbound'][0]['TimeStamp'];
+        if($Timestamp) {
+            $Timestamp = $_airserene_response['outbound'][0]['TimeStamp'];
+        }else {
+            $Timestamp = self::TimeFormate();
+        }
         $TimeZone = "+00:00";
         $ClientIP = self::$credential['IP'];
         $ContentType = "application/xml;charset=UTF-8";
+        $ShoppingResponseRefID = $_airserene_response['outbound'][0]['ShoppingResponseRefID'];
+
 
     
         $Body = '<IATA_AirShoppingRQ xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRQ">
@@ -874,15 +886,15 @@ class AirSerene
                         </ShoppingCriteria>
                         <FlightRequest>
                             <ShoppingResponse>
-                                <ShoppingResponseRefID>17289783665656BAE5B2</ShoppingResponseRefID>
+                                <ShoppingResponseRefID>'.$ShoppingResponseRefID.'</ShoppingResponseRefID>
                             </ShoppingResponse>
                             <OriginDestCriteria>
                                 <OriginDepCriteria>
-                                    <IATA_LocationCode>'.$params['Origin'].'</IATA_LocationCode>
+                                    <IATA_LocationCode>'.$params['Destination'].'</IATA_LocationCode>
                                     <Date>'.$params['Departure'].'</Date>
                                 </OriginDepCriteria>
                                 <DestArrivalCriteria>
-                                    <IATA_LocationCode>'.$params['Destination'].'</IATA_LocationCode>
+                                    <IATA_LocationCode>'.$params['Origin'].'</IATA_LocationCode>
                                 </DestArrivalCriteria>
                             </OriginDestCriteria>
                         </FlightRequest>
@@ -922,9 +934,8 @@ class AirSerene
 
     public static function getSingleFlightInBound($_airserene_response){
         
-        dd($_airserene_response);
-        $makeSigningKeyNTimeXml = self::makeSigningKeyInBound();
-        
+        $makeSigningKeyNTimeXml = self::makeSigningKeyInBound($_airserene_response);
+        // dd($makeSigningKeyNTimeXml);
         $client = new Client();
 
         self::set_credential();
@@ -954,14 +965,14 @@ class AirSerene
         ];
        
         $Body = $makeSigningKeyNTimeXml[2];
-
+        // dd($Body);
         $response = $client->request('POST', self::$credential['EndPoint'], [
             'headers' => $headers,
             'body' => $Body
         ]);
         // dd($response);
         // org
-        // $xml = $response->getBody()->getContents();
+        $xml = $response->getBody()->getContents();
         // dd($xml);
 
         // dd();       
@@ -969,12 +980,8 @@ class AirSerene
         // dd($a->Response->OffersGroup->CarrierOffers);
         
         // org
-        // $json_data = self::parseXML($xml);
-
-
-        $xml = '<IATA_AirShoppingRS xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRS"><Response><DataLists><BaggageAllowanceList><BaggageAllowance><BaggageAllowanceID>BaggageAllowanceID1</BaggageAllowanceID><TypeCode>Checked</TypeCode><WeightAllowance><MaximumWeightMeasure UnitCode="KG">20</MaximumWeightMeasure></WeightAllowance></BaggageAllowance><BaggageAllowance><BaggageAllowanceID>BaggageAllowanceID2</BaggageAllowanceID><TypeCode>Checked</TypeCode><WeightAllowance><MaximumWeightMeasure UnitCode="KG">40</MaximumWeightMeasure></WeightAllowance></BaggageAllowance><BaggageAllowance><BaggageAllowanceID>BaggageAllowanceID3</BaggageAllowanceID><TypeCode>Checked</TypeCode><WeightAllowance><MaximumWeightMeasure UnitCode="KG">80</MaximumWeightMeasure></WeightAllowance></BaggageAllowance></BaggageAllowanceList><OriginDestList><OriginDest><DestCode>ISB</DestCode><OriginCode>KHI</OriginCode><OriginDestID>KHIISB</OriginDestID><PaxJourneyRefID>FLT1</PaxJourneyRefID><PaxJourneyRefID>FLT2</PaxJourneyRefID></OriginDest></OriginDestList><PaxJourneyList><PaxJourney><DistanceMeasure UnitCode="KM">1126</DistanceMeasure><Duration>PT2H</Duration><PaxJourneyID>FLT1</PaxJourneyID><PaxSegmentRefID>SEG1</PaxSegmentRefID></PaxJourney><PaxJourney><DistanceMeasure UnitCode="KM">1126</DistanceMeasure><Duration>PT2H</Duration><PaxJourneyID>FLT2</PaxJourneyID><PaxSegmentRefID>SEG2</PaxSegmentRefID></PaxJourney></PaxJourneyList><PaxList><Pax><PaxID>PAX1</PaxID><PTC>ADT</PTC></Pax></PaxList><PaxSegmentList><PaxSegment><Arrival><AircraftScheduledDateTime>2025-01-31T18:00:00.000+05:00</AircraftScheduledDateTime><IATA_LocationCode>ISB</IATA_LocationCode></Arrival><Dep><AircraftScheduledDateTime>2025-01-31T16:00:00.000+05:00</AircraftScheduledDateTime><IATA_LocationCode>KHI</IATA_LocationCode></Dep><Duration>PT2H</Duration><MarketingCarrierInfo><CarrierDesigCode>ER</CarrierDesigCode><MarketingCarrierFlightNumberText>502</MarketingCarrierFlightNumberText><OperationalSuffixText/></MarketingCarrierInfo><PaxSegmentID>SEG1</PaxSegmentID></PaxSegment><PaxSegment><Arrival><AircraftScheduledDateTime>2025-01-31T09:00:00.000+05:00</AircraftScheduledDateTime><IATA_LocationCode>ISB</IATA_LocationCode></Arrival><Dep><AircraftScheduledDateTime>2025-01-31T07:00:00.000+05:00</AircraftScheduledDateTime><IATA_LocationCode>KHI</IATA_LocationCode></Dep><Duration>PT2H</Duration><MarketingCarrierInfo><CarrierDesigCode>ER</CarrierDesigCode><MarketingCarrierFlightNumberText>500</MarketingCarrierFlightNumberText><OperationalSuffixText/></MarketingCarrierInfo><PaxSegmentID>SEG2</PaxSegmentID></PaxSegment></PaxSegmentList><PenaltyList><Penalty><CancelFeeInd>true</CancelFeeInd><DescText>Before 4h of departure</DescText><PenaltyID>SEG1-ADT-1</PenaltyID><Price><TotalAmount CurCode="PKR">3500.00</TotalAmount></Price><TypeCode>Cancellation</TypeCode><ExpirationDateTime>2025-01-31T12:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><CancelFeeInd>true</CancelFeeInd><DescText>Within 4h of departure</DescText><PenaltyID>SEG1-ADT-2</PenaltyID><Price><TotalAmount CurCode="PKR">5000.00</TotalAmount></Price><TypeCode>Cancellation</TypeCode><EffectiveDateTime>2025-01-31T12:00:00.000+05:00</EffectiveDateTime><ExpirationDateTime>2025-01-31T16:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><ChangeFeeInd>true</ChangeFeeInd><DescText>Before 4h of departure</DescText><PenaltyID>SEG1-ADT-3</PenaltyID><Price><TotalAmount CurCode="PKR">3000.00</TotalAmount></Price><TypeCode>Change</TypeCode><ExpirationDateTime>2025-01-31T12:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><ChangeFeeInd>true</ChangeFeeInd><DescText>Within 4h of departure</DescText><PenaltyID>SEG1-ADT-4</PenaltyID><Price><TotalAmount CurCode="PKR">4500.00</TotalAmount></Price><TypeCode>Change</TypeCode><EffectiveDateTime>2025-01-31T12:00:00.000+05:00</EffectiveDateTime><ExpirationDateTime>2025-01-31T16:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><CancelFeeInd>true</CancelFeeInd><DescText>Before 4h of departure</DescText><PenaltyID>SEG2-ADT-1</PenaltyID><Price><TotalAmount CurCode="PKR">3500.00</TotalAmount></Price><TypeCode>Cancellation</TypeCode><ExpirationDateTime>2025-01-31T03:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><CancelFeeInd>true</CancelFeeInd><DescText>Within 4h of departure</DescText><PenaltyID>SEG2-ADT-2</PenaltyID><Price><TotalAmount CurCode="PKR">5000.00</TotalAmount></Price><TypeCode>Cancellation</TypeCode><EffectiveDateTime>2025-01-31T03:00:00.000+05:00</EffectiveDateTime><ExpirationDateTime>2025-01-31T07:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><ChangeFeeInd>true</ChangeFeeInd><DescText>Before 4h of departure</DescText><PenaltyID>SEG2-ADT-3</PenaltyID><Price><TotalAmount CurCode="PKR">3000.00</TotalAmount></Price><TypeCode>Change</TypeCode><ExpirationDateTime>2025-01-31T03:00:00.000+05:00</ExpirationDateTime></Penalty><Penalty><ChangeFeeInd>true</ChangeFeeInd><DescText>Within 4h of departure</DescText><PenaltyID>SEG2-ADT-4</PenaltyID><Price><TotalAmount CurCode="PKR">4500.00</TotalAmount></Price><TypeCode>Change</TypeCode><EffectiveDateTime>2025-01-31T03:00:00.000+05:00</EffectiveDateTime><ExpirationDateTime>2025-01-31T07:00:00.000+05:00</ExpirationDateTime></Penalty></PenaltyList><PriceClassList><PriceClass><Name>FREE BAGGAGE</Name><PriceClassID>FREEBAGGAGE</PriceClassID></PriceClass><PriceClass><Name>ECONOMYREGULAR</Name><PriceClassID>ECONOMYREGULAR</PriceClassID></PriceClass><PriceClass><Name>Serene Plus</Name><PriceClassID>SERENEPLUS</PriceClassID></PriceClass></PriceClassList><ServiceDefinitionList><ServiceDefinition><Desc><DescText>FREE BAGGAGE (20KG)</DescText></Desc><Name>LB</Name><OwnerCode>ER</OwnerCode><ServiceCode>XBAG</ServiceCode><ServiceDefinitionAssociation><BaggageAllowanceRef><BaggageAllowanceRefID>BaggageAllowanceID1</BaggageAllowanceRefID></BaggageAllowanceRef></ServiceDefinitionAssociation><ServiceDefinitionID>SRV1</ServiceDefinitionID></ServiceDefinition><ServiceDefinition><Desc><DescText>ECONOMY REGULAR (40KG)</DescText></Desc><Name>REG</Name><OwnerCode>ER</OwnerCode><ServiceCode>XBAG</ServiceCode><ServiceDefinitionAssociation><BaggageAllowanceRef><BaggageAllowanceRefID>BaggageAllowanceID2</BaggageAllowanceRefID></BaggageAllowanceRef></ServiceDefinitionAssociation><ServiceDefinitionID>SRV2</ServiceDefinitionID></ServiceDefinition></ServiceDefinitionList></DataLists><OffersGroup><CarrierOffers><CarrierOffersSummary><MatchedOfferQty>5</MatchedOfferQty></CarrierOffersSummary><Offer><JourneyOverview><JourneyPriceClass><PaxJourneyRefID>FLT1</PaxJourneyRefID></JourneyPriceClass></JourneyOverview><OfferID>17376272350166AEC9F7-1</OfferID><OfferItem><FareDetail><FareComponent><CabinType><CabinTypeName>Y</CabinTypeName></CabinType><FareRule><PenaltyRefID>SEG1-ADT-1</PenaltyRefID><PenaltyRefID>SEG1-ADT-2</PenaltyRefID><PenaltyRefID>SEG1-ADT-3</PenaltyRefID><PenaltyRefID>SEG1-ADT-4</PenaltyRefID></FareRule><PaxSegmentRefID>SEG1</PaxSegmentRefID><Price><BaseAmount CurCode="PKR">10398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">19534.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">6966.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9136.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">19534.66</TotalAmount></Price><PriceClassRefID>FREEBAGGAGE</PriceClassRefID><RBD><RBD_Code>T</RBD_Code></RBD></FareComponent><PaxRefID>PAX1</PaxRefID><Price><BaseAmount CurCode="PKR">10398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">19534.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">6966.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9136.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">19534.66</TotalAmount></Price></FareDetail><MandatoryInd>true</MandatoryInd><OfferItemID>17376272350166AEC9F7-1-1</OfferItemID><Price><BaseAmount CurCode="PKR">10398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">19534.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">6966.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9136.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">19534.66</TotalAmount></Price><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><ServiceDefinitionRef><PaxSegmentRefID>SEG1</PaxSegmentRefID><ServiceDefinitionRefID>SRV1</ServiceDefinitionRefID></ServiceDefinitionRef></ServiceAssociations><ServiceID>1</ServiceID></Service><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><PaxJourneyRef><PaxJourneyRefID>FLT1</PaxJourneyRefID></PaxJourneyRef></ServiceAssociations><ServiceID>2</ServiceID></Service></OfferItem><OwnerCode>ER</OwnerCode></Offer><Offer><JourneyOverview><JourneyPriceClass><PaxJourneyRefID>FLT1</PaxJourneyRefID></JourneyPriceClass></JourneyOverview><OfferID>17376272350166AEC9F7-2</OfferID><OfferItem><FareDetail><FareComponent><CabinType><CabinTypeName>Y</CabinTypeName></CabinType><FareRule><PenaltyRefID>SEG1-ADT-1</PenaltyRefID><PenaltyRefID>SEG1-ADT-2</PenaltyRefID><PenaltyRefID>SEG1-ADT-3</PenaltyRefID><PenaltyRefID>SEG1-ADT-4</PenaltyRefID></FareRule><PaxSegmentRefID>SEG1</PaxSegmentRefID><Price><BaseAmount CurCode="PKR">11398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">21204.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">7636.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9806.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">21204.66</TotalAmount></Price><PriceClassRefID>ECONOMYREGULAR</PriceClassRefID><RBD><RBD_Code>T</RBD_Code></RBD></FareComponent><PaxRefID>PAX1</PaxRefID><Price><BaseAmount CurCode="PKR">11398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">21204.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">7636.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9806.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">21204.66</TotalAmount></Price></FareDetail><MandatoryInd>true</MandatoryInd><OfferItemID>17376272350166AEC9F7-2-1</OfferItemID><Price><BaseAmount CurCode="PKR">11398.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">21204.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">7636.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">9806.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">21204.66</TotalAmount></Price><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><ServiceDefinitionRef><PaxSegmentRefID>SEG1</PaxSegmentRefID><ServiceDefinitionRefID>SRV2</ServiceDefinitionRefID></ServiceDefinitionRef></ServiceAssociations><ServiceID>1</ServiceID></Service><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><PaxJourneyRef><PaxJourneyRefID>FLT1</PaxJourneyRefID></PaxJourneyRef></ServiceAssociations><ServiceID>2</ServiceID></Service></OfferItem><OwnerCode>ER</OwnerCode></Offer><Offer><BaggageAllowance><BaggageAllowanceRefID>BaggageAllowanceID3</BaggageAllowanceRefID><BaggageFlightAssociations><PaxSegmentRef><PaxSegmentRefID>SEG1</PaxSegmentRefID></PaxSegmentRef></BaggageFlightAssociations><PaxRefID>PAX1</PaxRefID></BaggageAllowance><JourneyOverview><JourneyPriceClass><PaxJourneyRefID>FLT1</PaxJourneyRefID></JourneyPriceClass></JourneyOverview><OfferID>17376272350166AEC9F7-3</OfferID><OfferItem><FareDetail><FareComponent><CabinType><CabinTypeName>J</CabinTypeName></CabinType><FareRule><PenaltyRefID>SEG1-ADT-1</PenaltyRefID><PenaltyRefID>SEG1-ADT-2</PenaltyRefID><PenaltyRefID>SEG1-ADT-3</PenaltyRefID><PenaltyRefID>SEG1-ADT-4</PenaltyRefID></FareRule><PaxSegmentRefID>SEG1</PaxSegmentRefID><Price><BaseAmount CurCode="PKR">13698.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">25045.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">9177.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><TotalTaxAmount CurCode="PKR">11347.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">25045.66</TotalAmount></Price><PriceClassRefID>SERENEPLUS</PriceClassRefID><RBD><RBD_Code>I</RBD_Code></RBD></FareComponent><PaxRefID>PAX1</PaxRefID><Price><BaseAmount CurCode="PKR">13698.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">25045.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">9177.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">11347.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">25045.66</TotalAmount></Price></FareDetail><MandatoryInd>true</MandatoryInd><OfferItemID>17376272350166AEC9F7-3-1</OfferItemID><Price><BaseAmount CurCode="PKR">13698.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">25045.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">9177.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">11347.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">25045.66</TotalAmount></Price><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><PaxJourneyRef><PaxJourneyRefID>FLT1</PaxJourneyRefID></PaxJourneyRef></ServiceAssociations><ServiceID>1</ServiceID></Service></OfferItem><OwnerCode>ER</OwnerCode></Offer><Offer><JourneyOverview><JourneyPriceClass><PaxJourneyRefID>FLT2</PaxJourneyRefID></JourneyPriceClass></JourneyOverview><OfferID>17376272350166AEC9F7-4</OfferID><OfferItem><FareDetail><FareComponent><CabinType><CabinTypeName>Y</CabinTypeName></CabinType><FareRule><PenaltyRefID>SEG2-ADT-1</PenaltyRefID><PenaltyRefID>SEG2-ADT-2</PenaltyRefID><PenaltyRefID>SEG2-ADT-3</PenaltyRefID><PenaltyRefID>SEG2-ADT-4</PenaltyRefID></FareRule><PaxSegmentRefID>SEG2</PaxSegmentRefID><Price><BaseAmount CurCode="PKR">8598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">16528.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">5760.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><TotalTaxAmount CurCode="PKR">7930.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">16528.66</TotalAmount></Price><PriceClassRefID>FREEBAGGAGE</PriceClassRefID><RBD><RBD_Code>L</RBD_Code></RBD></FareComponent><PaxRefID>PAX1</PaxRefID><Price><BaseAmount CurCode="PKR">8598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">16528.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">5760.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">7930.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">16528.66</TotalAmount></Price></FareDetail><MandatoryInd>true</MandatoryInd><OfferItemID>17376272350166AEC9F7-4-1</OfferItemID><Price><BaseAmount CurCode="PKR">8598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">16528.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">5760.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">7930.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">16528.66</TotalAmount></Price><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><ServiceDefinitionRef><PaxSegmentRefID>SEG2</PaxSegmentRefID><ServiceDefinitionRefID>SRV1</ServiceDefinitionRefID></ServiceDefinitionRef></ServiceAssociations><ServiceID>1</ServiceID></Service><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><PaxJourneyRef><PaxJourneyRefID>FLT2</PaxJourneyRefID></PaxJourneyRef></ServiceAssociations><ServiceID>2</ServiceID></Service></OfferItem><OwnerCode>ER</OwnerCode></Offer><Offer><JourneyOverview><JourneyPriceClass><PaxJourneyRefID>FLT2</PaxJourneyRefID></JourneyPriceClass></JourneyOverview><OfferID>17376272350166AEC9F7-5</OfferID><OfferItem><FareDetail><FareComponent><CabinType><CabinTypeName>Y</CabinTypeName></CabinType><FareRule><PenaltyRefID>SEG2-ADT-1</PenaltyRefID><PenaltyRefID>SEG2-ADT-2</PenaltyRefID><PenaltyRefID>SEG2-ADT-3</PenaltyRefID><PenaltyRefID>SEG2-ADT-4</PenaltyRefID></FareRule><PaxSegmentRefID>SEG2</PaxSegmentRefID><Price><BaseAmount CurCode="PKR">9598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">18198.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">6430.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><TotalTaxAmount CurCode="PKR">8600.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">18198.66</TotalAmount></Price><PriceClassRefID>ECONOMYREGULAR</PriceClassRefID><RBD><RBD_Code>L</RBD_Code></RBD></FareComponent><PaxRefID>PAX1</PaxRefID><Price><BaseAmount CurCode="PKR">9598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">18198.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">6430.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">8600.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">18198.66</TotalAmount></Price></FareDetail><MandatoryInd>true</MandatoryInd><OfferItemID>17376272350166AEC9F7-5-1</OfferItemID><Price><BaseAmount CurCode="PKR">9598.00</BaseAmount><Discount><PreDiscountedAmount CurCode="PKR">18198.66</PreDiscountedAmount></Discount><TaxSummary><Tax><Amount CurCode="PKR">50.00</Amount><DescText>STAMP DUTY</DescText><TaxCode>N9</TaxCode></Tax><Tax><Amount CurCode="PKR">100.00</Amount><DescText>TAX SECURITY CHARGE</DescText><TaxCode>XZ</TaxCode></Tax><Tax><Amount CurCode="PKR">1500.00</Amount><DescText>TAX EXCISE DUTY PAKISTAN</DescText><TaxCode>PK</TaxCode></Tax><Tax><Amount CurCode="PKR">20.00</Amount><DescText>GOVERNMENT AIRPORT TAX</DescText><TaxCode>YI</TaxCode></Tax><Tax><Amount CurCode="PKR">6430.66</Amount><DescText>fuel surcharge domestic</DescText><TaxCode>YQD</TaxCode></Tax><Tax><Amount CurCode="PKR">500.00</Amount><DescText>Embarkation Fee</DescText><TaxCode>SP</TaxCode></Tax><TotalTaxAmount CurCode="PKR">8600.66</TotalTaxAmount></TaxSummary><TotalAmount CurCode="PKR">18198.66</TotalAmount></Price><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><ServiceDefinitionRef><PaxSegmentRefID>SEG2</PaxSegmentRefID><ServiceDefinitionRefID>SRV2</ServiceDefinitionRefID></ServiceDefinitionRef></ServiceAssociations><ServiceID>1</ServiceID></Service><Service><PaxRefID>PAX1</PaxRefID><ServiceAssociations><PaxJourneyRef><PaxJourneyRefID>FLT2</PaxJourneyRefID></PaxJourneyRef></ServiceAssociations><ServiceID>2</ServiceID></Service></OfferItem><OwnerCode>ER</OwnerCode></Offer></CarrierOffers></OffersGroup><ShoppingResponse><ShoppingResponseRefID>17376272350166AEC9F7</ShoppingResponseRefID></ShoppingResponse></Response></IATA_AirShoppingRS>';
         $json_data = self::parseXML($xml);
-
+        
         $mergedOffers = [];
 
         foreach ($json_data->Response->OffersGroup->CarrierOffers->Offer as $flightOffer) {
@@ -991,6 +998,7 @@ class AirSerene
 
         $PriceClasses = $json_data->Response->DataLists->PriceClassList->PriceClass;
         $BaggageAllowances = $json_data->Response->DataLists->BaggageAllowanceList->BaggageAllowance;
+        $BaggageAllowances = self::convertToArrayIfNotExists($BaggageAllowances);
         $MergedData = [];
 
         foreach ($PriceClasses as $index => $PriceClass) {
@@ -1020,7 +1028,7 @@ class AirSerene
                     $SegmentDetail = $json_data->Response->DataLists->PaxSegmentList->PaxSegment;
                 }
 
-                $TYPE = 'outbound';
+                $TYPE = 'inbound';
                 $FLIGHT = [
                     'AIRLINE' => 'Air Serene',
                     'AIRLINE_CODE' => $SegmentDetail->MarketingCarrierInfo->CarrierDesigCode,
@@ -1125,6 +1133,232 @@ class AirSerene
         }
         return array_map('array_values', $FLIGHTS);
     }
+    
+    
+    
+    
 
+    public static function makeSigningKeyOrderCreateRQReturn($params, $flights){
+        
+        // dd($flights);
+        // dd($flights['outbound']->flight->TimeStamp);
+
+        // Outbound
+        $OfferID = $flights['outbound']->baggage->OfferID;
+        $OfferItemID = $flights['outbound']->baggage->OfferItemID;
+        $ShoppingResponseRefID = $flights['outbound']->flight->ShoppingResponseRefID;
+        $Mobile = $params['MOBILE'];
+        $Email = $params['EMAIL'];
+        $Passengers = $params['TRAVELERS_INFORMATION'];
+        $ContactInfoFN = $Passengers['ADT'][0]['Firstname'];
+        $ContactInfoLN = $Passengers['ADT'][0]['Lastname'];
+        $PaxList = $flights['outbound']->flight->PaxList;
+        $PaxList = self::convertToArrayIfNotExists($PaxList->Pax);
+        $FlightTimeStamp = $flights['outbound']->flight->TimeStamp;
+        
+        
+        // Inbound
+        $InboundOfferID = $flights['inbound']->baggage->OfferID;
+        $InboundOfferItemID = $flights['inbound']->baggage->OfferItemID;
+        $InboundShoppingResponseRefID = $flights['inbound']->flight->ShoppingResponseRefID;
+        $InboundPassengers = $params['TRAVELERS_INFORMATION'];
+        $InboundContactInfoFN = $Passengers['ADT'][0]['Firstname'];
+        $InboundContactInfoLN = $Passengers['ADT'][0]['Lastname'];
+        $InboundPaxList = $flights['inbound']->flight->PaxList;
+        $InboundPaxList = self::convertToArrayIfNotExists($InboundPaxList->Pax);
+        $InboundFlightTimeStamp = $flights['inbound']->flight->TimeStamp;
+
+        // dd($PaxList);
+        // dump($OfferID);
+        // dump($OfferItemID);
+        // dump($ShoppingResponseRefID);
+        // dump($Mobile);
+        // dump($Email);
+        // dump($Passengers);
+        // dump($ContactInfoFN);
+        // dump($ContactInfoLN);
+        // dump($PaxList);
+        // dump($FlightTimeStamp);
+        // exit;
+
+        self::set_credential();
+
+        $ServiceName = "NDC_ORDERCREATE_SERVICE";
+        $AuthUserID = self::$credential['AuthUserID'];
+        $AuthAppID = self::$credential['AuthAppID'];
+        $Version = "20.1";
+        $Language = "en_US";
+        $Timestamp = $FlightTimeStamp;
+        $TimeZone = "+00:00";
+        $ClientIP = self::$credential['IP'];
+        $ContentType = "application/xml;charset=UTF-8";
+
+    
+            $Body = '<IATA_OrderCreateRQ xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_OrderCreateRQ">
+                <Request>
+                    <CreateOrder>
+                        <SelectedOffer>
+                            <OfferRefID>'.$OfferID.'</OfferRefID>
+                            <OwnerCode>ER</OwnerCode>
+                            <SelectedOfferItem>
+                                <OfferItemRefID>'.$OfferItemID.'</OfferItemRefID>';
+                                foreach($PaxList as $PaxListPerson) {
+                                    $Body .='<PaxRefID>'.$PaxListPerson->PaxID.'</PaxRefID>';
+                                }
+                                $Body .='</SelectedOfferItem>
+                            <ShoppingResponseRefID>'.$ShoppingResponseRefID.'</ShoppingResponseRefID>
+                        </SelectedOffer>';
+                        
+                        if($InboundOfferID) {
+                            $Body .='<SelectedOffer>
+                                <OfferRefID>'.$InboundOfferID.'</OfferRefID>
+                                <OwnerCode>ER</OwnerCode>
+                                <SelectedOfferItem>
+                                    <OfferItemRefID>'.$InboundOfferItemID.'</OfferItemRefID>';
+                                    foreach($InboundPaxList as $InboundPaxListPerson) {
+                                        $Body .='<PaxRefID>'.$InboundPaxListPerson->PaxID.'</PaxRefID>';
+                                    }
+                                    $Body .='</SelectedOfferItem>
+                                <ShoppingResponseRefID>'.$ShoppingResponseRefID.'</ShoppingResponseRefID>
+                            </SelectedOffer>';
+                        }
+
+                    $Body .='</CreateOrder>
+                    <DataLists>
+                        <ContactInfoList>
+                            <ContactInfo>
+                                <IndividualRefID>PAX1</IndividualRefID>
+                                <Phone>
+                                    <AreaCodeNumber>92</AreaCodeNumber>
+                                    <PhoneNumber>'.$Mobile.'</PhoneNumber>
+                                </Phone>
+                                <EmailAddress>
+                                    <EmailAddressText>'.$Email.'</EmailAddressText>
+                                </EmailAddress>
+                            </ContactInfo>
+                            <ContactInfo>
+                                <ContactPurposeText>3</ContactPurposeText>
+                                <Phone>
+                                    <AreaCodeNumber>92</AreaCodeNumber>
+                                    <PhoneNumber>'.$Mobile.'</PhoneNumber>
+                                </Phone>
+                                <EmailAddress>
+                                    <EmailAddressText>'.$Email.'</EmailAddressText>
+                                </EmailAddress>
+                                <Individual>
+                                    <Surname>'.$ContactInfoFN.'</Surname>
+                                    <GivenName>'.$ContactInfoLN.'</GivenName>
+                                </Individual>
+                            </ContactInfo>
+                        </ContactInfoList>
+                        <PaxList>';
+
+                            $PaxIndividualID = 1;
+                            $PaxListCounter = 0;
+                            $PaxRefID = 1;
+                        
+                            foreach($Passengers as $key => $Passenger) {
+                                foreach($Passenger as $Passenger) {
+                                $Body .='<Pax>
+                                    <CitizenshipCountryCode>PK</CitizenshipCountryCode>
+                                    <IdentityDoc>
+                                        <ExpiryDate>2025-11-04</ExpiryDate>
+                                        <GivenName>'.$Passenger['Firstname'].'</GivenName>
+                                        <IdentityDocID>'.(str_replace('-','',$Passenger['Cnic'])).'</IdentityDocID>
+                                        <IdentityDocTypeCode>CNIC</IdentityDocTypeCode>
+                                        <IssuingCountryCode>PK</IssuingCountryCode>
+                                        <Surname>'.$Passenger['Lastname'].'</Surname>
+                                    </IdentityDoc>
+                                    <Individual>
+                                        <Birthdate>'.$Passenger['Dob'].'</Birthdate>
+                                        <GenderCode>M</GenderCode>
+                                        <GivenName>'.$Passenger['Firstname'].'</GivenName>
+                                        <IndividualID>PAX'.$PaxIndividualID.'</IndividualID>
+                                        <Surname>'.$Passenger['Lastname'].'</Surname>
+                                    </Individual>
+                                    <PaxID>PAX'.$PaxIndividualID.'</PaxID>
+                                    <PTC>'.$key.'</PTC>';
+                                    if($PaxList[$PaxListCounter]->PTC == 'INF') {
+                                        $Body .='<PaxRefID>PAX'.$PaxRefID.'</PaxRefID>';
+                                        $PaxRefID++;
+                                    }
+                                    $Body .='</Pax>';
+                                    $PaxIndividualID++;
+                                    $PaxListCounter++;
+                                }
+                                
+                            }
+                        $Body .='</PaxList>
+                    </DataLists>
+                </Request>
+                </IATA_OrderCreateRQ>';
+
+        $minifiedBody = preg_replace('/\s+/', ' ', $Body);
+        $Body = str_replace('> <', '><', $minifiedBody);
+        // dd($Body);
+        $Signature_String = $AuthAppID . "|" . $AuthUserID . "|" . $ServiceName . "|" . $Language . "|" . $AuthAppID . "|" . $Timestamp . "|" . $Body . "|" . $Version . "|" . $ClientIP;
+        
+        $signature_key = self::$credential['SignatureKey'];
+    
+        $signature = SignatureUtil::newEncodeSHA($Signature_String, $signature_key);
+        
+        $signature = htmlspecialchars($signature);
+        return [$signature, $Timestamp, $Body];
+    }
+
+    public static function OrderCreateRQReturn($params, $flights, $makeSigningKeyOrderCreateRQ){
+        
+        // dd($flights);
+        // dd($makeSigningKeyOrderCreateRQ);
+        
+        $client = new Client();
+
+        self::set_credential();
+
+        $headers = [
+            'ServiceName' => 'NDC_ORDERCREATE_SERVICE',
+            'AuthUserID' => self::$credential['AuthUserID'],
+            'AuthAppID' => self::$credential['AuthAppID'],
+            'AuthTktdeptid' => self::$credential['AuthTktdeptid'],
+            'Version' => '20.1',
+            'Language' => 'en_US',
+            // 'Token' => 'CHALOJE',
+            'Timestamp' => $flights['outbound']->flight->TimeStamp,
+            'TimeZone' => '+00:00',
+            'ClientIP' => self::$credential['IP'],
+            'Content-Type' => 'application/xml;charset=UTF-8',
+            'Sign' => $makeSigningKeyOrderCreateRQ[0],
+        ];
+       
+        $Body = $makeSigningKeyOrderCreateRQ[2];
+        // dd($Body);
+
+        $response = $client->request('POST', self::$credential['EndPoint'], [
+            'headers' => $headers,
+            'body' => $Body
+        ]);
+
+        // org
+        $xml = $response->getBody()->getContents();
+        // org
+        $json_data = self::parseXML($xml);
+        
+        // dd($json_data);
+        // dd($json_data->Response->Order->OrderID);
+        // dd($json_data->Response->Order->TotalPrice->TotalAmount);
+        
+        if (isset($json_data->Response->Order->OrderID)) {
+            return [
+                'data' => $json_data,
+                'status' => true
+            ];
+        } else {
+            return [
+                'data' => $json_data,
+                'status' => false
+            ];
+        }
+
+    }
 
 }

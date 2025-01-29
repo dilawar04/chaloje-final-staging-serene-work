@@ -6,6 +6,8 @@ use Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use SimpleXMLElement;
+use App\Utils\SignatureUtil;
+
 
 trait Airserene
 {    
@@ -19,10 +21,16 @@ trait Airserene
         $OPT = json_decode(opt('airserene'), 1);
         $mode = $OPT['mode'];
         $crd = [
-            'Username' => $OPT[$mode]['Username'],
-            'Password' => $OPT[$mode]['Password'],
             'CarrierCode' => $OPT[$mode]['CarrierCode'],
-            'IATANum' => $OPT[$mode]['IATANum'],
+            'EndPoint' => $OPT[$mode]['EndPoint'],
+            'IP' => $OPT[$mode]['IP'],
+            'AuthAppID' => $OPT[$mode]['AuthAppID'],
+            'AuthUserID' => $OPT[$mode]['AuthUserID'],
+            'AuthTktdeptid' => $OPT[$mode]['AuthTktdeptid'],
+            'SignatureKey' => $OPT[$mode]['SignatureKey'],
+            'Token' => $OPT[$mode]['Token'],
+            'PlannedActiveTime' => $OPT[$mode]['PlannedActiveTime'],
+            'Username' => $OPT[$mode]['Username'],
         ];
         //dd($crd);
         self::$credential = $crd;
@@ -35,92 +43,119 @@ trait Airserene
         return json_decode(json_encode($xml));
     }
 
-    public  function SaveReservation($response = [],$params = [])
-    {
-        self::SetCredential();        
-
-        // $token = \App\AirSerene::RetrieveSecurityToken();
-
-        $booking = Booking::find($response['Order_Ref_Number']);
+    public  function SerenePaymentMethod($response = [],$params = []) {
         
-        $token = $booking->serene_token;
-        $default = [
-            'ActionType' => 'SaveReservation',
-            'SeriesNumber' => 299,
-            'ConfirmationNumber' => $booking->pnr
-        ];
+        self::SetCredential();
 
-            //  dd($default);
-        $params = array_merge($default, $params);
-        
         $client = new Client();
-        $headers = [
-            'Content-Type' => 'text/xml',
-            'SOAPAction' => 'http://tempuri.org/IConnectPoint_Reservation/CreatePNR',
-            // 'Cookie' => 'ASP.NET_SessionId=lo4ynsutfldthdgtltstck4w'
 
-        ];
-        $action = end(explode('/', $headers['SOAPAction']));
-
-        $body = '<soapenv:Envelope
-        xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-        xmlns:tem="http://tempuri.org/"
-        xmlns:rad="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request"
-        xmlns:rad1="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Reservation.Request">
-        <soapenv:Header/>
-        <soapenv:Body>
-            <tem:CreatePNR>
-                <!--Optional:-->
-                <tem:CreatePnrRequest>
-                    <rad:SecurityGUID>' . $token . '</rad:SecurityGUID>
-                    <rad:CarrierCodes>
-                        <!--Zero or more repetitions:-->
-                        <rad:CarrierCode>
-                            <rad:AccessibleCarrierCode>' . self::$credential['CarrierCode'] . '</rad:AccessibleCarrierCode>
-                        </rad:CarrierCode>
-                    </rad:CarrierCodes>
-                    <!--Optional:-->
-                    <rad:ClientIPAddress xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">'. \request()->ip() .' </rad:ClientIPAddress>
-                    <!--Optional:-->
-                    <rad:HistoricUserName xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                        <rad1:ActionType>'.$params['ActionType'].'</rad1:ActionType>
-                        <rad1:ReservationInfo>
-                            <rad:SeriesNumber>'.$params['SeriesNumber'].'</rad:SeriesNumber>
-                            <rad:ConfirmationNumber xmlns="http://schemas.datacontract.org/2004/07/Radixx.ConnectPoint.Request">'.$params['ConfirmationNumber'].'</rad:ConfirmationNumber>
-                            </rad1:ReservationInfo>
-                        </tem:CreatePnrRequest>
-                    </tem:CreatePNR>
-                </soapenv:Body>
-            </soapenv:Envelope>';
-            // dd($body);
-        // dump('CreatePNR(CommitSummary)' , $body);
-
-        if(req('c')){
-            $action = end(explode('/', $headers['SOAPAction']));
-            $RQ = collect(['URI' => 'https://srn.app.radixxhost.com/SRN/Radixx.ConnectPoint/ConnectPoint.Reservation.svc'])->merge($headers)->map(function ($val, $key){
-                return "{$key} : {$val}";
-            })->join("\n");
-            $RQ .= "\n-------------------------------------------------------------------------- \n\n";
-            $RQ .= $body;
-            \File::put("{$action}-RQ.xml", $RQ);
+        // MakeSigningKey
+        $booking = Booking::find($response['Order_Ref_Number']);
+        // dd($booking);
+        $json_data = json_decode($booking->flight_summary);
+        $FirstTimestamp = $json_data->outbound->flight->TimeStamp;
+        if($FirstTimestamp) {
+            $FirstTimestamp = $json_data->outbound->flight->TimeStamp;
+        }else {
+            $FirstTimestamp = $json_data->inbound->flight->TimeStamp;
         }
 
-        $response = $client->request('POST', 'https://srn.app.radixxhost.com/SRN/Radixx.ConnectPoint/ConnectPoint.Reservation.svc', [
+        $ServiceName = "NDC_ORDERCHANGE_SERVICE";
+        $AuthUserID = self::$credential['AuthUserID'];
+        $AuthAppID = self::$credential['AuthAppID'];
+        $Version = "20.1";
+        $Language = "en_US";
+        $Timestamp = $FirstTimestamp;
+        $TimeZone = "+00:00";
+        $ClientIP = self::$credential['IP'];
+        $ContentType = "application/xml;charset=UTF-8";
+
+    
+        $Body = '<IATA_OrderChangeRQ xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_OrderChangeRQ">
+                    <Party>
+                        <Sender>
+                            <MarketingCarrier>
+                                <AirlineDesigCode>ER</AirlineDesigCode>
+                            </MarketingCarrier>
+                        </Sender>
+                    </Party>
+                    <Request>
+                        <Order>
+                            <OrderID>'.$booking->pnr.'</OrderID>
+                            <OwnerCode>ER</OwnerCode>
+                        </Order>
+                        <PaymentFunctions>
+                            <PaymentProcessingDetails>
+                                <Amount CurCode="PKR">'.$booking->total_amount.'</Amount>
+                                <PaymentMethod>
+                                    <OtherPaymentMethod>
+                                        <Remark>
+                                            <RemarkText>Balance</RemarkText>
+                                        </Remark>
+                                    </OtherPaymentMethod>
+                                </PaymentMethod>
+                                <TypeCode>AgentAccount</TypeCode>
+                            </PaymentProcessingDetails>
+                        </PaymentFunctions>
+                    </Request>
+                </IATA_OrderChangeRQ>';
+                // dd($Body);
+
+        $minifiedBody = preg_replace('/\s+/', ' ', $Body);
+        $Body = str_replace('> <', '><', $minifiedBody);
+
+        $Signature_String = $AuthAppID . "|" . $AuthUserID . "|" . $ServiceName . "|" . $Language . "|" . $AuthAppID . "|" . $Timestamp . "|" . $Body . "|" . $Version . "|" . $ClientIP;
+
+        $signature_key = self::$credential['SignatureKey'];
+    
+        $signature = SignatureUtil::newEncodeSHA($Signature_String, $signature_key);
+        
+        $signature = htmlspecialchars($signature);
+
+        $headers = [
+            'ServiceName' => 'NDC_ORDERCHANGE_SERVICE',
+            'AuthUserID' => self::$credential['AuthUserID'],
+            'AuthAppID' => self::$credential['AuthAppID'],
+            'AuthTktdeptid' => self::$credential['AuthTktdeptid'],
+            'Version' => '20.1',
+            'Language' => 'en_US',
+            // 'Token' => 'CHALOJE',
+            'Timestamp' => $Timestamp,
+            'TimeZone' => '+00:00',
+            'ClientIP' => self::$credential['IP'],
+            'Content-Type' => 'application/xml;charset=UTF-8',
+            'Sign' => $signature,
+        ];
+
+        // dump($headers);
+        // dump($Body);
+
+        $response = $client->request('POST', self::$credential['EndPoint'], [
             'headers' => $headers,
-            'body' => $body
+            'body' => $Body
         ]);
 
         $xml = $response->getBody()->getContents();
-        if(req('c')){
-            \File::put( "{$action}-RS.xml", $xml);
+        // dump($xml);
+        $json_data = self::parseXML($xml);
+        // dd($json_data);
+
+        \File::put( "{$action}-RS.xml", $xml);
+
+
+        if (isset($json_data->Response->Order->OrderID)) {
+            return [
+                'data' => $json_data,
+                'status' => true
+            ];
+        } else {
+            return [
+                'data' => $json_data,
+                'status' => false
+            ];
         }
 
-        $json_data = self::parseXML($xml);
-        // dump($params['ActionType'],$body);
-        // dump($params['ActionType'],$json_data);
-        // exit;
-        $response =  $json_data->Body->{"{$action}Response"}->{"{$action}Result"};
-
     }
+    
+
 }

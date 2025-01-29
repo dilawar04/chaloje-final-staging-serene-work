@@ -50,7 +50,7 @@ class PaymentMethodController extends Controller
                     $this->IssueTicketAPI($response);
                     return view('themes.chaloge.pages.thankyou')->with(compact('response'));
                 }elseif ($response['code'] === '100' && $booking->airline == 'Air Serene') {
-                    $this->SaveReservation($response);
+                    $this->SerenePaymentMethod($response);
                     return view('themes.chaloge.pages.thankyou')->with(compact('response'));
                 }else{
                     return view('themes.chaloge.pages.payment-failed')->with(compact('response'));
