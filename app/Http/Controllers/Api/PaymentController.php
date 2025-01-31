@@ -30,7 +30,7 @@ class PaymentController extends Controller
     public static function hbl($booking_id, $retry = false)
     {
         self::set_credential();
-        // dump($booking_id);
+        // dd($booking_id);
         // dd(\req('booking_id'));
         $data = null;
 
@@ -54,12 +54,32 @@ class PaymentController extends Controller
         $addressLine = $retry ? $data->addressLine : req('addressLine');
 
 
-        $booking = \DB::table('booking')->where(['id' => $booking_id])->first();
+        $bookings = \DB::table('booking')->where(['order_id' => $booking_id])->get();
+        // dd($bookings);
+        if ($bookings[1]) {
+            $booking = $bookings[0];
+        } else {
+            $bookings = \App\Booking::with('details')->where('order_id', $booking_id)->first();
+            $booking = $bookings;
+        }
         // dd($booking);
         $summary = json_decode($booking->summary);
-        // dd($summary);
+        // dump(json_decode($bookings[0]->summary));
+        $InboundSummary = json_decode($bookings[1]->summary);
+        // dd($bookings[1]->total_amount);
         $OrderSummaryDescription = [];
         foreach ($summary as $item) {
+            // dd($item);
+            // dd($item->price);
+            if($item->label == 'ADULT'){
+                $item->price = $item->price + $InboundSummary[0]->price;
+            }
+            if($item->label == 'CHILD'){
+                $item->price = $item->price + $InboundSummary[1]->price;
+            }
+            if($item->label == 'INFANT'){
+                $item->price = $item->price + $InboundSummary[2]->price;
+            }
             if ($item->quantity > 0) {
                 $OrderSummaryDescription[] = [
                     'ITEM_NAME' => $item->label,
@@ -74,7 +94,7 @@ class PaymentController extends Controller
         }
         $order = [
             'DISCOUNT_ON_TOTAL' => number_format(floatval($booking->discount)),
-            'SUBTOTAL' => $booking->total_amount,
+            'SUBTOTAL' => $booking->total_amount + $bookings[1]->total_amount,
             // 'SUBTOTAL' => 5,
             'OrderSummaryDescription' => $OrderSummaryDescription
         ];
@@ -227,7 +247,7 @@ class PaymentController extends Controller
     {
 
         $data = DB_FormFields('payment_details');
-        // dd(\req('order_number'));
+        // dd($data['table']);
         $booking_id = \req('order_number');
         // dd($booking_id);
         save($data['table'], $data['data']);

@@ -36,7 +36,9 @@ trait Airsial
     public  function IssueTicketAPI($response = [])
     {
         $_session = self::makeSession();
-        $booking = Booking::find($response['Order_Ref_Number']);
+        // echo 'asdasda';
+        // dd($response['booking_id']);
+        $booking = Booking::find($response['booking_id']);
 
         $params = [collect([
             "Caller" => "makePayment",
@@ -45,5 +47,6 @@ trait Airsial
         ])->merge(\request()->input())->merge($_params)->toArray()];
         
         $response = Http::withHeaders(['Content-Type' => 'application/json'])->post(self::$endpoint, $params);
+        // dd($response);
     }
 }

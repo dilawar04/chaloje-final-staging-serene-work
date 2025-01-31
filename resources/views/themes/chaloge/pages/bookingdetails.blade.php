@@ -1258,9 +1258,8 @@ getTimeLeftAndStartTimer();
                 data.pay = $(this).data('pay');
             //data.passenger = $('.passengers').serialize();
             $.post("{{ url("api/bookSeat") }}", data, function (json) {
-                console.log('json', json)
                 if (json?.PNR?.length > 0) {
-                    window.location = '{{ url('pnr?pnr=') }}' + json.PNR
+                    window.location = '{{ url('pnr?pnr=') }}' + json.PNR + '&order_id=' + json.order_id
                 } else {
                     alert(json.message);
                 }

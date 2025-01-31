@@ -309,6 +309,7 @@ class FlightController extends Controller
         if($Inboundflights['inbound']->airline == $Outboundflights['outbound']->airline){
             // echo 'asdsadas';
             // exit;
+            // dump('exit;');
             $flights['outbound'] = json_decode(base64_decode(request('flight')));
             if(request()->has('inboundFlight')) {
                 $flights['inbound'] = json_decode(base64_decode(request('inboundFlight')));
@@ -604,12 +605,15 @@ class FlightController extends Controller
         }   
         elseif(request()->has('inboundFlight') && $Outboundflights['outbound']->airline != $Inboundflights['inbound']->airline){
             $Multipleflights = array_merge($Outboundflights,$Inboundflights);
-            dd($Multipleflights);
+            // dd($Multipleflights);
             // foreach($Multipleflights as $key => $flight){
             //     dump($key,$flight);
             // }
             // exit;
-
+            // foreach($Multipleflights as $key => $flight){
+            //     dump($flight);
+            // }
+            // exit;
             foreach($Multipleflights as $key => $flight){
                 if($flight->type == 'outbound'){
                     $flights['outbound'] = json_decode(base64_decode(request('flight')));
@@ -631,7 +635,7 @@ class FlightController extends Controller
                     // dd($flight);
 
                 }
-                // dump($flights);
+                // dd($flight);
                 // exit;
             
                 // dd($flight->flight->AIRLINE);
@@ -669,17 +673,17 @@ class FlightController extends Controller
                 $_FARE['CHILD']['TOTAL'] = $FARE->CHILD->TOTAL;
                 $_FARE['INFANT']['TOTAL'] = $FARE->INFANT->TOTAL;
 
-                if(isset($flights['inbound'])){
-                    $INB_FARE = $flights['inbound']->baggage->FARE_PAX_WISE;
+                // if(isset($flights['inbound'])){
+                //     $INB_FARE = $flights['inbound']->baggage->FARE_PAX_WISE;
 
-                    $TAX += ($flight->travelers->AdultNo * $INB_FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->TAX);
-                    $AMOUNT += ($flight->travelers->AdultNo * $INB_FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->BASIC_FARE);
-                    $TOTAL_AMOUNT += $flights['inbound']->baggage->TOTAL;
+                //     $TAX += ($flight->travelers->AdultNo * $INB_FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->TAX);
+                //     $AMOUNT += ($flight->travelers->AdultNo * $INB_FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->BASIC_FARE);
+                //     $TOTAL_AMOUNT += $flights['inbound']->baggage->TOTAL;
 
-                    $_FARE['ADULT']['TOTAL'] += $INB_FARE->ADULT->TOTAL;
-                    $_FARE['CHILD']['TOTAL'] += $INB_FARE->CHILD->TOTAL;
-                    $_FARE['INFANT']['TOTAL'] += $INB_FARE->INFANT->TOTAL;
-                }
+                //     $_FARE['ADULT']['TOTAL'] += $INB_FARE->ADULT->TOTAL;
+                //     $_FARE['CHILD']['TOTAL'] += $INB_FARE->CHILD->TOTAL;
+                //     $_FARE['INFANT']['TOTAL'] += $INB_FARE->INFANT->TOTAL;
+                // }
 
                 $booking = new \App\Booking();
                 $booking->airline = $airline;
@@ -699,6 +703,7 @@ class FlightController extends Controller
                 ]);
                 $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
                 // dump($airline, $flight, request()->all());
+
                 switch ($airline){
                     case 'Airsial':
                         // echo 'asdasd';
@@ -967,7 +972,24 @@ class FlightController extends Controller
                         $booking->save();
                         break;
                 }
-            }  
+            
+                if($booking->id > 0){
+                    $bookingDTL = new \App\BookingDetail();
+                    $bookingDTL->booking_id = $booking->id;
+                    $bookingDTL->order_id = $newOrderID;
+                    $bookingDTL->adult = json_encode($adult);
+                    $bookingDTL->child = json_encode($child);
+                    $bookingDTL->infant = json_encode($infant);
+                    $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+                    $bookingDTL->email = request('email');
+                    $bookingDTL->mobile = request('mobile');
+                    $bookingDTL->comments = request('comments');
+                    $bookingDTL->save();
+                }
+            
+            
+            }
+              
         } 
         else {
                 $flights['outbound'] = json_decode(base64_decode(request('flight')));
@@ -1313,7 +1335,7 @@ class FlightController extends Controller
             $bookingDTL->save();
         }
 
-        return ['status' => true, 'PNR' => $PNR, 'id' => $booking->id, 'detail' => $detail];
+        return ['status' => true, 'PNR' => $PNR, 'id' => $booking->id, 'detail' => $detail, 'order_id' => $newOrderID];
     }
 
     /**

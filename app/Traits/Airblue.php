@@ -27,10 +27,12 @@ trait Airblue
 
     public  function AirDemandTicket($response = []){
         self::set_credential();
-        $booking = Booking::find($response['Order_Ref_Number']);
+        $booking = Booking::find($response['booking_id']);
+        // dd($booking->total_amount);
         $data = json_decode($booking->booking_summary);
         $params = $data->data->AirReservation->BookingReferenceID[1];
         $totalfare = $data->data->AirReservation->PriceInfo->ItinTotalFare->TotalFare->_Amount;
+        // dd($data->data->AirReservation->PriceInfo->ItinTotalFare->TotalFare);
         $xml = "<Envelope xmlns='http://schemas.xmlsoap.org/soap/envelope/'>
                 <Header/>
                 <Body>
@@ -48,7 +50,8 @@ trait Airblue
                         </airDemandTicketRQ>
                     </AirDemandTicket>
                 </Body>
-            </Envelope>";   
+            </Envelope>";
+        // dd($xml);       
 
         $xmlresponse = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
             

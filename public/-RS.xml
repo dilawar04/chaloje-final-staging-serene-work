@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<IATA_OrderViewRS xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_OrderViewRS"><Error><Code>912</Code><DescText>Incomplete message - data missing in query(LCC-API-01-00125)</DescText></Error></IATA_OrderViewRS>

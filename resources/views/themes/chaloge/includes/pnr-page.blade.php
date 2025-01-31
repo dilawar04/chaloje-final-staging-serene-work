@@ -66,17 +66,32 @@
                 $('#ARV').addClass('btn-active');
                 $('#ARV').removeClass('btn');
             });
-        })
+        });
 </script>
 
 
  @php
+    //dd($_GET['booking_id']);
+    //dd(request());
     //$pnr = request()->segment(2) ?? '1Q5VRG';
-    $pnr = req('pnr', '1Q5VRG');
+    //$pnr = req('pnr', '1Q5VRG');
     //dd($pnr);
-    $booking = \App\Booking::with('details')->where('pnr', $pnr)->first();
+    $OrderId = $_GET['order_id'];
+    //dd($pnr);
+    $bookings = \App\Booking::with('details')->where('order_id', $OrderId)->get();
+    //dd($booking[0]);
+    //dd($booking[0]);
+    if ($bookings[1]) {
+        $booking = $bookings[0];
+    } else {
+        $bookings = \App\Booking::with('details')->where('order_id', $OrderId)->first();
+        $booking = $bookings;
+    }
+    //dd($booking);
     $travelers = json_decode($booking->travelers);
+    //dd($travelers);
     $_flight = json_decode($booking->flight_summary);
+    //dd($_flight);
     if(isset($_flight->outbound)){
         $flight = $_flight->outbound->flight;
         $flight->baggage = $_flight->outbound->baggage;
@@ -128,11 +143,16 @@
                            <div class="row">
                                <div class="col-lg-10 col-md-9 my-auto text-center">
                                    <div class="row">
-                                       <div class="col-lg-3 col-md-3"><img
-                                               src="https://s3.ap-south-1.amazonaws.com/st-airline-images/{{ $flight->AIRLINE_CODE }}.png"
-                                               alt="airline image"
-                                               width="100px"
-                                               height="92px"></div>
+                                       <div class="col-lg-3 col-md-3">
+                                            <img src="https://s3.ap-south-1.amazonaws.com/st-airline-images/{{ $flight->AIRLINE_CODE }}.png" alt="airline image" width="100px" height="92px">
+                                            @if($bookings[1])
+                                                @php 
+                                                    $RoundTripIfNotSame_flight = json_decode($bookings[1]->flight_summary);
+                                                    $RoundTripIfNotSameFlight = $RoundTripIfNotSame_flight->inbound->flight;
+                                                @endphp
+                                                <img src="https://s3.ap-south-1.amazonaws.com/st-airline-images/{{ $RoundTripIfNotSameFlight->AIRLINE_CODE }}.png" alt="airline image" width="100px" height="92px">
+                                            @endif
+                                        </div>
                                         <!--<div class="col-lg-8 col-md-9" style="margin-left: 20px">-->
                                            <!--<h4>Destination: {{ $flight->DEST }}</h4><span>{{ $flight->ORGN }} to {{ $flight->DEST }}</span><span> {{ \Str::of($booking->flight_type)->snake(' ')->title() }} Flight</span>-->
                                         <!--</div>-->
@@ -151,7 +171,13 @@
                                </div>
                                <div class="col-lg-2 col-md-3 py-2">
                                    <div class="rupees_left" style="color: #44a8d9;">
-                                       <h2>{{ number_format($booking->total_amount) }} Rupees</h2>
+                                            @if($bookings[1])
+                                                @php 
+                                                    $IfRoundTripNotSameFlight = $bookings[1];
+                                                    $InboundTotal = $IfRoundTripNotSameFlight->total_amount;
+                                                @endphp
+                                            @endif
+                                       <h2>{{ number_format($booking->total_amount + $InboundTotal) }} Rupees</h2>
                                        <p>Total Amount</p>
                                    </div>
                                </div>
@@ -183,7 +209,7 @@
                                                 <fieldset>
                                                     <ul>
                                                         <li><span class="styling-text">Airline</span><span>-</span><span>{{ $flight->AIRLINE }}</span></li>
-                                                        <li><span>Flight type</span><span>-</span><span>Economy</span></li>
+                                                        <li><span>Flight type</span><span>-</span><span>{{$flight->baggage->title}}</span></li>
                                                         {{--<li><span>Fare type</span><span>-</span><span>Refundable</span></li>
                                                         <li><span>Cancellation</span><span>-</span><span>PKR 0/Person</span></li>
                                                         <li><span>Flight Change</span><span>-</span><span>PKR 0/Person</span></li>--}}
@@ -211,6 +237,11 @@
                                 </div>
                             </div>
                         </div>
+                        @if($bookings[1])
+                            @php
+                                $_flight = json_decode($bookings[1]->flight_summary);
+                            @endphp
+                        @endif
                         @if(isset($_flight->inbound))
                             @php
                                 $flight = $_flight->inbound->flight;
@@ -243,7 +274,7 @@
                                                     <fieldset>
                                                         <ul>
                                                             <li><span class="styling-text">Airline</span><span>-</span><span>{{ $flight->AIRLINE }}</span></li>
-                                                            <li><span>Flight type</span><span>-</span><span>Economy</span></li>
+                                                            <li><span>Flight type</span><span>-</span><span>{{$flight->baggage->title}}</span></li>
                                                             {{--<li><span>Fare type</span><span>-</span><span>Refundable</span></li>
                                                             <li><span>Cancellation</span><span>-</span><span>PKR 0/Person</span></li>
                                                             <li><span>Flight Change</span><span>-</span><span>PKR 0/Person</span></li>--}}
@@ -474,7 +505,7 @@
    </div>
 </div>
 <div class="pnr-payment-btn" style="display: flex; justify-content: center; padding: 20px 0px 20px 0px">
-<a href="{{ url("/payment?pnr={$pnr}") }}"><button class="btn" style="margin-right: 20px;">Proceed To Payment</button></a>
+<a href="{{ url("/payment?order_id={$OrderId}") }}"><button class="btn" style="margin-right: 20px;">Proceed To Payment</button></a>
 <a href="{{ url('/') }}"><button class="btn">Pay Later</button></a>
 </div>
 

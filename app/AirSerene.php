@@ -663,7 +663,7 @@ class AirSerene
         ]);
         // dd($response);
         // org
-        $xml = $response->getBody()->getContents();
+        // $xml = $response->getBody()->getContents();
         // dd($xml);
 
         // dd();       
@@ -671,6 +671,1099 @@ class AirSerene
         // dd($a->Response->OffersGroup->CarrierOffers);
         
         // org
+        // $json_data = self::parseXML($xml);
+
+        $xml = '<IATA_AirShoppingRS xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRS">
+                    <Response>
+                        <DataLists>
+                        <BaggageAllowanceList>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID1</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">20</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID2</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">40</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID3</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">80</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                        </BaggageAllowanceList>
+                        <OriginDestList>
+                            <OriginDest>
+                            <DestCode>ISB</DestCode>
+                            <OriginCode>KHI</OriginCode>
+                            <OriginDestID>KHIISB</OriginDestID>
+                            <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                            <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                            <MinimumStayTime>0</MinimumStayTime>
+                            <MaximumStayTime>525600</MaximumStayTime>
+                            </OriginDest>
+                        </OriginDestList>
+                        <PaxJourneyList>
+                            <PaxJourney>
+                            <DistanceMeasure UnitCode="KM">1126</DistanceMeasure>
+                            <Duration>PT2H</Duration>
+                            <PaxJourneyID>FLT1</PaxJourneyID>
+                            <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                            </PaxJourney>
+                            <PaxJourney>
+                            <DistanceMeasure UnitCode="KM">1126</DistanceMeasure>
+                            <Duration>PT2H</Duration>
+                            <PaxJourneyID>FLT2</PaxJourneyID>
+                            <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                            </PaxJourney>
+                        </PaxJourneyList>
+                        <PaxList>
+                            <Pax>
+                            <PaxID>PAX1</PaxID>
+                            <PTC>ADT</PTC>
+                            </Pax>
+                        </PaxList>
+                        <PaxSegmentList>
+                            <PaxSegment>
+                            <Arrival>
+                                <AircraftScheduledDateTime>2025-04-05T20:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>ISB</IATA_LocationCode>
+                            </Arrival>
+                            <Dep>
+                                <AircraftScheduledDateTime>2025-04-05T18:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>KHI</IATA_LocationCode>
+                            </Dep>
+                            <Duration>PT2H</Duration>
+                            <MarketingCarrierInfo>
+                                <CarrierDesigCode>ER</CarrierDesigCode>
+                                <MarketingCarrierFlightNumberText>504</MarketingCarrierFlightNumberText>
+                                <OperationalSuffixText/>
+                            </MarketingCarrierInfo>
+                            <PaxSegmentID>SEG1</PaxSegmentID>
+                            </PaxSegment>
+                            <PaxSegment>
+                            <Arrival>
+                                <AircraftScheduledDateTime>2025-04-05T08:45:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>ISB</IATA_LocationCode>
+                            </Arrival>
+                            <Dep>
+                                <AircraftScheduledDateTime>2025-04-05T06:45:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>KHI</IATA_LocationCode>
+                            </Dep>
+                            <Duration>PT2H</Duration>
+                            <MarketingCarrierInfo>
+                                <CarrierDesigCode>ER</CarrierDesigCode>
+                                <MarketingCarrierFlightNumberText>500</MarketingCarrierFlightNumberText>
+                                <OperationalSuffixText/>
+                            </MarketingCarrierInfo>
+                            <PaxSegmentID>SEG2</PaxSegmentID>
+                            </PaxSegment>
+                        </PaxSegmentList>
+                        <PenaltyList>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-1</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <ExpirationDateTime>2025-04-05T14:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-2</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">5000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <EffectiveDateTime>2025-04-05T14:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T18:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-3</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <ExpirationDateTime>2025-04-05T14:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-4</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">4500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <EffectiveDateTime>2025-04-05T14:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T18:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-1</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <ExpirationDateTime>2025-04-05T02:45:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-2</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">5000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <EffectiveDateTime>2025-04-05T02:45:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T06:45:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-3</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <ExpirationDateTime>2025-04-05T02:45:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-4</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">4500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <EffectiveDateTime>2025-04-05T02:45:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T06:45:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                        </PenaltyList>
+                        <PriceClassList>
+                            <PriceClass>
+                            <Name>FREE BAGGAGE</Name>
+                            <PriceClassID>FREEBAGGAGE</PriceClassID>
+                            </PriceClass>
+                            <PriceClass>
+                            <Name>ECONOMYREGULAR</Name>
+                            <PriceClassID>ECONOMYREGULAR</PriceClassID>
+                            </PriceClass>
+                            <PriceClass>
+                            <Name>Serene Plus</Name>
+                            <PriceClassID>SERENEPLUS</PriceClassID>
+                            </PriceClass>
+                        </PriceClassList>
+                        <ServiceDefinitionList>
+                            <ServiceDefinition>
+                            <Desc>
+                                <DescText>FREE BAGGAGE (20KG)</DescText>
+                            </Desc>
+                            <Name>LB</Name>
+                            <OwnerCode>ER</OwnerCode>
+                            <ServiceCode>XBAG</ServiceCode>
+                            <ServiceDefinitionAssociation>
+                                <BaggageAllowanceRef>
+                                <BaggageAllowanceRefID>BaggageAllowanceID1</BaggageAllowanceRefID>
+                                </BaggageAllowanceRef>
+                            </ServiceDefinitionAssociation>
+                            <ServiceDefinitionID>SRV1</ServiceDefinitionID>
+                            </ServiceDefinition>
+                            <ServiceDefinition>
+                            <Desc>
+                                <DescText>ECONOMY REGULAR (40KG)</DescText>
+                            </Desc>
+                            <Name>REG</Name>
+                            <OwnerCode>ER</OwnerCode>
+                            <ServiceCode>XBAG</ServiceCode>
+                            <ServiceDefinitionAssociation>
+                                <BaggageAllowanceRef>
+                                <BaggageAllowanceRefID>BaggageAllowanceID2</BaggageAllowanceRefID>
+                                </BaggageAllowanceRef>
+                            </ServiceDefinitionAssociation>
+                            <ServiceDefinitionID>SRV2</ServiceDefinitionID>
+                            </ServiceDefinition>
+                        </ServiceDefinitionList>
+                        </DataLists>
+                        <OffersGroup>
+                        <CarrierOffers>
+                            <CarrierOffersSummary>
+                            <MatchedOfferQty>5</MatchedOfferQty>
+                            </CarrierOffersSummary>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-1</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>FREEBAGGAGE</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-1-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15207.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV1</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-2</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>ECONOMYREGULAR</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-2-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15877.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV2</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <BaggageAllowance>
+                                <BaggageAllowanceRefID>BaggageAllowanceID3</BaggageAllowanceRefID>
+                                <BaggageFlightAssociations>
+                                <PaxSegmentRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                                </BaggageFlightAssociations>
+                                <PaxRefID>PAX1</PaxRefID>
+                            </BaggageAllowance>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-3</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>J</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">19227.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>SERENEPLUS</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>J</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">19227.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-3-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">19227.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-4</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG2-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>FREEBAGGAGE</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-4-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15207.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV1</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-5</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG2-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG2-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>ECONOMYREGULAR</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-5-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15877.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV2</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                        </CarrierOffers>
+                        </OffersGroup>
+                        <ShoppingResponse>
+                        <ShoppingResponseRefID>1738153094550A342213</ShoppingResponseRefID>
+                        </ShoppingResponse>
+                    </Response>
+                </IATA_AirShoppingRS>';
+
         $json_data = self::parseXML($xml);
 
         // dd($json_data);
@@ -972,7 +2065,7 @@ class AirSerene
         ]);
         // dd($response);
         // org
-        $xml = $response->getBody()->getContents();
+        // $xml = $response->getBody()->getContents();
         // dd($xml);
 
         // dd();       
@@ -980,8 +2073,695 @@ class AirSerene
         // dd($a->Response->OffersGroup->CarrierOffers);
         
         // org
-        $json_data = self::parseXML($xml);
+        // $json_data = self::parseXML($xml);
         
+
+        $xml = '<IATA_AirShoppingRS xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_AirShoppingRS">
+                    <Response>
+                        <DataLists>
+                        <BaggageAllowanceList>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID1</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">20</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID2</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">40</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID3</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">80</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                        </BaggageAllowanceList>
+                        <OriginDestList>
+                            <OriginDest>
+                            <DestCode>KHI</DestCode>
+                            <OriginCode>ISB</OriginCode>
+                            <OriginDestID>ISBKHI</OriginDestID>
+                            <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                            <MinimumStayTime>0</MinimumStayTime>
+                            <MaximumStayTime>525600</MaximumStayTime>
+                            </OriginDest>
+                        </OriginDestList>
+                        <PaxJourneyList>
+                            <PaxJourney>
+                            <DistanceMeasure UnitCode="KM">1126</DistanceMeasure>
+                            <Duration>PT2H</Duration>
+                            <PaxJourneyID>FLT1</PaxJourneyID>
+                            <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                            </PaxJourney>
+                        </PaxJourneyList>
+                        <PaxList>
+                            <Pax>
+                            <PaxID>PAX1</PaxID>
+                            <PTC>ADT</PTC>
+                            </Pax>
+                        </PaxList>
+                        <PaxSegmentList>
+                            <PaxSegment>
+                            <Arrival>
+                                <AircraftScheduledDateTime>2025-04-06T22:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>KHI</IATA_LocationCode>
+                            </Arrival>
+                            <Dep>
+                                <AircraftScheduledDateTime>2025-04-06T20:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>ISB</IATA_LocationCode>
+                            </Dep>
+                            <Duration>PT2H</Duration>
+                            <MarketingCarrierInfo>
+                                <CarrierDesigCode>ER</CarrierDesigCode>
+                                <MarketingCarrierFlightNumberText>505</MarketingCarrierFlightNumberText>
+                                <OperationalSuffixText/>
+                            </MarketingCarrierInfo>
+                            <PaxSegmentID>SEG1</PaxSegmentID>
+                            </PaxSegment>
+                        </PaxSegmentList>
+                        <PenaltyList>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-1</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <ExpirationDateTime>2025-04-06T16:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-2</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">5000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <EffectiveDateTime>2025-04-06T16:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-06T20:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-3</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <ExpirationDateTime>2025-04-06T16:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-4</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">4500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <EffectiveDateTime>2025-04-06T16:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-06T20:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                        </PenaltyList>
+                        <PriceClassList>
+                            <PriceClass>
+                            <Name>FREE BAGGAGE</Name>
+                            <PriceClassID>FREEBAGGAGE</PriceClassID>
+                            </PriceClass>
+                            <PriceClass>
+                            <Name>ECONOMYREGULAR</Name>
+                            <PriceClassID>ECONOMYREGULAR</PriceClassID>
+                            </PriceClass>
+                            <PriceClass>
+                            <Name>Serene Plus</Name>
+                            <PriceClassID>SERENEPLUS</PriceClassID>
+                            </PriceClass>
+                        </PriceClassList>
+                        <ServiceDefinitionList>
+                            <ServiceDefinition>
+                            <Desc>
+                                <DescText>FREE BAGGAGE (20KG)</DescText>
+                            </Desc>
+                            <Name>LB</Name>
+                            <OwnerCode>ER</OwnerCode>
+                            <ServiceCode>XBAG</ServiceCode>
+                            <ServiceDefinitionAssociation>
+                                <BaggageAllowanceRef>
+                                <BaggageAllowanceRefID>BaggageAllowanceID1</BaggageAllowanceRefID>
+                                </BaggageAllowanceRef>
+                            </ServiceDefinitionAssociation>
+                            <ServiceDefinitionID>SRV1</ServiceDefinitionID>
+                            </ServiceDefinition>
+                            <ServiceDefinition>
+                            <Desc>
+                                <DescText>ECONOMY REGULAR (40KG)</DescText>
+                            </Desc>
+                            <Name>REG</Name>
+                            <OwnerCode>ER</OwnerCode>
+                            <ServiceCode>XBAG</ServiceCode>
+                            <ServiceDefinitionAssociation>
+                                <BaggageAllowanceRef>
+                                <BaggageAllowanceRefID>BaggageAllowanceID2</BaggageAllowanceRefID>
+                                </BaggageAllowanceRef>
+                            </ServiceDefinitionAssociation>
+                            <ServiceDefinitionID>SRV2</ServiceDefinitionID>
+                            </ServiceDefinition>
+                        </ServiceDefinitionList>
+                        </DataLists>
+                        <OffersGroup>
+                        <CarrierOffers>
+                            <CarrierOffersSummary>
+                            <MatchedOfferQty>3</MatchedOfferQty>
+                            </CarrierOffersSummary>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-6</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>FREEBAGGAGE</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15207.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-6-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">22698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">40075.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15207.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">17377.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">40075.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV1</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-7</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>Y</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>ECONOMYREGULAR</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>Y</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">15877.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-7-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">23698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">41745.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">15877.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">18047.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">41745.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <ServiceDefinitionRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <ServiceDefinitionRefID>SRV2</ServiceDefinitionRefID>
+                                    </ServiceDefinitionRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>2</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                            <Offer>
+                            <BaggageAllowance>
+                                <BaggageAllowanceRefID>BaggageAllowanceID3</BaggageAllowanceRefID>
+                                <BaggageFlightAssociations>
+                                <PaxSegmentRef>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                                </BaggageFlightAssociations>
+                                <PaxRefID>PAX1</PaxRefID>
+                            </BaggageAllowance>
+                            <JourneyOverview>
+                                <JourneyPriceClass>
+                                <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                </JourneyPriceClass>
+                            </JourneyOverview>
+                            <OfferID>1738153094550A342213-8</OfferID>
+                            <OfferItem>
+                                <FareDetail>
+                                <FareComponent>
+                                    <CabinType>
+                                    <CabinTypeName>J</CabinTypeName>
+                                    </CabinType>
+                                    <FareRule>
+                                    <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                    <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                    </FareRule>
+                                    <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                    <Price>
+                                    <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                    <Discount>
+                                        <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                        <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                        </Tax>
+                                        <Tax>
+                                        <Amount CurCode="PKR">19227.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                        </Tax>
+                                        <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                    </Price>
+                                    <PriceClassRefID>SERENEPLUS</PriceClassRefID>
+                                    <RBD>
+                                    <RBD_Code>J</RBD_Code>
+                                    </RBD>
+                                </FareComponent>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <Price>
+                                    <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                    <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                    </Discount>
+                                    <TaxSummary>
+                                    <Tax>
+                                        <Amount CurCode="PKR">50.00</Amount>
+                                        <DescText>STAMP DUTY</DescText>
+                                        <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">100.00</Amount>
+                                        <DescText>TAX SECURITY CHARGE</DescText>
+                                        <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">1500.00</Amount>
+                                        <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                        <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">20.00</Amount>
+                                        <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                        <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">19227.66</Amount>
+                                        <DescText>fuel surcharge domestic</DescText>
+                                        <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                        <Amount CurCode="PKR">500.00</Amount>
+                                        <DescText>Embarkation Fee</DescText>
+                                        <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                    </TaxSummary>
+                                    <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                </FareDetail>
+                                <MandatoryInd>true</MandatoryInd>
+                                <OfferItemID>1738153094550A342213-8-1</OfferItemID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                <Discount>
+                                    <PreDiscountedAmount CurCode="PKR">50095.66</PreDiscountedAmount>
+                                </Discount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">19227.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                <Service>
+                                <PaxRefID>PAX1</PaxRefID>
+                                <ServiceAssociations>
+                                    <PaxJourneyRef>
+                                    <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                                    </PaxJourneyRef>
+                                </ServiceAssociations>
+                                <ServiceID>1</ServiceID>
+                                </Service>
+                            </OfferItem>
+                            <OwnerCode>ER</OwnerCode>
+                            </Offer>
+                        </CarrierOffers>
+                        </OffersGroup>
+                        <ShoppingResponse>
+                        <ShoppingResponseRefID>1738153094550A342213</ShoppingResponseRefID>
+                        </ShoppingResponse>
+                    </Response>
+                </IATA_AirShoppingRS>';
+
+        $json_data = self::parseXML($xml);
+
+
         $mergedOffers = [];
 
         foreach ($json_data->Response->OffersGroup->CarrierOffers->Offer as $flightOffer) {
@@ -1339,8 +3119,501 @@ class AirSerene
         ]);
 
         // org
-        $xml = $response->getBody()->getContents();
+        // $xml = $response->getBody()->getContents();
         // org
+        // $json_data = self::parseXML($xml);
+        
+        $xml = '<IATA_OrderViewRS xmlns="http://www.iata.org/IATA/2015/00/2020.1/IATA_OrderViewRS">
+                    <Response>
+                        <DataLists>
+                        <BaggageAllowanceList>
+                            <BaggageAllowance>
+                            <BaggageAllowanceID>BaggageAllowanceID1</BaggageAllowanceID>
+                            <TypeCode>Checked</TypeCode>
+                            <WeightAllowance>
+                                <MaximumWeightMeasure UnitCode="KG">80</MaximumWeightMeasure>
+                            </WeightAllowance>
+                            </BaggageAllowance>
+                        </BaggageAllowanceList>
+                        <ContactInfoList>
+                            <ContactInfo>
+                            <ContactInfoID>PAX1-1</ContactInfoID>
+                            <EmailAddress>
+                                <EmailAddressText>s.dilawarali95@gmail.com</EmailAddressText>
+                            </EmailAddress>
+                            <IndividualRefID>PAX1</IndividualRefID>
+                            <Phone>
+                                <AreaCodeNumber>92</AreaCodeNumber>
+                                <PhoneNumber>0321-8969503</PhoneNumber>
+                            </Phone>
+                            </ContactInfo>
+                            <ContactInfo>
+                            <ContactInfoID>Emergency contact</ContactInfoID>
+                            <ContactPurposeText>3</ContactPurposeText>
+                            <EmailAddress>
+                                <EmailAddressText>s.dilawarali95@gmail.com</EmailAddressText>
+                            </EmailAddress>
+                            <Individual>
+                                <GivenName>Rizvi</GivenName>
+                                <Surname>Syed Dilawar Ali</Surname>
+                            </Individual>
+                            <Phone>
+                                <AreaCodeNumber>92</AreaCodeNumber>
+                                <PhoneNumber>0321-8969503</PhoneNumber>
+                            </Phone>
+                            </ContactInfo>
+                        </ContactInfoList>
+                        <OriginDestList>
+                            <OriginDest>
+                            <DestCode>ISB</DestCode>
+                            <OriginCode>KHI</OriginCode>
+                            <OriginDestID>KHIISB</OriginDestID>
+                            <PaxJourneyRefID>FLT1</PaxJourneyRefID>
+                            </OriginDest>
+                            <OriginDest>
+                            <DestCode>KHI</DestCode>
+                            <OriginCode>ISB</OriginCode>
+                            <OriginDestID>ISBKHI</OriginDestID>
+                            <PaxJourneyRefID>FLT2</PaxJourneyRefID>
+                            </OriginDest>
+                        </OriginDestList>
+                        <PaxJourneyList>
+                            <PaxJourney>
+                            <PaxJourneyID>FLT1</PaxJourneyID>
+                            <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                            </PaxJourney>
+                            <PaxJourney>
+                            <PaxJourneyID>FLT2</PaxJourneyID>
+                            <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                            </PaxJourney>
+                        </PaxJourneyList>
+                        <PaxList>
+                            <Pax>
+                            <CitizenshipCountryCode>PK</CitizenshipCountryCode>
+                            <IdentityDoc>
+                                <ExpiryDate>2025-11-04Z</ExpiryDate>
+                                <GivenName>Syed Dilawar Ali</GivenName>
+                                <IdentityDocID>4444555555555</IdentityDocID>
+                                <IdentityDocTypeCode>CNIC</IdentityDocTypeCode>
+                                <IssuingCountryCode>PK</IssuingCountryCode>
+                                <Surname>Rizvi</Surname>
+                            </IdentityDoc>
+                            <Individual>
+                                <Birthdate>2004-09-16Z</Birthdate>
+                                <GenderCode>M</GenderCode>
+                                <GivenName>Syed Dilawar Ali</GivenName>
+                                <IndividualID>PAX1</IndividualID>
+                                <Surname>Rizvi</Surname>
+                            </Individual>
+                            <PaxID>PAX1</PaxID>
+                            <PTC>ADT</PTC>
+                            </Pax>
+                        </PaxList>
+                        <PaxSegmentList>
+                            <PaxSegment>
+                            <Arrival>
+                                <AircraftScheduledDateTime>2025-04-05T20:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>ISB</IATA_LocationCode>
+                            </Arrival>
+                            <Dep>
+                                <AircraftScheduledDateTime>2025-04-05T18:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>KHI</IATA_LocationCode>
+                            </Dep>
+                            <MarketingCarrierInfo>
+                                <CarrierDesigCode>ER</CarrierDesigCode>
+                                <MarketingCarrierFlightNumberText>504</MarketingCarrierFlightNumberText>
+                                <OperationalSuffixText/>
+                            </MarketingCarrierInfo>
+                            <PaxSegmentID>SEG1</PaxSegmentID>
+                            </PaxSegment>
+                            <PaxSegment>
+                            <Arrival>
+                                <AircraftScheduledDateTime>2025-04-06T22:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>KHI</IATA_LocationCode>
+                            </Arrival>
+                            <Dep>
+                                <AircraftScheduledDateTime>2025-04-06T20:00:00.000+05:00</AircraftScheduledDateTime>
+                                <IATA_LocationCode>ISB</IATA_LocationCode>
+                            </Dep>
+                            <MarketingCarrierInfo>
+                                <CarrierDesigCode>ER</CarrierDesigCode>
+                                <MarketingCarrierFlightNumberText>505</MarketingCarrierFlightNumberText>
+                                <OperationalSuffixText/>
+                            </MarketingCarrierInfo>
+                            <PaxSegmentID>SEG2</PaxSegmentID>
+                            </PaxSegment>
+                        </PaxSegmentList>
+                        <PenaltyList>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-1</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <ExpirationDateTime>2025-04-05T14:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-2</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">5000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <EffectiveDateTime>2025-04-05T14:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T18:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-3</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <ExpirationDateTime>2025-04-05T14:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG1-ADT-4</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">4500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <EffectiveDateTime>2025-04-05T14:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-05T18:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-1</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <ExpirationDateTime>2025-04-06T16:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <CancelFeeInd>true</CancelFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-2</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">5000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Cancellation</TypeCode>
+                            <EffectiveDateTime>2025-04-06T16:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-06T20:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Before 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-3</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">3000.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <ExpirationDateTime>2025-04-06T16:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                            <Penalty>
+                            <ChangeFeeInd>true</ChangeFeeInd>
+                            <DescText>Within 4h of departure</DescText>
+                            <PenaltyID>SEG2-ADT-4</PenaltyID>
+                            <Price>
+                                <TotalAmount CurCode="PKR">4500.00</TotalAmount>
+                            </Price>
+                            <TypeCode>Change</TypeCode>
+                            <EffectiveDateTime>2025-04-06T16:00:00.000+05:00</EffectiveDateTime>
+                            <ExpirationDateTime>2025-04-06T20:00:00.000+05:00</ExpirationDateTime>
+                            </Penalty>
+                        </PenaltyList>
+                        <PriceClassList>
+                            <PriceClass>
+                            <Name>Serene Plus</Name>
+                            <PriceClassID>SERENEPLUS</PriceClassID>
+                            </PriceClass>
+                        </PriceClassList>
+                        </DataLists>
+                        <Order>
+                        <CreationDateTime>2025-01-29T12:29:45.000Z</CreationDateTime>
+                        <OrderID>O2025012912294513516</OrderID>
+                        <OrderItem>
+                            <CreationDateTime>2025-01-29T12:29:45.000Z</CreationDateTime>
+                            <FareDetail>
+                            <FareComponent>
+                                <CabinType>
+                                <CabinTypeName>Serene Plus</CabinTypeName>
+                                </CabinType>
+                                <FareRule>
+                                <PenaltyRefID>SEG1-ADT-1</PenaltyRefID>
+                                <PenaltyRefID>SEG1-ADT-2</PenaltyRefID>
+                                <PenaltyRefID>SEG1-ADT-3</PenaltyRefID>
+                                <PenaltyRefID>SEG1-ADT-4</PenaltyRefID>
+                                </FareRule>
+                                <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">19227.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                <PriceClassRefID>SERENEPLUS</PriceClassRefID>
+                                <RBD>
+                                <RBD_Code>J</RBD_Code>
+                                </RBD>
+                            </FareComponent>
+                            <FareComponent>
+                                <CabinType>
+                                <CabinTypeName>Serene Plus</CabinTypeName>
+                                </CabinType>
+                                <FareRule>
+                                <PenaltyRefID>SEG2-ADT-1</PenaltyRefID>
+                                <PenaltyRefID>SEG2-ADT-2</PenaltyRefID>
+                                <PenaltyRefID>SEG2-ADT-3</PenaltyRefID>
+                                <PenaltyRefID>SEG2-ADT-4</PenaltyRefID>
+                                </FareRule>
+                                <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                <Price>
+                                <BaseAmount CurCode="PKR">28698.00</BaseAmount>
+                                <TaxSummary>
+                                    <Tax>
+                                    <Amount CurCode="PKR">20.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">1500.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">500.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">19227.66</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                    </Tax>
+                                    <Tax>
+                                    <Amount CurCode="PKR">50.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                    </Tax>
+                                    <TotalTaxAmount CurCode="PKR">21397.66</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">50095.66</TotalAmount>
+                                </Price>
+                                <PriceClassRefID>SERENEPLUS</PriceClassRefID>
+                                <RBD>
+                                <RBD_Code>J</RBD_Code>
+                                </RBD>
+                            </FareComponent>
+                            <PaxRefID>PAX1</PaxRefID>
+                            <Price>
+                                <BaseAmount CurCode="PKR">57396.00</BaseAmount>
+                                <TaxSummary>
+                                <Tax>
+                                    <Amount CurCode="PKR">40.00</Amount>
+                                    <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                    <TaxCode>YI</TaxCode>
+                                </Tax>
+                                <Tax>
+                                    <Amount CurCode="PKR">3000.00</Amount>
+                                    <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                    <TaxCode>PK</TaxCode>
+                                </Tax>
+                                <Tax>
+                                    <Amount CurCode="PKR">1000.00</Amount>
+                                    <DescText>Embarkation Fee</DescText>
+                                    <TaxCode>SP</TaxCode>
+                                </Tax>
+                                <Tax>
+                                    <Amount CurCode="PKR">38455.32</Amount>
+                                    <DescText>fuel surcharge domestic</DescText>
+                                    <TaxCode>YQD</TaxCode>
+                                </Tax>
+                                <Tax>
+                                    <Amount CurCode="PKR">100.00</Amount>
+                                    <DescText>STAMP DUTY</DescText>
+                                    <TaxCode>N9</TaxCode>
+                                </Tax>
+                                <Tax>
+                                    <Amount CurCode="PKR">200.00</Amount>
+                                    <DescText>TAX SECURITY CHARGE</DescText>
+                                    <TaxCode>XZ</TaxCode>
+                                </Tax>
+                                <TotalTaxAmount CurCode="PKR">42795.32</TotalTaxAmount>
+                                </TaxSummary>
+                                <TotalAmount CurCode="PKR">100191.32</TotalAmount>
+                            </Price>
+                            </FareDetail>
+                            <OrderItemID>AIR-1</OrderItemID>
+                            <OwnerCode>ER</OwnerCode>
+                            <PaymentTimeLimitDateTime>2025-01-29T16:29:46.000Z</PaymentTimeLimitDateTime>
+                            <Price>
+                            <BaseAmount CurCode="PKR">57396.00</BaseAmount>
+                            <TaxSummary>
+                                <Tax>
+                                <Amount CurCode="PKR">40.00</Amount>
+                                <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                <TaxCode>YI</TaxCode>
+                                </Tax>
+                                <Tax>
+                                <Amount CurCode="PKR">3000.00</Amount>
+                                <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                <TaxCode>PK</TaxCode>
+                                </Tax>
+                                <Tax>
+                                <Amount CurCode="PKR">1000.00</Amount>
+                                <DescText>Embarkation Fee</DescText>
+                                <TaxCode>SP</TaxCode>
+                                </Tax>
+                                <Tax>
+                                <Amount CurCode="PKR">38455.32</Amount>
+                                <DescText>fuel surcharge domestic</DescText>
+                                <TaxCode>YQD</TaxCode>
+                                </Tax>
+                                <Tax>
+                                <Amount CurCode="PKR">100.00</Amount>
+                                <DescText>STAMP DUTY</DescText>
+                                <TaxCode>N9</TaxCode>
+                                </Tax>
+                                <Tax>
+                                <Amount CurCode="PKR">200.00</Amount>
+                                <DescText>TAX SECURITY CHARGE</DescText>
+                                <TaxCode>XZ</TaxCode>
+                                </Tax>
+                                <TotalTaxAmount CurCode="PKR">42795.32</TotalTaxAmount>
+                            </TaxSummary>
+                            <TotalAmount CurCode="PKR">100191.32</TotalAmount>
+                            </Price>
+                            <BaggageAllowance>
+                            <BaggageAllowanceRefID>BaggageAllowanceID1</BaggageAllowanceRefID>
+                            <BaggageFlightAssociations>
+                                <PaxSegmentRef>
+                                <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                            </BaggageFlightAssociations>
+                            <PaxRefID>PAX1</PaxRefID>
+                            </BaggageAllowance>
+                            <BaggageAllowance>
+                            <BaggageAllowanceRefID>BaggageAllowanceID1</BaggageAllowanceRefID>
+                            <BaggageFlightAssociations>
+                                <PaxSegmentRef>
+                                <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                            </BaggageFlightAssociations>
+                            <PaxRefID>PAX1</PaxRefID>
+                            </BaggageAllowance>
+                            <Service>
+                            <BookingRef>
+                                <BookingID>M0E3KL</BookingID>
+                            </BookingRef>
+                            <PaxRefID>PAX1</PaxRefID>
+                            <ServiceAssociations>
+                                <PaxSegmentRef>
+                                <PaxSegmentRefID>SEG1</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                            </ServiceAssociations>
+                            <ServiceID>PAX1-SEG1</ServiceID>
+                            </Service>
+                            <Service>
+                            <BookingRef>
+                                <BookingID>M0E3KL</BookingID>
+                            </BookingRef>
+                            <PaxRefID>PAX1</PaxRefID>
+                            <ServiceAssociations>
+                                <PaxSegmentRef>
+                                <PaxSegmentRefID>SEG2</PaxSegmentRefID>
+                                </PaxSegmentRef>
+                            </ServiceAssociations>
+                            <ServiceID>PAX1-SEG2</ServiceID>
+                            </Service>
+                            <StatusCode>NOT ENTITLED</StatusCode>
+                        </OrderItem>
+                        <OwnerCode>ER</OwnerCode>
+                        <StatusCode>OPENED</StatusCode>
+                        <TotalPrice>
+                            <BaseAmount CurCode="PKR">57396.00</BaseAmount>
+                            <TaxSummary>
+                            <Tax>
+                                <Amount CurCode="PKR">40.00</Amount>
+                                <DescText>GOVERNMENT AIRPORT TAX</DescText>
+                                <TaxCode>YI</TaxCode>
+                            </Tax>
+                            <Tax>
+                                <Amount CurCode="PKR">3000.00</Amount>
+                                <DescText>TAX EXCISE DUTY PAKISTAN</DescText>
+                                <TaxCode>PK</TaxCode>
+                            </Tax>
+                            <Tax>
+                                <Amount CurCode="PKR">1000.00</Amount>
+                                <DescText>Embarkation Fee</DescText>
+                                <TaxCode>SP</TaxCode>
+                            </Tax>
+                            <Tax>
+                                <Amount CurCode="PKR">38455.32</Amount>
+                                <DescText>fuel surcharge domestic</DescText>
+                                <TaxCode>YQD</TaxCode>
+                            </Tax>
+                            <Tax>
+                                <Amount CurCode="PKR">100.00</Amount>
+                                <DescText>STAMP DUTY</DescText>
+                                <TaxCode>N9</TaxCode>
+                            </Tax>
+                            <Tax>
+                                <Amount CurCode="PKR">200.00</Amount>
+                                <DescText>TAX SECURITY CHARGE</DescText>
+                                <TaxCode>XZ</TaxCode>
+                            </Tax>
+                            <TotalTaxAmount CurCode="PKR">42795.32</TotalTaxAmount>
+                            </TaxSummary>
+                            <TotalAmount CurCode="PKR">100191.32</TotalAmount>
+                        </TotalPrice>
+                        </Order>
+                    </Response>
+                </IATA_OrderViewRS>';
+
         $json_data = self::parseXML($xml);
         
         // dd($json_data);
