@@ -809,6 +809,9 @@ $mealavail = $Mealavailablity->Body->AA_OTA_AirMealDetailsRS->MealDetailsRespons
                 </div>
                 <div class="booking-details-wrap">
                     <form action="#" method="post" class="row g-3 needs-validation passengers" novalidate>
+                        <input type="hidden" name="outboundBundlerServiceId" value="{{session()->get('outboundBundlerServiceId')}}">
+                        <input type="hidden" name="inboundBundlerServiceId" value="{{session()->get('inboundBundlerServiceId')}}">
+
                         <input type="hidden" name="totalseatbooking" id="totalseatbooking">
                         <input type="hidden" name="totalmealbooking" id="totalmealbooking">
                         <div id="seat_meal_inputs"></div>

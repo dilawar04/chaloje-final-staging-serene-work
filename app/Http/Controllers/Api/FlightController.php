@@ -7,6 +7,7 @@ use CodeDredd\Soap\Facades\Soap;
 use HTTP_Request2;
 use Illuminate\Support\Facades\Http;
 use function App\Airsial;
+use Session;
 
 
 class FlightController extends Controller
@@ -203,38 +204,8 @@ class FlightController extends Controller
         return $merge_flights;  
     }
 
-    // old seren code
-    // public static function GetFlightsAirserene()
-    // {
-
-    //     $origin = Airport::where('IATA_code', req('LocationDep'))->select('IATA_code', 'airport', 'city', 'country')->first();
-    //     $destination = Airport::where('IATA_code', req('LocationArr'))->select('IATA_code', 'airport', 'city', 'country')->first();
-       
-    //     if(empty(request('ReturningOn'))){
-    //         $_airserene_response = \App\AirSerene::getSingleFlight();
-    //     }else{
-    //         $_airserenemul_response = \App\AirSerene::getSingleFlightMUl();
-    //         $_airserene_response = \App\AirSerene::getSingleFlight();  
-    //     }
-
-    //     if(empty(request('ReturningOn'))){
-    //         $merge_flights = array_merge_recursive($_airserene_response);
-    //     }else{
-    //         $merge_flights = array_merge_recursive($_airserene_response , $_airserenemul_response);
-    //     }
-
-
-    //     $merge_flights['origin'] = $origin;
-    //     $merge_flights['destination'] = $destination;
-    //     // dd($merge_flights);
-    //     // dd($_airsial_response);
-    //     return $merge_flights;
-    // }
-
     public static function GetFlightsAirblue()
     {
-        $_session = self::GetFlightsAirsial();
-
         $origin = Airport::where('IATA_code', req('LocationDep'))->select('IATA_code', 'airport', 'city', 'country')->first();
         $destination = Airport::where('IATA_code', req('LocationArr'))->select('IATA_code', 'airport', 'city', 'country')->first();
        
@@ -272,6 +243,8 @@ class FlightController extends Controller
         session()->forget('outboundflyjinnahMealavailablity');
         session()->forget('inboundflyjinnahseatavailablity');
         session()->forget('inboundflyjinnahMealavailablity');
+        session()->forget('outboundBundlerServiceId');
+        session()->forget('inboundBundlerServiceId');
 
 
         
@@ -378,6 +351,7 @@ class FlightController extends Controller
                     // dump($airline, $flight, request()->all());
                     switch ($airline){
                         case 'Airsial':
+                            dd($flights);
                             // echo 'asdasd';
                             // exit;
                             if($flights['inbound']->airline == $flights['outbound']->airline){
@@ -438,6 +412,8 @@ class FlightController extends Controller
                             break;
                         case 'Airblue':
                         case 'airblue':
+                            dd($flights);
+
                                 for ($x = 0; $x <= 1; $x++) {
                                     if($x == 0){
                                         $params = json_decode(json_encode($flight->flight), 1);
@@ -511,6 +487,8 @@ class FlightController extends Controller
                             break;
                         case 'Air Serene':
                         case 'air-serene':
+                            dd($flights);
+
                             // dd($flights);
                             // echo 'airserene n';
                             // exit;
@@ -534,56 +512,57 @@ class FlightController extends Controller
                             
                             break;
                         case 'Fly Jinnah':
-                            // dd($flights);
-                            foreach($flights as $flight){
+                            // dd($FARE);
+                            $params['outbound'] = json_decode(json_encode($flights['outbound']), 1);
+                            $params['inbound'] = json_decode(json_encode($flights['inbound'], 1));
+                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
+                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];            
+                            $params['form'] = request()->all();
+                            // dd($params);
+                            $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params);
 
-                                if($flight->flight->TYPE == 'outbound'){
-                                    $flight->travelers->LocationDep = $flight->flight->ORGN;
-                                    $flight->travelers->LocationArr = $flight->flight->DEST;
-                                }
-                                    $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
-                                    // dd($TAX);
-                                    $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
-                                    // dd($AMOUNT);
-                                    $TOTAL_AMOUNT = $flight->baggage->TOTAL;
+                            $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
+                            // dd($TAX);
+                            $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
+                            // dd($AMOUNT);
+                            $TOTAL_AMOUNT = $flight->baggage->TOTAL;
 
-                                    $booking = new \App\Booking();
-                                    $booking->airline = $airline;
-                                    $booking->order_id = $newOrderID;
-                                    $booking->tax = $TAX;
-                                    $booking->amount = $AMOUNT;
-                                    $booking->total_amount = $TOTAL_AMOUNT;
-                                    $booking->travelers = $flight->travelers;
-                                    $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
-                                    $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
-                                    $booking->flight_summary = json_encode($flights);
-                                    //[{"label":"ADULT","quantity":"1","price":"18125"},{"label":"ADULT","quantity":"1","price":"19535"}]
-                                    $booking->summary = json_encode([
-                                        ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
-                                        ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
-                                        ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
-                                    ]);
-                                    $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
+                            $booking = new \App\Booking();
+                            $booking->airline = $airline;
+                            $booking->order_id = $newOrderID;
+                            $booking->tax = $TAX;
+                            $booking->amount = $AMOUNT;
+                            $booking->total_amount = $TOTAL_AMOUNT;
+                            $booking->travelers = $flight->travelers;
+                            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
+                            $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
+                            $booking->flight_summary = json_encode($flights);
+                            //[{"label":"ADULT","quantity":"1","price":"18125"},{"label":"ADULT","quantity":"1","price":"19535"}]
+                            $booking->summary = json_encode([
+                                ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
+                                ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
+                                ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
+                            ]);
+                            $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
 
-                                    $params = json_decode(json_encode($flight), 1);
-                                    $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                                    $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant];
-                                    $params['form'] = request()->all();
+                            $params = json_decode(json_encode($flight), 1);
+                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
+                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant];
+                            $params['form'] = request()->all();
 
-                                    $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params);
+                            $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params);
 
-                                    $params['flight']['AirPrice'] = $priceRS;
-                                    $RES = \App\FlyJinnah::OTA_AirBookRQ($params);
-                                    if(!$RES['status']){
-                                        return ['status' => false, 'message' => $RES['data']];
-                                    }
-
-                                    $PNR = $RES['data']['AirReservation']['BookingReferenceID']['@attributes']['ID'];
-
-                                    $booking->booking_summary = json_encode($RES);
-                                    $booking->pnr = $PNR;
-                                    $booking->save();
+                            $params['flight']['AirPrice'] = $priceRS;
+                            $RES = \App\FlyJinnah::OTA_AirBookRQ($params);
+                            if(!$RES['status']){
+                                return ['status' => false, 'message' => $RES['data']];
                             }
+
+                            $PNR = $RES['data']['AirReservation']['BookingReferenceID']['@attributes']['ID'];
+
+                            $booking->booking_summary = json_encode($RES);
+                            $booking->pnr = $PNR;
+                            $booking->save();
                             break;
                     }
 

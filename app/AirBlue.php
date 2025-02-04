@@ -762,6 +762,7 @@ class AirBlue {
 
     public static  function bookSeat($params = [])
     {
+        // dd($params);
         // dd($params['TRAVELERS_XML']);
         self::set_credential();
 
@@ -931,7 +932,7 @@ class AirBlue {
         // dd($response);
         // exit;
         $json = $response['json'];
-        // dd($json, $json['Envelope']['Body']['AirBookResponse']['AirBookResult']);
+        dd($json, $json['Envelope']['Body']['AirBookResponse']['AirBookResult']);
 
         if (isset($json['Envelope']['Body']['AirBookResponse']['AirBookResult']['Success'])) {
             // echo 'sdas';

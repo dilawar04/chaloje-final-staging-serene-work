@@ -188,7 +188,6 @@ class FlightController extends Controller
         // dd($Cookie);
         // dump($Identifier);
         // dump($Cookie);
-        
 
         $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
         $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
@@ -252,7 +251,7 @@ class FlightController extends Controller
                 </ns2:OTA_AirPriceRQ>
             </soap:Body>
         </soap:Envelope>';
-        // dump('AirTravelerAvail',$body);
+        // dump('OTA_AirPriceRQWithoutBundleId',$body);
         // dd($body);
         // exit;
 
@@ -278,6 +277,9 @@ class FlightController extends Controller
 
     public static function PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId)
     {
+        // dump($FlyjinnahOutboundGettingBundleServiceId);
+        // dump($FlyjinnahInboundGettingBundleServiceId);
+        // exit;
         $Passengers = [
             'ADT' => $flight->travelers->AdultNo,
             'CHD' => $flight->travelers->ChildNo,
@@ -750,6 +752,7 @@ class FlightController extends Controller
 
         
         $flight = json_decode(session()->get($type));
+        // dump($type,$flight);
         $FlyjinnahOutbound = json_decode(session()->get('flyjinnahoutbound'));
         $FlyjinnahInbound = json_decode(session()->get('flyjinnahinbound'));
         // dump($FlyjinnahOutbound);
@@ -761,7 +764,7 @@ class FlightController extends Controller
 
         if (isset($queryParams['ReturningOn'])) {
             if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-
+                // echo 'ReturningOn same flight';
                 $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 
                 $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
@@ -792,9 +795,9 @@ class FlightController extends Controller
                 $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                dump($SeatMapResponse);
-                dump($HasMealsResponse);
-                exit;
+                // dump($SeatMapResponse);
+                // dump($HasMealsResponse);
+                // exit;
                 // dump('SeatMapResponse',$SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow);
                 // exit;
                 $SeatMapOutboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow;
@@ -811,10 +814,12 @@ class FlightController extends Controller
                 // dump('HasMealsOutboundResponse',$HasMealsOutboundResponse);
                 // dump('HasMealsInboundResponse',$HasMealsInboundResponse);
                 // exit;
-                
+                // dd(json_decode(req('flight')));
+
                 session()->put($type, req('flight'));
                 session()->put('flyjinnah'.$type, req('flight'));
 
+                session()->put(['outboundBundlerServiceId' => $FlyjinnahOutboundGettingBundleServiceId,'inboundBundlerServiceId' => $FlyjinnahInboundGettingBundleServiceId]);
                 session()->put(['outboundflyjinnahMealavailablity' => $HasMealsOutboundResponse,'outboundflyjinnahseatavailablity' => $SeatMapOutboundResponse]);
                 session()->put(['inboundflyjinnahMealavailablity' => $HasMealsInboundResponse,'inboundflyjinnahseatavailablity' => $SeatMapInboundResponse]);
                 
@@ -822,6 +827,7 @@ class FlightController extends Controller
             } else if($FlyjinnahOutbound->airline == 'fly-jinnah' && !empty($FlyjinnahInbound->airline) || $FlyjinnahInbound->airline == 'fly-jinnah' && !empty($FlyjinnahOutbound->airline)){
                 // echo 'second condition ReturningOn';
                 // exit;
+                // echo 'ReturningOn not same flight';
                 $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 
                 $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
@@ -863,7 +869,7 @@ class FlightController extends Controller
                 return ['status' => 1];
             }
         } else {
-            
+            // echo 'oneway flight';
             $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
                 
             $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
