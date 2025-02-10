@@ -351,7 +351,7 @@ class FlightController extends Controller
                     // dump($airline, $flight, request()->all());
                     switch ($airline){
                         case 'Airsial':
-                            dd($flights);
+                            // dd($flights);
                             // echo 'asdasd';
                             // exit;
                             if($flights['inbound']->airline == $flights['outbound']->airline){
@@ -412,7 +412,7 @@ class FlightController extends Controller
                             break;
                         case 'Airblue':
                         case 'airblue':
-                            dd($flights);
+                            // dd($flights);
 
                                 for ($x = 0; $x <= 1; $x++) {
                                     if($x == 0){
@@ -487,7 +487,7 @@ class FlightController extends Controller
                             break;
                         case 'Air Serene':
                         case 'air-serene':
-                            dd($flights);
+                            // dd($flights);
 
                             // dd($flights);
                             // echo 'airserene n';
@@ -841,82 +841,27 @@ class FlightController extends Controller
                     case 'Air Serene':
                     case 'air-serene':
                         
-
-                        $referrer = $_SERVER['HTTP_REFERER'];
-                        $queryString = parse_url($referrer, PHP_URL_QUERY);
-                        parse_str($queryString, $params);
-                        // unset($params['ReturningOn']); 
-                        // dd(http_build_query($queryArray));
-
-                        $pnr = $params['pnr'];
-
-                        $lastrow = \App\Booking::where('pnr', $pnr)->first();
-                        $wherexml = $lastrow['xml'];
+                        $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+                        $params = ['MOBILE' => request()->mobile, 'EMAIL' => request()->email];
+                        $params['TRAVELERS_INFORMATION'] = ['ADT' => $adult, 'CHD' => $child, 'INF' => $infant];
                         
-                        $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
+                        $getSingleFlight = \App\AirSerene::IfNotSamegetSingleFlight($flight);
+                        // dd($getSingleFlight);
 
-                        $token = \App\AirSerene::RetrieveSecurityToken();
-                        // dd($token);
-                        $LoginTravelAgent = \App\AirSerene::LoginTravelAgent($token);
-                        // $params['SeriesNumber'] = random_int(100000, 999999);
-                        // $params['ConfirmationNumber'] = random_int(100000, 999999);
-                        // $var = \App\AirSerene::SummaryPNR($token, $params);
-                        // dd($var);
-                        // dd($flights);
-                        $RetrieveFareQuote = \App\AirSerene::RetrieveFareQuote($token, $params, $flights);
-                        // dd($RetrieveFareQuote);
-                        // $RetrieveAARQuote = \App\AirSerene::RetrieveAARQuote($token, $params, $flights);
-                        
-                        $DepartureDateCron = $RetrieveFareQuote->FlightSegments->FlightSegment->DepartureDate;
-                        
-                        $SummaryPNR = \App\AirSerene::SummaryPNR($token, $params, $flights);
-                        // dd($SummaryPNR);
-                        $params['ActionType'] = 'CommitSummary';
-                        $CommitSummary = \App\AirSerene::CreatePNR($token, $params);
-                        // dd($CommitSummary);
-                        // $ProcessPNRPayment = \App\AirSerene::ProcessPNRPayment($token, $params,$RetrieveFareQuote,$CommitSummary);
-                        // $InsertExternalProcessedPayment = \App\AirSerene::InsertExternalProcessedPayment($token, $params,$RetrieveFareQuote,$CommitSummary);
-                        // dd($ProcessPNRPayment);
-                        $ConfirmationNumber = $CommitSummary->ConfirmationNumber;
-                        $params['ConfirmationNumber'] = $ConfirmationNumber;
-                        // $as = \App\AirSerene::CreatePNR($token, $params);
-                        
-                        // $params['ActionType'] = 'SaveReservation';
-                        // $PNR_RES = \App\AirSerene::CreatePNR($token, $params);
+                        $makeSigningKeyOrderCreateRQ = \App\AirSerene::makeSigningKeyOrderCreateIfNotRQReturn($params, $getSingleFlight);
 
-                        // $PNR = $PNR_RES['pnr'];
-                        // dd($DepartureDateCron);
-                        // exit;
-                        // $PNR = $PNR_RES->ConfirmationNumber; old
-                        $PNR = $CommitSummary->ConfirmationNumber;
-                        $booking->pnr = $PNR;
-                        $booking->serene_token = $token;
+
+                        $OrderCreateRQ = \App\AirSerene::OrderCreateIfNotRQReturn($params, $getSingleFlight, $makeSigningKeyOrderCreateRQ);
+                        // dd($OrderCreateRQ['data']->Response->Order->OrderID);
+
+                        $PNR = $OrderCreateRQ['data']->Response->Order->OrderID;
+                        $detail = $OrderCreateRQ;
+                        $booking->order_ref_id = $OrderCreateRQ['data']->Response->Order->OrderID;
                         $booking->departuretime = $DepartureDateCron;
+                        $booking->booking_summary = json_encode($OrderCreateRQ);
+                        $booking->pnr = $OrderCreateRQ['data']->Response->Order->OrderID;
+                        // dd($booking);
                         $booking->save();
-                        // exit;
-                        session_start();
-                            $lastrow = \App\Booking::latest()->first();
-                            // dd($lastrow);exit;
-                            $id = $lastrow['id'];
-                            // dd($id);
-                            // exit;
-                            $booking = \App\Booking::find($id);
-                            // dd($_SESSION);
-                            // exit;
-                            if($_SESSION['xml'] == ''){
-                                $booking->update([
-                                    'xml' => $wherexml,
-                                ]);
-                            }else{
-                                $xml = $_SESSION['xml'];
-                                $xml = str_replace('"', "'", $xml);
-                                $booking->update([
-                                    'xml' => $xml,
-                                ]);
-                            }
-                            // dd($_SESSION);
-                            // exit;
-                        session_destroy();
                         
                         break;
                     case 'Fly Jinnah':
@@ -1206,6 +1151,7 @@ class FlightController extends Controller
                                 // exit;
                                 break;
                             case 'Fly Jinnah':
+                                dd(request());
                                 // exit;
                                 // dd($flight->type);
                                 // seatbooking gets price

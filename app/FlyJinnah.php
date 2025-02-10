@@ -51,532 +51,176 @@ class FlyJinnah
         return simplexml_load_string($clean_xml);
     }
 
-    // public static function OTA_AirAvailRQ($params = [])
-    // {
-    //     self::set_credential();
+    public static function OUTBOUND_PRICE_REQ_GET_ORIGINAL_PRICE($flight, $params, $Passengers, $Cookie, $TransactionIdentifier)
+    {
+        self::set_credential();
+        // dd($flight['ARRIVAL_DATE']);
+        $Identifier = $TransactionIdentifier;
+       
 
-    //     $params = collect([
-    //         "Departure" => request('DepartingOn', date('Y-m-d', strtotime('+0 days'))),
-    //         "Origin" => request('LocationDep', 'KHI'),
-    //         "Destination" => request('LocationArr', 'ISB'),
-    //         //"Return" => true,
-    //         "AdultNo" => request('AdultNo', 1),
-    //         "ChildNo" => request('ChildNo', 0),
-    //         "InfantNo" => request('InfantNo', 0)
-    //     ])->merge($params)->toArray();
-    //     if (is_null($params['Returning'])) {
-    //         unset($params['Returning']);
-    //     }
+        $ArrivalDate = $flight['ARRIVAL_DATE'].'T'.$flight['ARRIVAL_TIME'];
+        $DepartureDate = $flight['DEPARTURE_DATE'].'T'.$flight['DEPARTURE_TIME'];
 
-    //     $Passengers = [
-    //         'ADT' => \req('AdultNo'),
-    //         'CHD' => \req('ChildNo'),
-    //         'INF' => \req('InfantNo')
-    //     ];
-    //     // dd($params);
+       
+        $FlyjinnahFlightFlightNo = $flight['FLIGHT_NO'];
+        $FlyjinnahFlightRPH = $flight['RPH'];
 
-    //     $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    //     <soap:Header>
-    //         <wsse:Security soap:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-    //         <wsse:UsernameToken wsu:Id="UsernameToken-17855236" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-    //             <wsse:Username>' . self::$credential['USERNAME'] . '</wsse:Username>
-    //             <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' . self::$credential['PASSWORD'] . '</wsse:Password>
-    //         </wsse:UsernameToken>
-    //         </wsse:Security>
-    //     </soap:Header>
-    //     <soap:Body xmlns:ns2="http://www.opentravel.org/OTA/2003/05">
-    //         <ns2:OTA_AirAvailRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="' . self::$credential['Target'] . '" TimeStamp="' . \Carbon\Carbon::now()->format('Y-m-d\TH:i:s') . '" Version="' . self::$credential['Version'] . '">
-    //         <ns2:POS>
-    //             <ns2:Source TerminalID="' . self::$credential['TerminalID'] . '">
-    //             <ns2:RequestorID ID="' . self::$credential['USERNAME'] . '" Type="4" />
-    //             <ns2:BookingChannel Type="12" />
-    //             </ns2:Source>
-    //         </ns2:POS>
-    //         <ns2:OriginDestinationInformation>
-    //             <ns2:DepartureDateTime>' . $params['Departure'] . 'T00:00:00</ns2:DepartureDateTime>
-    //             <ns2:OriginLocation LocationCode="' . $params['Origin'] . '" />
-    //             <ns2:DestinationLocation LocationCode="' . $params['Destination'] . '" />
-    //         </ns2:OriginDestinationInformation>';
-
-    //             if (!empty($params['Returning'])) {
-    //                 $body .= '<ns2:OriginDestinationInformation>
-    //             <ns2:DepartureDateTime>' . $params['Returning'] . 'T00:00:00</ns2:DepartureDateTime>
-    //             <ns2:OriginLocation LocationCode="' . $params['Destination'] . '" />
-    //             <ns2:DestinationLocation LocationCode="' . $params['Origin'] . '" />
-    //         </ns2:OriginDestinationInformation>';
-    //             }
-
-    //             $body .= '<ns2:TravelerInfoSummary>
-    //             <ns2:AirTravelerAvail>
-    //             ';
-    //             foreach ($Passengers as $key => $qty) {
-    //                 if ($qty > 0) {
-    //                     $body .= '<ns2:PassengerTypeQuantity Code="' . $key . '" Quantity="' . $qty . '" />' . "\n";
-    //                 }
-    //             }
-    //             $body .= '</ns2:AirTravelerAvail>
-    //         </ns2:TravelerInfoSummary>
-    //         </ns2:OTA_AirAvailRQ>
-    //     </soap:Body>
-    //     </soap:Envelope>';
-    //         //        dump($body);
-    //         //   exit();
-    //     /*
-    //     <ns2:PassengerTypeQuantity Code="CHD" Quantity="'.$params['ChildNo'].'" />
-    //       <ns2:PassengerTypeQuantity Code="INF" Quantity="'.$params['InfantNo'].'" />
-    //     */
-
-    //     $client = new Client();
-    //     $headers = [
-    //         'Content-Type' => 'text/xml',
-    //         'SOAPAction' => 'getAvailability',
-    //     ];
-    //     // dump(self::$credential, $headers);
-    //     // die($body);
-    //     if (!req('c')) {
-    //         $response = $client->request('POST', self::$credential['URL'], [
-    //             'headers' => $headers,
-    //             'body' => $body
-    //         ]);
-    //         $_xml = $response->getBody()->getContents();
-    //         file_put_contents(!empty($params['Returning']) ? 'RT-' : '' . 'FJ.xml', $_xml);
-    //     } else {
-    //         $_xml = file_get_contents(!empty($params['Returning']) ? 'RT-' : '' . 'FJ.xml');
-    //     }
-    //     $SetCookie = $response->getHeader('set-cookie');
-    //     // dump($SetCookie);
-    //     // JSESSIONID start
-    //     $JSIDSetCookie = $SetCookie[0];
-    //     $JSIDpattern = '/([^;]+)/';
-    //     preg_match($JSIDpattern, $JSIDSetCookie, $matches);
-    //     $jsessionid = isset($matches[1]) ? $matches[1] : null;
-
-    //     // JSESSIONID end
-
-    //     // __Secure-AAID= start 
-    //     $SecureIdSetCookie = $SetCookie[1];
-    //     $SecureIdpattern = '/=([^==;]+)/';
-    //     preg_match($SecureIdpattern, $SecureIdSetCookie, $matches1);
-    //     $SecureID = isset($matches1[1]) ? $matches1[1] : null;
-    //     $Cookie = $jsessionid.'; __Secure-AAID='.$SecureID;
-    //     // dump($Cookie);
+        $Orgn = $flight['ORGN'];
+        $Dest = $flight['DEST'];
 
 
-    //     // dd($SecureID);
-    //     // __Secure-AAID= end
+        $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <soap:Header>
+                <wsse:Security soap:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+                    <wsse:UsernameToken wsu:Id="UsernameToken-17855236" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                        <wsse:Username>'.self::$credential['USERNAME'].'</wsse:Username>
+                        <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">'.self::$credential['PASSWORD'].'</wsse:Password>
+                    </wsse:UsernameToken>
+                </wsse:Security>
+            </soap:Header>
+            <soap:Body xmlns:ns2="http://www.opentravel.org/OTA/2003/05">
+                <ns2:OTA_AirPriceRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="live" TransactionIdentifier="'.$Identifier.'" Version="20061.00">
+                    <ns2:POS>
+                        <ns2:Source TerminalID="'.self::$credential['USERNAME'].'">
+                            <ns2:RequestorID ID="'.self::$credential['USERNAME'].'" Type="4" />
+                            <ns2:BookingChannel Type="12" />
+                        </ns2:Source>
+                    </ns2:POS>
+                    <ns2:AirItinerary DirectionInd="OneWay">
+                        <ns2:OriginDestinationOptions>';
+                            $body .= '<ns2:OriginDestinationOption>
+                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                                    <ns2:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
+                                    <ns2:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
+                                </ns2:FlightSegment>
+                            </ns2:OriginDestinationOption>';
 
-    //     //die($_xml);
+                        $body .= '</ns2:OriginDestinationOptions>
+                    </ns2:AirItinerary>
+                    <ns2:TravelerInfoSummary>
+                        <ns2:AirTravelerAvail>';
+                            
+                            foreach ($Passengers as $Passenger => $Key) {
+                                if($Key > 0){
+                                    $body .= '<ns2:PassengerTypeQuantity Code="'.$Passenger.'" Quantity="'.$Key.'" />';
+                                }
+                            }  
+                            
 
-    //     $xml = self::parseXML($_xml);
-    //     $json_data = json_decode(json_encode($xml), 1);
-    //     // dump($json_data);
-    //     // exit;
-    //     //pre($json_data);
-    //     //$json_data = json_decode(json_encode($xml), JSON_PRETTY_PRINT);
-    //     //return $json_data;
-
-    //     if (isset($json_data['Body']['OTA_AirAvailRS']['Success'])) {
-    //         $FLIGHTS = [];
-
-    //         $OriginDestinationInformation = $json_data['Body']['OTA_AirAvailRS']['OriginDestinationInformation'];
-    //         $OriginDestinationInformation = is_array($OriginDestinationInformation['OriginDestinationOptions']) ? $OriginDestinationInformation['OriginDestinationOptions'] : $OriginDestinationInformation;
-    //         // dd($OriginDestinationInformation);
-    //         //dd(self::$credential['Target'] == 'live' ? $OriginDestinationInformation : );
-    //         foreach ($OriginDestinationInformation as $i => $info) {
-
-    //             $TRAVELERS_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItineraryPricingInfo->PTC_FareBreakdowns->PTC_FareBreakdown->asXML();
-    //             $OriginDestination_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->OriginDestinationOption->asXML();
-    //             if (!empty($params['Returning'])) {
-    //                 //$segments = $info['OriginDestinationOptions']['OriginDestinationOption'];
-    //                 $segments = [$info];
-    //             } else {
-    //                 //$segments = [$info['OriginDestinationOptions']['OriginDestinationOption']];
-    //                 $segments = [$info];
-    //             }
-    //             // dd($segments);
-
-    //             foreach ($segments as $seg) {
-    //                 // dd($seg);
-    //                 //dd(self::$credential['Target'] == 'live' ? $seg['OriginDestinationOptions']['OriginDestinationOption']['FlightSegment'] : );
-    //                 $segment = (is_array($seg['FlightSegment']) ? $seg['FlightSegment'] : $seg['OriginDestinationOptions']['OriginDestinationOption']);
-    //                 // dd($segments);
-    //                 if (empty($params['Returning'])) {
-    //                     // SINGLE FLIGHT ARRAY
-    //                     // echo "WORKING";
-    //                     // exit();
-    //                     $FlightSegment = $segment['FlightSegment']['@attributes'];
-
-    //                 } else {
-    //                     // RETURN FLIGHT ARRAY
-    //                     // echo "WORKING Return";
-    //                     // exit();
-    //                     $FlightSegment = ["outbound" => $segment[0]['FlightSegment'], "inbound" => $segment[1]['FlightSegment']];
-    //                 }
-    //                 // dd($FlightSegment); 
-    //                 $TYPE = (!empty($params['Returning']) && \Carbon\Carbon::parse($FlightSegment['ArrivalDateTime'])->diffInDays(\Carbon\Carbon::parse($params['Returning'])) == 0 ? 'inbound' : 'outbound');
-    //                 // dd($TYPE);
-    //                 // exit;
-    //                 $DURATION = str_replace(['PT', 'M0.000S', 'H'], ['', 'm', 'h '], $FlightSegment['JourneyDuration']); //PT 2H 0M0.000S
-    //                 $rules_info = [];
-    //                 // dd($segment['FlightSegment']);
-    //                 if (!empty($params['Returning'])) {
-    //                     // $newType = ['inbound' , 'outbound'];
-    //                     $new = 'outbound';
-    //                     $Inboundnew = 'inbound';
-    //                     $flight = [];
-    //                     $InboundFlight = [];
-    //                     // foreach ($newType as $new) {
-    //                         // dd($new);
-    //                         // echo 'first '. $new;
-    //                         // echo 'sec '. $new;
-    //                         // exit;
-    //                         $flightDetail = [
-    //                             'AIRLINE' => 'Fly Jinnah',
-    //                             'AIRLINE_CODE' => "9P",
-    //                             'TYPE' => strtolower($new), 
-    //                             'FLIGHT_NO' => $FlightSegment[$new]['@attributes']['FlightNumber'],
-    //                             'DEPARTURE_DATE' => \Carbon\Carbon::parse($FlightSegment[$new]['@attributes']['DepartureDateTime'])->format('Y-m-d'),
-    //                             'DEPARTURE_TIME' => \Carbon\Carbon::parse($FlightSegment[$new]['@attributes']['DepartureDateTime'])->format('H:i:s'),
-    //                             'ARRIVAL_DATE' => \Carbon\Carbon::parse($FlightSegment[$new]['@attributes']['ArrivalDateTime'])->format('Y-m-d'),
-    //                             'ARRIVAL_TIME' => \Carbon\Carbon::parse($FlightSegment[$new]['@attributes']['ArrivalDateTime'])->format('H:i:s'),
-    //                             'JOURNEY_CODE' => $FlightSegment[$new]['DepartureAirport']['@attributes']['LocationCode'] . "-" . $FlightSegment[$new]['ArrivalAirport']['@attributes']['LocationCode'],
-    //                             'TERMINAL' => $FlightSegment[$new][($TYPE == 'outbound') ? 'DepartureAirport' : 'ArrivalAirport']['@attributes']['Terminal'],
-    //                             'ORGN' => $FlightSegment[$new]['DepartureAirport']['@attributes']['LocationCode'],
-    //                             'DEST' => $FlightSegment[$new]['ArrivalAirport']['@attributes']['LocationCode'],
-    //                             'CURRENCY' => 'PKR',
-    //                             'STOPS' => 1,
-    //                             //'DURATION_MINUTES' => $DURATION,
-    //                             'DURATION' => $DURATION,
-    //                             //'DURATION' => \Carbon\Carbon::parse($DURATION)->format('H') . 'h ' . \Carbon\Carbon::parse($DURATION)->format('i') . 'm',//'02h 00m',
-    //                             'STATUS' => "ONTIME",
-    //                             'RPH' => $FlightSegment[$new]['@attributes']['RPH'],
-    //                             'TRAVELERS_XML' => $TRAVELERS_XML,
-    //                             'OriginDestination_XML' => $OriginDestination_XML,
-    //                             'RULES_INFO' => $rules_info,
-    //                             'TransactionIdentifier' => $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'],
-    //                             'Cookie' => $Cookie,
-    //                         ];
+                        $body .='</ns2:AirTravelerAvail>
+                    </ns2:TravelerInfoSummary>
+                </ns2:OTA_AirPriceRQ>
+            </soap:Body>
+        </soap:Envelope>';
+        // dump('BundledServiceSelectionOptions',$body);
+        // dd($body);
+        // exit;
 
 
-    //                         $flightDetailInbound = [
-    //                             'AIRLINE' => 'Fly Jinnah',
-    //                             'AIRLINE_CODE' => "9P",
-    //                             'TYPE' => strtolower($Inboundnew), 
-    //                             'FLIGHT_NO' => $FlightSegment[$Inboundnew]['@attributes']['FlightNumber'],
-    //                             'DEPARTURE_DATE' => \Carbon\Carbon::parse($FlightSegment[$Inboundnew]['@attributes']['DepartureDateTime'])->format('Y-m-d'),
-    //                             'DEPARTURE_TIME' => \Carbon\Carbon::parse($FlightSegment[$Inboundnew]['@attributes']['DepartureDateTime'])->format('H:i:s'),
-    //                             'ARRIVAL_DATE' => \Carbon\Carbon::parse($FlightSegment[$Inboundnew]['@attributes']['ArrivalDateTime'])->format('Y-m-d'),
-    //                             'ARRIVAL_TIME' => \Carbon\Carbon::parse($FlightSegment[$Inboundnew]['@attributes']['ArrivalDateTime'])->format('H:i:s'),
-    //                             'JOURNEY_CODE' => $FlightSegment[$Inboundnew]['DepartureAirport']['@attributes']['LocationCode'] . "-" . $FlightSegment[$Inboundnew]['ArrivalAirport']['@attributes']['LocationCode'],
-    //                             'TERMINAL' => $FlightSegment[$Inboundnew][($TYPE == 'outbound') ? 'DepartureAirport' : 'ArrivalAirport']['@attributes']['Terminal'],
-    //                             'ORGN' => $FlightSegment[$Inboundnew]['DepartureAirport']['@attributes']['LocationCode'],
-    //                             'DEST' => $FlightSegment[$Inboundnew]['ArrivalAirport']['@attributes']['LocationCode'],
-    //                             'CURRENCY' => 'PKR',
-    //                             'STOPS' => 1,
-    //                             //'DURATION_MINUTES' => $DURATION,
-    //                             'DURATION' => $DURATION,
-    //                             //'DURATION' => \Carbon\Carbon::parse($DURATION)->format('H') . 'h ' . \Carbon\Carbon::parse($DURATION)->format('i') . 'm',//'02h 00m',
-    //                             'STATUS' => "ONTIME",
-    //                             'RPH' => $FlightSegment[$Inboundnew]['@attributes']['RPH'],
-    //                             'TRAVELERS_XML' => $TRAVELERS_XML,
-    //                             'OriginDestination_XML' => $OriginDestination_XML,
-    //                             'RULES_INFO' => $rules_info,
-    //                             'TransactionIdentifier' => $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'],
-    //                             'Cookie' => $Cookie,
-    //                         ];
-    //                         // echo 'first'.$flightDetail;
-    //                         // dd($flightDetail);
-    //                         $flight = array_merge($flight, $flightDetail);
-    //                         $InboundFlight = array_merge($InboundFlight, $flightDetailInbound);
+        $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
+        $client = new Client();
+        
+        $headers = [
+            'Cookie' => $Cookie,
+            'Content-Type' => 'text/xml',
+        ];
+        
+        $response = $client->request('POST', $url, [
+            'headers' => $headers,
+            'body' => $body,
+        ]);
+        $_xml = $response->getBody()->getContents();
+        
+        $xml = self::parseXML($_xml);
 
-    //                     // }
-    //                     // exit;
+        return $json_data = json_decode(json_encode($xml), 1);
+    } 
+    
+    public static function INBOUND_PRICE_REQ_GET_ORIGINAL_PRICE($flight, $params, $Passengers, $Cookie, $TransactionIdentifier)
+    {
+        self::set_credential();
+        // dd($flight['ARRIVAL_DATE']);
+        $Identifier = $TransactionIdentifier;
+       
 
-    //                 } else {
-    //                     // SINGLE FLIGHT DATA
-    //                     // dd($segment);
-    //                     $flight = [
-    //                         'AIRLINE' => 'Fly Jinnah',
-    //                         'AIRLINE_CODE' => "9P",
-    //                         'TYPE' => $TYPE,
-    //                         'FLIGHT_NO' => $FlightSegment['FlightNumber'],
-    //                         'DEPARTURE_DATE' => \Carbon\Carbon::parse($FlightSegment['DepartureDateTime'])->format('Y-m-d'),
-    //                         'DEPARTURE_TIME' => \Carbon\Carbon::parse($FlightSegment['DepartureDateTime'])->format('H:i:s'),
-    //                         'ARRIVAL_DATE' => \Carbon\Carbon::parse($FlightSegment['ArrivalDateTime'])->format('Y-m-d'),
-    //                         'ARRIVAL_TIME' => \Carbon\Carbon::parse($FlightSegment['ArrivalDateTime'])->format('H:i:s'),
-    //                         'JOURNEY_CODE' => $segment['FlightSegment']['DepartureAirport']['@attributes']['LocationCode'] . "-" . $segment['FlightSegment']['ArrivalAirport']['@attributes']['LocationCode'],
-    //                         'TERMINAL' => $segment['FlightSegment'][($TYPE == 'outbound') ? 'DepartureAirport' : 'ArrivalAirport']['@attributes']['Terminal'],
-    //                         'ORGN' => $segment['FlightSegment']['DepartureAirport']['@attributes']['LocationCode'],
-    //                         'DEST' => $segment['FlightSegment']['ArrivalAirport']['@attributes']['LocationCode'],
-    //                         'CURRENCY' => 'PKR',
-    //                         'STOPS' => 0,
-    //                         //'DURATION_MINUTES' => $DURATION,
-    //                         'DURATION' => $DURATION,
-    //                         //'DURATION' => \Carbon\Carbon::parse($DURATION)->format('H') . 'h ' . \Carbon\Carbon::parse($DURATION)->format('i') . 'm',//'02h 00m',
-    //                         'STATUS' => "ONTIME",
-    //                         'RPH' => $FlightSegment['RPH'],
-    //                         'TRAVELERS_XML' => $TRAVELERS_XML,
-    //                         'OriginDestination_XML' => $OriginDestination_XML,
-    //                         'RULES_INFO' => $rules_info,
-    //                         'TransactionIdentifier' => $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'],
-    //                         'Cookie' => $Cookie,
-    //                     ];
-    //                 }
-    //                 ;
-    //                 // dd($flight);
-    //                 $FARE_PAX_WISE = [];
-    //                 /*if(!empty($params['Returning'])){
-    //                     $segments = $info['OriginDestinationOptions']['OriginDestinationOption'];
-    //                 } else {
-    //                     $segments = [$info['OriginDestinationOptions']['OriginDestinationOption']];
-    //                 }*/
+        $ArrivalDate = $flight['ARRIVAL_DATE'].'T'.$flight['ARRIVAL_TIME'];
+        $DepartureDate = $flight['DEPARTURE_DATE'].'T'.$flight['DEPARTURE_TIME'];
 
-    //                 $PTC_FareBreakdowns = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['PTC_FareBreakdowns'];
-    //                 // dd($json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']);
-    //                 if (!is_array($PTC_FareBreakdowns['PTC_FareBreakdown'][0])) {
-    //                     $PTC_FareBreakdowns['PTC_FareBreakdown'] = [$PTC_FareBreakdowns['PTC_FareBreakdown']];
-    //                 }
-    //                 // dd($PTC_FareBreakdowns);
-    //                 foreach ($PTC_FareBreakdowns['PTC_FareBreakdown'] as $_fare) {
-    //                     // dd($_fare);
-    //                     $PassengerQty = $_fare['PassengerTypeQuantity']['@attributes']['Quantity'];
-    //                     $PassengerCode = $_fare['PassengerTypeQuantity']['@attributes']['Code'];
-    //                     $PassengerType = 'ADULT';
-    //                     if ($PassengerCode == 'CHD') {
-    //                         $PassengerType = 'CHILD';
-    //                     } else if ($PassengerCode == 'INF') {
-    //                         $PassengerType = 'INFANT';
-    //                     }
-    //                     $TOTAL = $_fare['PassengerFare']['TotalFare']['@attributes']['Amount'];
-    //                     // dd($TOTAL);
-    //                     $FARE = $_fare['PassengerFare']['BaseFare']['@attributes'];
-    //                     $FARE_PAX_WISE[$PassengerType] = [
-    //                         'BASIC_FARE' => floatval($FARE['Amount']),
-    //                         'TAX' => 0,
-    //                         'TOTAL' => floatval($TOTAL),
-    //                         // * $PassengerQty,
-    //                         'FEES' => 0,
-    //                         'SURCHARGE' => 0,
-    //                     ];
-    //                 }
-    //                 // dd($FARE_PAX_WISE);
-    //                 $M_TOTAL = ($params['AdultNo'] * $FARE_PAX_WISE['ADULT']['TOTAL'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['TOTAL'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['TOTAL']);
-    //                 $TOTAL = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['ItinTotalFare']['TotalFare']['@attributes']['Amount'];
-    //                 $TOTAL_BASIC_FARE = ($params['AdultNo'] * $FARE_PAX_WISE['ADULT']['BASIC_FARE'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['BASIC_FARE'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['BASIC_FARE']);
-    //                 // dump($FARE_PAX_WISE);
-    //                 // dump($json_data);
-    //                 // $BaggageRateList = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions']['AABundledServiceExt']['bundledService'];
-                     
-    //                 //foreach ($json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions'] as $bag) {
+       
+        $FlyjinnahFlightFlightNo = $flight['FLIGHT_NO'];
+        $FlyjinnahFlightRPH = $flight['RPH'];
 
-    //                 //$OriginDestinationOptions = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions'];
-    //                 if (!empty($params['Returning'])) {
-    //                     $OriginDestinationOptions = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions'];
-    //                 } else {
-    //                     $OriginDestinationOptions = [
-    //                         'OriginDestinationOption' => [$json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions']['OriginDestinationOption']],
-    //                         'AABundledServiceExt' => [$json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions']['AABundledServiceExt']]
-    //                     ];
-    //                 }
-    //                 // dd($OriginDestinationOptions);
-    //                 $OriginDestinationOptions = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions'];
-    //                 $BAGGAGE_FARE = [];
-    //                 $InBoundBAGGAGE_FARE = [];
-                     
-    //                 if ($params['Returning']) {
-                        
-    //                     $bag_basic = [
-    //                         'title' => 'Basic',
-    //                         'bundledServiceName' => 'Basic',
-    //                         'no_of_bags' => 0,
-    //                         'weight' => '0 Kg Checked Baggage',
-    //                         'included_services' => 'BAGGAGE, SEAT_MAP, MEAL, FLEXI_CHARGES(Additional Charges if included)',
-    //                         'description' => [ "Flight" => "",
-    //                         "Checked Baggage" => "none"],
-    //                         'bookingClasses' => 'Economy',
-    //                         'TOTAL' => $M_TOTAL,
-    //                         'TOTAL_BASIC_FARE' => $TOTAL_BASIC_FARE,
-    //                         // + $bag['perPaxBundledFee'],
-    //                         'MTOTAL' => ($params['AdultNo'] * $FARE_PAX_WISE['ADULT']['TOTAL'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['TOTAL'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['TOTAL']), 
-    //                         // + $bag['perPaxBundledFee'],
-    //                         'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                     ];   
-    //                     // dd($bag_basic);
-                     
-    //                     foreach ($OriginDestinationOptions['AABundledServiceExt'][0]['bundledService'] as $bag) {
-    //                         $text = $bag['description'];
-    //                         $lines = explode("\n", $text);
-    //                         $data = [];
-    //                         foreach ($lines as $line) {
-    //                             list($key, $value) = explode(": ", $line, 2);
-    //                             $data[trim($key)] = trim($value);
-    //                         }
-    //                         if ($bag['bundledServiceName'] == 'Value' || $bag['bundledServiceName'] == 'Value Flex') {
-    //                             $weight = '23 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Ultimate') {
-    //                             $weight = '46 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Basic') {
-    //                             $weight = '0 Kg Checked Baggage';
-    //                         }  
-    //                         $BAGGAGE_FARE[] = [
-    //                             'title' => $bag['bundledServiceName'],
-    //                             'no_of_bags' => ($bag['bundledServiceName'] == 'Value' ? 1 : ($bag['bundledServiceName'] == 'Extra' ? 2 : 0)),
-    //                             'weight' => $weight,
-    //                             'included_services' => join(', ', $bag['includedServies']),
-    //                             'description' => $data,
-    //                             'bookingClasses' => $bag['bookingClasses'],
-    //                             'TOTAL' => $TOTAL + $bag['perPaxBundledFee'],
-    //                             'TOTAL_BASIC_FARE' => $TOTAL_BASIC_FARE,
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'MTOTAL' => $M_TOTAL + $bag['perPaxBundledFee'],
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                         ];
-    //                     }
-    //                     $BAGGAGE_FARE = array_merge([$bag_basic], $BAGGAGE_FARE);
-    //                     // dd($BAGGAGE_FARE);
+        $Orgn = $flight['ORGN'];
+        $Dest = $flight['DEST'];
 
-    //                     foreach ($OriginDestinationOptions['AABundledServiceExt'][1]['bundledService'] as $bag) {
-    //                         $text = $bag['description'];
-    //                         $lines = explode("\n", $text);
-    //                         $data = [];
-    //                         foreach ($lines as $line) {
-    //                             list($key, $value) = explode(": ", $line, 2);
-    //                             $data[trim($key)] = trim($value);
-    //                         }
-    //                         if ($bag['bundledServiceName'] == 'Value' || $bag['bundledServiceName'] == 'Value Flex') {
-    //                             $weight = '23 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Ultimate') {
-    //                             $weight = '46 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Basic') {
-    //                             $weight = '0 Kg Checked Baggage';
-    //                         }  
-    //                         $InBoundBAGGAGE_FARE[] = [
-    //                             'title' => $bag['bundledServiceName'],
-    //                             'no_of_bags' => ($bag['bundledServiceName'] == 'Value' ? 1 : ($bag['bundledServiceName'] == 'Extra' ? 2 : 0)),
-    //                             'weight' => $weight,
-    //                             'included_services' => join(', ', $bag['includedServies']),
-    //                             'description' => $data,
-    //                             'bookingClasses' => $bag['bookingClasses'],
-    //                             'TOTAL' => $TOTAL + $bag['perPaxBundledFee'],
-    //                             'TOTAL_BASIC_FARE' => $TOTAL_BASIC_FARE,
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'MTOTAL' => $M_TOTAL + $bag['perPaxBundledFee'],
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                         ];
-    //                     }
-    //                     $InBoundBAGGAGE_FARE = array_merge([$bag_basic], $InBoundBAGGAGE_FARE);
-    //                 } else {
-    //                     // old start
-    //                     // dd($OriginDestinationOptions['AABundledServiceExt']['bundledService']);
-    //                     // $bag_value = $OriginDestinationOptions['AABundledServiceExt']['bundledService'][2];
-    //                     // dd($bag_value);
-    //                     $bag_value_flex = $OriginDestinationOptions['AABundledServiceExt']['bundledService'][0];
-    //                     // dd($bag_value_flex);
-    //                     $bag_ultimate = $OriginDestinationOptions['AABundledServiceExt']['bundledService'][1];
-    //                     // dd($bag_ultimate);
 
-    //                     $bag_basic = [
-    //                         'title' => 'Basic',
-    //                         'bundledServiceName' => 'Basic',
-    //                         'no_of_bags' => 0,
-    //                         'weight' => '0 Kg Checked Baggage',
-    //                         'included_services' => 'BAGGAGE, SEAT_MAP, MEAL, FLEXI_CHARGES(Additional Charges if included)',
-    //                         'description' => [ "Flight" => "",
-    //                         "Checked Baggage" => "none"],
-    //                         'bookingClasses' => 'Economy',
-    //                         'TOTAL' => $M_TOTAL,
-    //                         'TOTAL_BASIC_FARE' => $TOTAL_BASIC_FARE,
-    //                         // + $bag['perPaxBundledFee'],
-    //                         'MTOTAL' => ($params['AdultNo'] * $FARE_PAX_WISE['ADULT']['TOTAL'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['TOTAL'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['TOTAL']), 
-    //                         // + $bag['perPaxBundledFee'],
-    //                         'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                     ];   
-    //                     $mergedBages = [$bag_basic, $bag_value_flex, $bag_ultimate];
-    //                     // dd($mergedBages);   
-    //                     foreach ($mergedBages as $bag) {
+        $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <soap:Header>
+                <wsse:Security soap:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+                    <wsse:UsernameToken wsu:Id="UsernameToken-17855236" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                        <wsse:Username>'.self::$credential['USERNAME'].'</wsse:Username>
+                        <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">'.self::$credential['PASSWORD'].'</wsse:Password>
+                    </wsse:UsernameToken>
+                </wsse:Security>
+            </soap:Header>
+            <soap:Body xmlns:ns2="http://www.opentravel.org/OTA/2003/05">
+                <ns2:OTA_AirPriceRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="live" TransactionIdentifier="'.$Identifier.'" Version="20061.00">
+                    <ns2:POS>
+                        <ns2:Source TerminalID="'.self::$credential['USERNAME'].'">
+                            <ns2:RequestorID ID="'.self::$credential['USERNAME'].'" Type="4" />
+                            <ns2:BookingChannel Type="12" />
+                        </ns2:Source>
+                    </ns2:POS>
+                    <ns2:AirItinerary DirectionInd="OneWay">
+                        <ns2:OriginDestinationOptions>';
+                            $body .= '<ns2:OriginDestinationOption>
+                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                                    <ns2:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
+                                    <ns2:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
+                                </ns2:FlightSegment>
+                            </ns2:OriginDestinationOption>';
 
-    //                         $text = $bag['description'];
-    //                         $lines = explode("\n", $text);
-    //                         $data = [];
-    //                         foreach ($lines as $line) {
-    //                             list($key, $value) = explode(": ", $line, 2);
-    //                             $data[trim($key)] = trim($value);
-    //                         }
-    //                         if ($bag['bundledServiceName'] == 'Value' || $bag['bundledServiceName'] == 'Value Flex') {
-    //                             $weight = '23 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Ultimate') {
-    //                             $weight = '46 Kg Checked Baggage';
-    //                         } elseif ($bag['bundledServiceName'] == 'Basic') {
-    //                             $weight = '0 Kg Checked Baggage';
-    //                         }                          
-    //                         $BAGGAGE_FARE[] = [
-    //                             'title' => $bag['bundledServiceName'],
-    //                             'no_of_bags' => ($bag['bundledServiceName'] == 'Value' ? 1 : ($bag['bundledServiceName'] == 'Extra' ? 2 : 0)),
-    //                             'weight' =>  $weight,
-    //                             'included_services' => join(', ', $bag['includedServies']),
-    //                             'description' => $data,
-    //                             'bookingClasses' => $bag['bookingClasses'],
-    //                             'TOTAL' => $TOTAL + $bag['perPaxBundledFee'],
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'TOTAL_BASIC_FARE' => $TOTAL_BASIC_FARE,
-    //                             'MTOTAL' => $M_TOTAL + $bag['perPaxBundledFee'], 
-    //                             // + $bag['perPaxBundledFee'],
-    //                             'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                         ];
-    //                         // dd($BAGGAGE_FARE);
-    //                     }
-    //                     // dd($BAGGAGE_FARE);
-    //                     // old end
-    //                 }
-    //                 // $EconomyBagage[] = [
-    //                 //         'title' => 'Basic',
-    //                 //         'no_of_bags' => 0,
-    //                 //         'weight' => 'No check-in baggage(Additional Charges if included)',
-    //                 //         'included_services' => 'BAGGAGE, SEAT_MAP, MEAL, FLEXI_CHARGES(Additional Charges if included)',
-    //                 //         'description' => [ "Flight" => "",
-    //                 //         "Checked Baggage" => "none",
-    //                 //         "Meal" => "Additional Charges if included",
-    //                 //         "Seat" => "Random",
-    //                 //         "Modification" => "One modification, up to 6h",
-    //                 //         "Cancellation" => "Up to 6h"],
-    //                 //         'bookingClasses' => 'Economy',
-    //                 //         'TOTAL' => $M_TOTAL,
-    //                 //         // + $bag['perPaxBundledFee'],
-    //                 //         'MTOTAL' => ($params['AdultNo'] * $FARE_PAX_WISE['ADULT']['TOTAL'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['TOTAL'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['TOTAL']), 
-    //                 //         // + $bag['perPaxBundledFee'],
-    //                 //         'FARE_PAX_WISE' => $FARE_PAX_WISE
-    //                 // ];
-    //                 // dd($InboundFlight);
-    //                 $flight['BAGGAGE_FARE'] = array_merge_recursive($BAGGAGE_FARE);
-    //                 // dd($flight['BAGGAGE_FARE']);
-    //                 //$flight['xml'] = $_xml;
-    //                 $FLIGHTS[$TYPE][$flight['FLIGHT_NO']] = $flight;
-    //                 if (!empty($params['Returning'])) {
-    //                     $InboundFlight['BAGGAGE_FARE'] = array_merge_recursive($InBoundBAGGAGE_FARE);
-    //                     $FLIGHTS['inbound'][$InboundFlight['FLIGHT_NO']] = $InboundFlight;
-    //                 }
-    //                 // dd($FLIGHTS['inbound'][$InboundFlight['FLIGHT_NO']]);
-    //                 // dump('new--aw',$flight);
-    //             }
-    //         }
-    //          $info = array_map('array_values', $FLIGHTS);
-    //         //  dd($info);
-    //         $FLIGHTS['FLIGHT_FlyJinnah_STATUS'][] = 'Success';
-    //         // dd($FLIGHTS);
-    //         return array_map('array_values', $FLIGHTS);
-    //     } else {
-    //         return [
-    //             'data' => $json_data['Body']['OTA_AirAvailRS']['Errors']['Error']['@attributes']['ShortText'],
-    //             'code' => $json_data['Body']['OTA_AirAvailRS']['Errors']['Error']['@attributes']['Code'],
-    //             'status' => false,
-    //             'FLIGHT_FlyJinnah_STATUS' => 'UnSuccess'
-    //         ];
+                        $body .= '</ns2:OriginDestinationOptions>
+                    </ns2:AirItinerary>
+                    <ns2:TravelerInfoSummary>
+                        <ns2:AirTravelerAvail>';
+                            
+                            foreach ($Passengers as $Passenger => $Key) {
+                                if($Key > 0){
+                                    $body .= '<ns2:PassengerTypeQuantity Code="'.$Passenger.'" Quantity="'.$Key.'" />';
+                                }
+                            }  
+                            
 
-    //         //return $json_data['Body']['OTA_AirAvailRS'];
-    //     }
-    // }
+                        $body .='</ns2:AirTravelerAvail>
+                    </ns2:TravelerInfoSummary>
+                </ns2:OTA_AirPriceRQ>
+            </soap:Body>
+        </soap:Envelope>';
+        // dump('BundledServiceSelectionOptions',$body);
+        // dd($body);
+        // exit;
+
+
+        $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
+        $client = new Client();
+        
+        $headers = [
+            'Cookie' => $Cookie,
+            'Content-Type' => 'text/xml',
+        ];
+        
+        $response = $client->request('POST', $url, [
+            'headers' => $headers,
+            'body' => $body,
+        ]);
+        $_xml = $response->getBody()->getContents();
+        
+        $xml = self::parseXML($_xml);
+
+        return $json_data = json_decode(json_encode($xml), 1);
+    } 
+
     public static function OTA_AirAvailRQ($params = [])
     {
         // dd(request());
@@ -708,12 +352,14 @@ class FlyJinnah
             $OriginDestinationInformation = is_array($OriginDestinationInformation['OriginDestinationOptions']) ? $OriginDestinationInformation['OriginDestinationOptions'] : $OriginDestinationInformation;
             // dd($OriginDestinationInformation);
             //dd(self::$credential['Target'] == 'live' ? $OriginDestinationInformation : );
-            dd($OriginDestinationInformation);
+            // dd($OriginDestinationInformation);
             foreach ($OriginDestinationInformation as $i => $info) {
-                // dump($info->asXML());
-                dd($xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItineraryPricingInfo->PTC_FareBreakdowns->PTC_FareBreakdown->asXML());
+                // dump($info);
+                // dd($xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItineraryPricingInfo->PTC_FareBreakdowns->PTC_FareBreakdown->asXML());
                 $TRAVELERS_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItineraryPricingInfo->PTC_FareBreakdowns->PTC_FareBreakdown->asXML();
-                $OriginDestination_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->OriginDestinationOption->asXML();
+                $OriginDestination_XML = json_encode($info);
+                // dump($TRAVELERS_XML);
+                // dump($OriginDestination_XML);
                 if (!empty($params['Returning'])) {
                     //$segments = $info['OriginDestinationOptions']['OriginDestinationOption'];
                     $segments = [$info];
@@ -722,6 +368,7 @@ class FlyJinnah
                     $segments = [$info];
                 }
                 // dd($segments);
+                
 
                 foreach ($segments as $seg) {
                     // dd($seg);
@@ -745,6 +392,7 @@ class FlyJinnah
                     // dd($TYPE);
                     // exit;
                     $DURATION = str_replace(['PT', 'M0.000S', 'H'], ['', 'm', 'h '], $FlightSegment['JourneyDuration']); //PT 2H 0M0.000S
+                    $TransactionIdentifier = $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'];
                     $rules_info = [];
                     // dd($segment['FlightSegment']);
                    
@@ -773,7 +421,7 @@ class FlyJinnah
                         'TRAVELERS_XML' => $TRAVELERS_XML,
                         'OriginDestination_XML' => $OriginDestination_XML,
                         'RULES_INFO' => $rules_info,
-                        'TransactionIdentifier' => $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'],
+                        'TransactionIdentifier' => $TransactionIdentifier,
                         'Cookie' => $Cookie,
                     ];
                     // dd($flight);
@@ -783,8 +431,10 @@ class FlyJinnah
                     } else {
                         $segments = [$info['OriginDestinationOptions']['OriginDestinationOption']];
                     }*/
-
-                    $PTC_FareBreakdowns = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['PTC_FareBreakdowns'];
+                    
+                    $PRICEREQGETORIGINALPRICE = self::OUTBOUND_PRICE_REQ_GET_ORIGINAL_PRICE($flight, $params, $Passengers, $Cookie, $TransactionIdentifier);
+                   
+                    $PTC_FareBreakdowns = $PRICEREQGETORIGINALPRICE['Body']['OTA_AirPriceRS']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['PTC_FareBreakdowns'];
                     // dd($json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']);
                     if (!is_array($PTC_FareBreakdowns['PTC_FareBreakdown'][0])) {
                         $PTC_FareBreakdowns['PTC_FareBreakdown'] = [$PTC_FareBreakdowns['PTC_FareBreakdown']];
@@ -846,6 +496,7 @@ class FlyJinnah
                     }
                     // dd($OriginDestinationOptions);
                     $OriginDestinationOptions = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItinerary']['OriginDestinationOptions'];
+                    // dd($OriginDestinationOptions);
                     $BAGGAGE_FARE = [];
 
                     $bag_basic = [
@@ -872,13 +523,16 @@ class FlyJinnah
                         $TotalBages = $OriginDestinationOptions['AABundledServiceExt']['bundledService'];
                         $mergedBages = [$bag_basic,$TotalBages];    
                     }  
-                    // dd($mergedBages);
+                    // dd($mergedBages[1]['bundledServiceName']);
+                    // if($mergedBages[1]['bundledServiceName'] == 'Ultimate') {
+                    //     echo 'correct';
+                    // }
+                    // echo 'wrong';
+                    // exit;
                     $BagCounter = 0;
-                    foreach ($mergedBages as $bag) {
-                        // dd($FARE_PAX_WISE);
 
+                    foreach ($mergedBages as $bag) {
                         if($bag['bundledServiceName'] == 'Ultimate') {
-                            
                             if($BagCounter == '2'){
                                 $FARE_PAX_WISE['ADULT']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];
                                 $FARE_PAX_WISE['CHILD']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];    
@@ -886,11 +540,8 @@ class FlyJinnah
 
                             $FARE_PAX_WISE['ADULT']['TOTAL'] += $bag['perPaxBundledFee'];
                             $FARE_PAX_WISE['CHILD']['TOTAL'] += $bag['perPaxBundledFee'];  
-                            // dd($FARE_PAX_WISE);                          
-                        } elseif($bag['bundledServiceName'] == 'Value') {
-                            // dump($BagCounter);
-                            // dump($FARE_PAX_WISE);
-                            // dump($mergedBages[$BagCounter-1]['perPaxBundledFee']);
+                        } 
+                        if($bag['bundledServiceName'] == 'Value') {
                             if($BagCounter == '2'){
                                 $FARE_PAX_WISE['ADULT']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];
                                 $FARE_PAX_WISE['CHILD']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];    
@@ -898,13 +549,9 @@ class FlyJinnah
 
                             $FARE_PAX_WISE['ADULT']['TOTAL'] += $bag['perPaxBundledFee'];
                             $FARE_PAX_WISE['CHILD']['TOTAL'] += $bag['perPaxBundledFee'];
-                            // dd($FARE_PAX_WISE);
                         }
                         $BagCounter++;
-                        // exit;
-                        // dump($bag['perPaxBundledFee']);
 
-                        // dd($FARE_PAX_WISE);
                         $TOTAL = $params['AdultNo'] * $FARE_PAX_WISE['ADULT']['TOTAL'] + $params['ChildNo'] * $FARE_PAX_WISE['CHILD']['TOTAL'] + $params['InfantNo'] * $FARE_PAX_WISE['INFANT']['TOTAL'];
 
                         $text = $bag['description'];
@@ -1101,7 +748,7 @@ class FlyJinnah
             foreach ($OriginDestinationInformation as $i => $info) {
 
                 $TRAVELERS_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItineraryPricingInfo->PTC_FareBreakdowns->PTC_FareBreakdown->asXML();
-                $OriginDestination_XML = $xml->Body->OTA_AirAvailRS->AAAirAvailRSExt->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->OriginDestinationOption->asXML();
+                $OriginDestination_XML = json_encode($info);
                 if (!empty($params['Returning'])) {
                     //$segments = $info['OriginDestinationOptions']['OriginDestinationOption'];
                     $segments = [$info];
@@ -1133,6 +780,7 @@ class FlyJinnah
                     // dd($TYPE);
                     // exit;
                     $DURATION = str_replace(['PT', 'M0.000S', 'H'], ['', 'm', 'h '], $FlightSegment['JourneyDuration']); //PT 2H 0M0.000S
+                    $TransactionIdentifier = $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'];
                     $rules_info = [];
                     // dd($segment['FlightSegment']);
                    
@@ -1161,7 +809,7 @@ class FlyJinnah
                         'TRAVELERS_XML' => $TRAVELERS_XML,
                         'OriginDestination_XML' => $OriginDestination_XML,
                         'RULES_INFO' => $rules_info,
-                        'TransactionIdentifier' => $json_data['Body']['OTA_AirAvailRS']['@attributes']['TransactionIdentifier'],
+                        'TransactionIdentifier' => $TransactionIdentifier,
                         'Cookie' => $Cookie,
                     ];
                     // dd($flight);
@@ -1172,7 +820,9 @@ class FlyJinnah
                         $segments = [$info['OriginDestinationOptions']['OriginDestinationOption']];
                     }*/
 
-                    $PTC_FareBreakdowns = $json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['PTC_FareBreakdowns'];
+                    $PRICEREQGETORIGINALPRICE = self::INBOUND_PRICE_REQ_GET_ORIGINAL_PRICE($flight, $params, $Passengers, $Cookie, $TransactionIdentifier);
+
+                    $PTC_FareBreakdowns = $PRICEREQGETORIGINALPRICE['Body']['OTA_AirPriceRS']['PricedItineraries']['PricedItinerary']['AirItineraryPricingInfo']['PTC_FareBreakdowns'];
                     // dd($json_data['Body']['OTA_AirAvailRS']['AAAirAvailRSExt']['PricedItineraries']);
                     if (!is_array($PTC_FareBreakdowns['PTC_FareBreakdown'][0])) {
                         $PTC_FareBreakdowns['PTC_FareBreakdown'] = [$PTC_FareBreakdowns['PTC_FareBreakdown']];
@@ -1265,6 +915,7 @@ class FlyJinnah
                         }   
                         // dd($mergedBages);
                         $BagCounter = 0;
+    
                         foreach ($mergedBages as $bag) {
 
                             if($bag['bundledServiceName'] == 'Ultimate') {
@@ -1278,9 +929,7 @@ class FlyJinnah
                                 $FARE_PAX_WISE['CHILD']['TOTAL'] += $bag['perPaxBundledFee'];  
                                 // dd($FARE_PAX_WISE);                          
                             } elseif($bag['bundledServiceName'] == 'Value') {
-                                // dump($BagCounter);
-                                // dump($FARE_PAX_WISE);
-                                // dump($mergedBages[$BagCounter-1]['perPaxBundledFee']);
+                                
                                 if($BagCounter == '2'){
                                     $FARE_PAX_WISE['ADULT']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];
                                     $FARE_PAX_WISE['CHILD']['TOTAL'] -= $mergedBages[$BagCounter-1]['perPaxBundledFee'];    
@@ -1355,6 +1004,7 @@ class FlyJinnah
 
     public static function OTA_AirPriceRQ($params = [])
     {
+        dd($params);
         // dd($params['outbound']['travelers']['LocationDep']);
         // dd($params['outbound']['flight']['TYPE']);
         // dd(request());

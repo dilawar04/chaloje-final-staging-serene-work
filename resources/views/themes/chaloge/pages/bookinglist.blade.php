@@ -732,7 +732,7 @@ $as = json_encode($flightStatus);
                  console.log(flightType, _data.type)
                  $.post('{{ url('flight/checkFlight') }}', {flight: JSON.stringify(_data), type: _data.type}, function (json) {
                      if((flightType === 'Round Trip' && _data.type === 'inbound') || flightType === 'One Way'){
-                         window.location = '{!! url('manage-booking?' . http_build_query(request()->all())) !!}';
+                        //  window.location = '{!! url('manage-booking?' . http_build_query(request()->all())) !!}';
                      } else {
                          $('.flight-type-outbound').hide();
                          //$('.flight-type-inbound.airline-' + _data.airline).show();

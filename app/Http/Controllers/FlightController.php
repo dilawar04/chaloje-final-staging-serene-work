@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Session;
 use App\Utils\SignatureUtil;
-
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Http\Response;
 
 
 class FlightController extends Controller
@@ -151,52 +152,47 @@ class FlightController extends Controller
         return $json_data->Body->{"{$action}Response"}->{"{$action}Result"}->SecurityToken;
     }
 
-    public static function PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight)
+    public static function PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $type, $flight)
     {
-        
         $Passengers = [
             'ADT' => $flight->travelers->AdultNo,
             'CHD' => $flight->travelers->ChildNo,
             'INF' => $flight->travelers->InfantNo,
         ];
-        
 
         self::set_credential();
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-            $DirectionInd = 'Return';
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahOutbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahOutbound->flight->RPH;    
 
-            $FlyjinnahInboundFlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
-            $FlyjinnahInboundRPH = $FlyjinnahInbound->flight->RPH;    
+            $ArrivalDate = $FlyjinnahOutbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahOutbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahOutbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahOutbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahOutbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahOutbound->flight->Cookie;
 
-            $FlyjinnahInboundArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
-            $FlyjinnahInboundDepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            $Orgn = $FlyjinnahOutbound->flight->ORGN;
+            $Dest = $FlyjinnahOutbound->flight->DEST;
+
+        }
         
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahInbound->flight->RPH;    
 
-        }else {
-            $DirectionInd = 'OneWay'; 
+            $ArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahInbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahInbound->flight->Cookie;
+
+            $Orgn = $FlyjinnahInbound->flight->ORGN;
+            $Dest = $FlyjinnahInbound->flight->DEST;
+
         }
-
-        if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-            $FlyjinnahFlight = $FlyjinnahOutbound;
-        }else{
-            $FlyjinnahFlight = $FlyjinnahInbound;
-        }
-
-        $Identifier = $FlyjinnahFlight->flight->TransactionIdentifier;
-        $Cookie = $FlyjinnahFlight->flight->Cookie;
-        // dd($Cookie);
-        // dump($Identifier);
-        // dump($Cookie);
-
-        $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
-        $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
-
-        $FlyjinnahFlightFlightNo = $FlyjinnahFlight->flight->FLIGHT_NO;
-        $FlyjinnahFlightRPH = $FlyjinnahFlight->flight->RPH;
-
-        $Orgn = $FlyjinnahFlight->flight->ORGN;
-        $Dest = $FlyjinnahFlight->flight->DEST;
+        
+        $DirectionInd = 'OneWay'; 
 
 
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -219,20 +215,11 @@ class FlightController extends Controller
                     <ns2:AirItinerary DirectionInd="'.$DirectionInd.'">
                         <ns2:OriginDestinationOptions>';
                             $body .= '<ns2:OriginDestinationOption>
-                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlightNo.'" RPH="'.$RPH.'">
                                     <ns2:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
                                     <ns2:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
                                 </ns2:FlightSegment>
                             </ns2:OriginDestinationOption>';
-
-                            if($DirectionInd == 'Return'){
-                                $body .= '<ns2:OriginDestinationOption>
-                                    <ns2:FlightSegment ArrivalDateTime="'.$FlyjinnahInboundArrivalDate.'" DepartureDateTime="'.$FlyjinnahInboundDepartureDate.'" FlightNumber="'.$FlyjinnahInboundFlightNo.'" RPH="'.$FlyjinnahInboundRPH.'">
-                                        <ns2:DepartureAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
-                                        <ns2:ArrivalAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
-                                    </ns2:FlightSegment>
-                                </ns2:OriginDestinationOption>';
-                            }
 
                         $body .= '</ns2:OriginDestinationOptions>
                     </ns2:AirItinerary>
@@ -257,7 +244,7 @@ class FlightController extends Controller
 
         $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
         $client = new Client();
-        
+
         $headers = [
             'Cookie' => $Cookie,
             'Content-Type' => 'text/xml',
@@ -270,16 +257,13 @@ class FlightController extends Controller
         $_xml = $response->getBody()->getContents();
         
         $xml = self::parseXML($_xml);
-        // dump('PRICE_REQ_FOR_GETTING_BAGGAGES',$xml);
-        // exit;
+        
         return $json_data = json_decode(json_encode($xml));
     }
 
-    public static function PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId)
+    public static function PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId)
     {
-        // dump($FlyjinnahOutboundGettingBundleServiceId);
-        // dump($FlyjinnahInboundGettingBundleServiceId);
-        // exit;
+
         $Passengers = [
             'ADT' => $flight->travelers->AdultNo,
             'CHD' => $flight->travelers->ChildNo,
@@ -288,39 +272,38 @@ class FlightController extends Controller
 
         self::set_credential();
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-            $DirectionInd = 'Return';
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahOutbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahOutbound->flight->RPH;    
 
-            $FlyjinnahInboundFlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
-            $FlyjinnahInboundRPH = $FlyjinnahInbound->flight->RPH;    
+            $ArrivalDate = $FlyjinnahOutbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahOutbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahOutbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahOutbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahOutbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahOutbound->flight->Cookie;
 
-            $FlyjinnahInboundArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
-            $FlyjinnahInboundDepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
-        }else {
-            $DirectionInd = 'OneWay';
+            $Orgn = $FlyjinnahOutbound->flight->ORGN;
+            $Dest = $FlyjinnahOutbound->flight->DEST;
+
+
         }
+        
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahInbound->flight->RPH;    
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-            $FlyjinnahFlight = $FlyjinnahOutbound;
-        }else{
-            $FlyjinnahFlight = $FlyjinnahInbound;
+            $ArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahInbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahInbound->flight->Cookie;
+
+            $Orgn = $FlyjinnahInbound->flight->ORGN;
+            $Dest = $FlyjinnahInbound->flight->DEST;
+        
         }
-
-        $Identifier = $FlyjinnahFlight->flight->TransactionIdentifier;
-        $Cookie = $FlyjinnahFlight->flight->Cookie;
-
-        // dump($Identifier);
-        // dump($Cookie);
-
-        $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
-        $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
-
-        $FlyjinnahFlightFlightNo = $FlyjinnahFlight->flight->FLIGHT_NO;
-        $FlyjinnahFlightRPH = $FlyjinnahFlight->flight->RPH;
-
-        $Orgn = $FlyjinnahFlight->flight->ORGN;
-        $Dest = $FlyjinnahFlight->flight->DEST;
-
+        
+        $DirectionInd = 'OneWay'; 
 
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <soap:Header>
@@ -343,20 +326,11 @@ class FlightController extends Controller
                         <ns2:OriginDestinationOptions>';
 
                         $body .= '<ns2:OriginDestinationOption>
-                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                                <ns2:FlightSegment ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlightNo.'" RPH="'.$RPH.'">
                                     <ns2:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
                                     <ns2:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
                                 </ns2:FlightSegment>
                             </ns2:OriginDestinationOption>';
-
-                        if($DirectionInd == 'Return'){
-                            $body .= '<ns2:OriginDestinationOption>
-                                <ns2:FlightSegment ArrivalDateTime="'.$FlyjinnahInboundArrivalDate.'" DepartureDateTime="'.$FlyjinnahInboundDepartureDate.'" FlightNumber="'.$FlyjinnahInboundFlightNo.'" RPH="'.$FlyjinnahInboundRPH.'">
-                                    <ns2:DepartureAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'" />
-                                    <ns2:ArrivalAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'" />
-                                </ns2:FlightSegment>
-                            </ns2:OriginDestinationOption>';
-                        }
 
                         $body .= '</ns2:OriginDestinationOptions>
                     </ns2:AirItinerary>
@@ -372,23 +346,15 @@ class FlightController extends Controller
                         $body .= '</ns2:AirTravelerAvail>
                     </ns2:TravelerInfoSummary>
                     <ns2:BundledServiceSelectionOptions>';
-                        
-                        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-                
-                            $body .= '<ns2:OutBoundBunldedServiceId>'.$FlyjinnahOutboundGettingBundleServiceId.'</ns2:OutBoundBunldedServiceId>';
-                            $body .= '<ns2:InBoundBunldedServiceId>'.$FlyjinnahInboundGettingBundleServiceId.'</ns2:InBoundBunldedServiceId>';
-                
-                        }else if($FlyjinnahOutbound->airline == 'fly-jinnah' || $FlyjinnahInbound->airline == 'fly-jinnah'){
-                            
-                            if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-                                $FlyJinnahBundleServiceIdRoundTrip = $FlyjinnahOutboundGettingBundleServiceId;
-                            }else if($FlyjinnahInbound->airline == 'fly-jinnah'){
-                                $FlyJinnahBundleServiceIdRoundTrip = $FlyjinnahInboundGettingBundleServiceId;
-                            }
-                
-                            $body .= '<ns2:OutBoundBunldedServiceId>'.$FlyJinnahBundleServiceIdRoundTrip.'</ns2:OutBoundBunldedServiceId>';
-                            $body .= '<ns2:InBoundBunldedServiceId>null</ns2:InBoundBunldedServiceId>';
-                        }
+
+                    if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+                        $body .= '<ns2:OutBoundBunldedServiceId>'.$FlyjinnahOutboundGettingBundleServiceId.'</ns2:OutBoundBunldedServiceId>
+                                    <ns2:InBoundBunldedServiceId>null</ns2:InBoundBunldedServiceId>';
+                    }
+                    if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+                        $body .= '<ns2:OutBoundBunldedServiceId>'.$FlyjinnahInboundGettingBundleServiceId.'</ns2:OutBoundBunldedServiceId>
+                                    <ns2:InBoundBunldedServiceId>null</ns2:InBoundBunldedServiceId>';
+                    }
 
                     $body .= '</ns2:BundledServiceSelectionOptions>
                 </ns2:OTA_AirPriceRQ>
@@ -401,7 +367,7 @@ class FlightController extends Controller
 
         $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
         $client = new Client();
-        
+
         $headers = [
             'Cookie' => $Cookie,
             'Content-Type' => 'text/xml',
@@ -420,44 +386,42 @@ class FlightController extends Controller
         return $json_data = json_decode(json_encode($xml));
     }
 
-    public static function BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight)
+    public static function BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type)
     {
 
         self::set_credential();
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-            $DirectionInd = 'Return';
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahOutbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahOutbound->flight->RPH;    
 
-            $FlyjinnahInboundFlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
-            $FlyjinnahInboundRPH = $FlyjinnahInbound->flight->RPH;    
+            $ArrivalDate = $FlyjinnahOutbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahOutbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahOutbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahOutbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahOutbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahOutbound->flight->Cookie;
 
-            $FlyjinnahInboundArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
-            $FlyjinnahInboundDepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
-        }else {
-            $DirectionInd = 'OneWay';
+            $Orgn = $FlyjinnahOutbound->flight->ORGN;
+            $Dest = $FlyjinnahOutbound->flight->DEST;
+
+
         }
+        
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahInbound->flight->RPH;    
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-            $FlyjinnahFlight = $FlyjinnahOutbound;
-        }else{
-            $FlyjinnahFlight = $FlyjinnahInbound;
+            $ArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahInbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahInbound->flight->Cookie;
+
+            $Orgn = $FlyjinnahInbound->flight->ORGN;
+            $Dest = $FlyjinnahInbound->flight->DEST;
+        
         }
-
-        $Identifier = $FlyjinnahFlight->flight->TransactionIdentifier;
-        $Cookie = $FlyjinnahFlight->flight->Cookie;
-        // dump($Identifier);
-        // dump($Cookie);
-        // exit;
-
-        $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
-        $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
-
-        $FlyjinnahFlightFlightNo = $FlyjinnahFlight->flight->FLIGHT_NO;
-        $FlyjinnahFlightRPH = $FlyjinnahFlight->flight->RPH;
-
-        $Orgn = $FlyjinnahFlight->flight->ORGN;
-        $Dest = $FlyjinnahFlight->flight->DEST;
-
+        
 
         $body = '<?xml version="1.0" encoding="UTF-8"?>
                     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
@@ -482,22 +446,12 @@ class FlightController extends Controller
                                 <ns:BaggageDetailsRequests>';
 
                                     $body .= '<ns:BaggageDetailsRequest>
-                                        <ns:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'" returnFlag="false">
+                                        <ns:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlightNo.'" RPH="'.$RPH.'" returnFlag="false">
                                             <ns:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'"/>
                                             <ns:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'"/>
                                             <ns:OperatingAirline Code="9P"/>
                                         </ns:FlightSegmentInfo>
                                     </ns:BaggageDetailsRequest>';
-                
-                                    if($DirectionInd == 'Return'){
-                                        $body .= '<ns:BaggageDetailsRequest>
-                                            <ns:FlightSegmentInfo ArrivalDateTime="'.$FlyjinnahInboundArrivalDate.'" DepartureDateTime="'.$FlyjinnahInboundDepartureDate.'" FlightNumber="'.$FlyjinnahInboundFlightNo.'" RPH="'.$FlyjinnahInboundRPH.'" returnFlag="false">
-                                                <ns:DepartureAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'"/>
-                                                <ns:ArrivalAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'"/>
-                                                <ns:OperatingAirline Code="9P"/>
-                                            </ns:FlightSegmentInfo>
-                                        </ns:BaggageDetailsRequest>';
-                                    }
 
                                 $body .= '</ns:BaggageDetailsRequests>
                             </ns:AA_OTA_AirBaggageDetailsRQ>
@@ -510,7 +464,7 @@ class FlightController extends Controller
 
         $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
         $client = new Client();
-        
+
         $headers = [
             'Cookie' => $Cookie,
             'Content-Type' => 'text/xml',
@@ -530,42 +484,43 @@ class FlightController extends Controller
         return $json_data = json_decode(json_encode($xml));
     }
 
-    public static function SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight)
+    public static function SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type)
     {
+        
         self::set_credential();
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-            $DirectionInd = 'Return';
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahOutbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahOutbound->flight->RPH;    
 
-            $FlyjinnahInboundFlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
-            $FlyjinnahInboundRPH = $FlyjinnahInbound->flight->RPH;    
+            $ArrivalDate = $FlyjinnahOutbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahOutbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahOutbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahOutbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahOutbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahOutbound->flight->Cookie;
 
-            $FlyjinnahInboundArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
-            $FlyjinnahInboundDepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
-        }else {
-            $DirectionInd = 'OneWay';
+            $Orgn = $FlyjinnahOutbound->flight->ORGN;
+            $Dest = $FlyjinnahOutbound->flight->DEST;
+
+
         }
+        
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahInbound->flight->RPH;    
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-            $FlyjinnahFlight = $FlyjinnahOutbound;
-        }else{
-            $FlyjinnahFlight = $FlyjinnahInbound;
+            $ArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahInbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahInbound->flight->Cookie;
+
+            $Orgn = $FlyjinnahInbound->flight->ORGN;
+            $Dest = $FlyjinnahInbound->flight->DEST;
+        
         }
+        $DirectionInd = 'OneWay';
 
-        $Identifier = $FlyjinnahFlight->flight->TransactionIdentifier;
-        $Cookie = $FlyjinnahFlight->flight->Cookie;
-        // dump($Identifier);
-        // dump($Cookie);
-        // exit;
-
-        $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
-        $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
-
-        $FlyjinnahFlightFlightNo = $FlyjinnahFlight->flight->FLIGHT_NO;
-        $FlyjinnahFlightRPH = $FlyjinnahFlight->flight->RPH;
-
-        $Orgn = $FlyjinnahFlight->flight->ORGN;
-        $Dest = $FlyjinnahFlight->flight->DEST;
 
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <soap:Header>
@@ -587,21 +542,12 @@ class FlightController extends Controller
                 <ns:SeatMapRequests>';
 
                     $body .= '<ns:SeatMapRequest>
-                        <ns:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                        <ns:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlightNo.'" RPH="'.$RPH.'">
                         <ns:DepartureAirport LocationCode="'.$Orgn.'"/>
                         <ns:ArrivalAirport LocationCode="'.$Dest.'"/>
                         </ns:FlightSegmentInfo>
                     </ns:SeatMapRequest>';
 
-                    if($DirectionInd == 'Return'){
-
-                        $body .= '<ns:SeatMapRequest>
-                            <ns:FlightSegmentInfo ArrivalDateTime="'.$FlyjinnahInboundArrivalDate.'" DepartureDateTime="'.$FlyjinnahInboundDepartureDate.'" FlightNumber="'.$FlyjinnahInboundFlightNo.'" RPH="'.$FlyjinnahInboundRPH.'">
-                            <ns:DepartureAirport LocationCode="'.$Dest.'"/>
-                            <ns:ArrivalAirport LocationCode="'.$Orgn.'"/>
-                            </ns:FlightSegmentInfo>
-                        </ns:SeatMapRequest>';
-                    }
                 $body .= '</ns:SeatMapRequests>
                 </ns:OTA_AirSeatMapRQ>
             </soap:Body>
@@ -611,7 +557,7 @@ class FlightController extends Controller
 
         $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
         $client = new Client();
-        
+
         $headers = [
             'Cookie' => $Cookie,
             'Content-Type' => 'text/xml',
@@ -630,42 +576,40 @@ class FlightController extends Controller
 
     }
 
-    public static function HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight)
+    public static function HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type)
     {
         self::set_credential();
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-            $DirectionInd = 'Return';
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahOutbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahOutbound->flight->RPH;    
 
-            $FlyjinnahInboundFlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
-            $FlyjinnahInboundRPH = $FlyjinnahInbound->flight->RPH;    
+            $ArrivalDate = $FlyjinnahOutbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahOutbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahOutbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahOutbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahOutbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahOutbound->flight->Cookie;
 
-            $FlyjinnahInboundArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
-            $FlyjinnahInboundDepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
-        }else {
-            $DirectionInd = 'OneWay';
+            $Orgn = $FlyjinnahOutbound->flight->ORGN;
+            $Dest = $FlyjinnahOutbound->flight->DEST;
+
         }
+        
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $FlightNo = $FlyjinnahInbound->flight->FLIGHT_NO;
+            $RPH = $FlyjinnahInbound->flight->RPH;    
 
-        if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-            $FlyjinnahFlight = $FlyjinnahOutbound;
-        }else{
-            $FlyjinnahFlight = $FlyjinnahInbound;
+            $ArrivalDate = $FlyjinnahInbound->flight->ARRIVAL_DATE.'T'.$FlyjinnahInbound->flight->ARRIVAL_TIME;
+            $DepartureDate = $FlyjinnahInbound->flight->DEPARTURE_DATE.'T'.$FlyjinnahInbound->flight->DEPARTURE_TIME;
+            
+            $Identifier = $FlyjinnahInbound->flight->TransactionIdentifier;
+            $Cookie = $FlyjinnahInbound->flight->Cookie;
+
+            $Orgn = $FlyjinnahInbound->flight->ORGN;
+            $Dest = $FlyjinnahInbound->flight->DEST;
+        
         }
-
-        $Identifier = $FlyjinnahFlight->flight->TransactionIdentifier;
-        $Cookie = $FlyjinnahFlight->flight->Cookie;
-        // dump($Identifier);
-        // dump($Cookie);
-        // exit;
-
-        $ArrivalDate = $FlyjinnahFlight->flight->ARRIVAL_DATE.'T'.$FlyjinnahFlight->flight->ARRIVAL_TIME;
-        $DepartureDate = $FlyjinnahFlight->flight->DEPARTURE_DATE.'T'.$FlyjinnahFlight->flight->DEPARTURE_TIME;
-
-        $FlyjinnahFlightFlightNo = $FlyjinnahFlight->flight->FLIGHT_NO;
-        $FlyjinnahFlightRPH = $FlyjinnahFlight->flight->RPH;
-
-        $Orgn = $FlyjinnahFlight->flight->ORGN;
-        $Dest = $FlyjinnahFlight->flight->DEST;
+        $DirectionInd = 'OneWay';
 
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <soap:Header>
@@ -687,22 +631,12 @@ class FlightController extends Controller
         <ns2:MealDetailsRequests>';
 
             $body .= '<ns2:MealDetailsRequest>
-                <ns2:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlyjinnahFlightFlightNo.'" RPH="'.$FlyjinnahFlightRPH.'">
+                <ns2:FlightSegmentInfo ArrivalDateTime="'.$ArrivalDate.'" DepartureDateTime="'.$DepartureDate.'" FlightNumber="'.$FlightNo.'" RPH="'.$RPH.'">
                     <ns2:OperatingAirline/>
                     <ns2:DepartureAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'"/>
                     <ns2:ArrivalAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'"/>
                 </ns2:FlightSegmentInfo>
             </ns2:MealDetailsRequest>';
-
-            if($DirectionInd == 'Return'){
-                $body .= '<ns2:MealDetailsRequest>
-                    <ns2:FlightSegmentInfo ArrivalDateTime="'.$FlyjinnahInboundArrivalDate.'" DepartureDateTime="'.$FlyjinnahInboundDepartureDate.'" FlightNumber="'.$FlyjinnahInboundFlightNo.'" RPH="'.$FlyjinnahInboundRPH.'">
-                        <ns2:OperatingAirline/>
-                        <ns2:DepartureAirport LocationCode="'.$Dest.'" Terminal="'.self::$credential['USERNAME'].'"/>
-                        <ns2:ArrivalAirport LocationCode="'.$Orgn.'" Terminal="'.self::$credential['USERNAME'].'"/>
-                    </ns2:FlightSegmentInfo>
-                </ns2:MealDetailsRequest>';
-            }
 
         $body .= '</ns2:MealDetailsRequests>
         </ns2:AA_OTA_AirMealDetailsRQ>
@@ -712,7 +646,7 @@ class FlightController extends Controller
         // exit;
         $url = 'https://reservations.flyjinnah.com/webservices/services/AAResWebServices';
         $client = new Client();
-        
+
         $headers = [
             'Cookie' => $Cookie,
             'Content-Type' => 'text/xml',
@@ -732,6 +666,7 @@ class FlightController extends Controller
 
     public function checkFlight()
     {
+        // dd(\request());
         $referer = $_SERVER['HTTP_REFERER'];
         $urlComponents = parse_url($referer);
         parse_str($urlComponents['query'], $queryParams);
@@ -743,6 +678,7 @@ class FlightController extends Controller
             session()->forget('flyjinnahinbound');
             session()->forget('inboundflyjinnahseatavailablity');
             session()->forget('inboundflyjinnahMealavailablity');
+            session()->forget('inboundBundlerServiceId');
         }
         
         session()->put($type, req('flight'));
@@ -756,162 +692,80 @@ class FlightController extends Controller
         $FlyjinnahOutbound = json_decode(session()->get('flyjinnahoutbound'));
         $FlyjinnahInbound = json_decode(session()->get('flyjinnahinbound'));
         // dump($FlyjinnahOutbound);
-        // dump($FlyjinnahInbound);
-        // exit;
         // dd($queryParams['ReturningOn']);
         // dump($type);
 
 
-        if (isset($queryParams['ReturningOn'])) {
-            if($FlyjinnahOutbound->airline == 'fly-jinnah' && $FlyjinnahInbound->airline == 'fly-jinnah'){
-                // echo 'ReturningOn same flight';
-                $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                
-                $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
-                // dump($FlyjinnahOutbound->baggage->title);
-                // dump($FlyjinnahInbound->baggage->title);
-
-                // dump($BundledServicesIDs);
-                foreach($BundledServicesIDs as $BundledServicesID){
-                    foreach($BundledServicesID->bundledService as $BundleID){
-                        if($FlyjinnahOutbound->baggage->title == $BundleID->bundledServiceName){
-                            $FlyjinnahOutboundGettingBundleServiceId = $BundleID->bunldedServiceId;
-                        }
-                        if($FlyjinnahInbound->baggage->title == $BundleID->bundledServiceName){
-                            $FlyjinnahInboundGettingBundleServiceId = $BundleID->bunldedServiceId;
-                        }
-                    }
-                }
-                if(empty($FlyjinnahOutboundGettingBundleServiceId)){
-                    $FlyjinnahOutboundGettingBundleServiceId = 'null';
-                }
-                if(empty($FlyjinnahInboundGettingBundleServiceId)){
-                    $FlyjinnahInboundGettingBundleServiceId = 'null';
-                }
-                // dump($FlyjinnahOutboundGettingBundleServiceId);
-                // dump($FlyjinnahInboundGettingBundleServiceId);
-                // exit;
-                $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
-                $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                // dump($SeatMapResponse);
-                // dump($HasMealsResponse);
-                // exit;
-                // dump('SeatMapResponse',$SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow);
-                // exit;
-                $SeatMapOutboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow;
-                $SeatMapInboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['1']->SeatMapDetails->CabinClass->AirRows->AirRow;
-                // $SeatMapOutboundResponse = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['0']->SeatMapDetails->CabinClass->AirRows->AirRow;
-                // $SeatMapInboundResponse = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse['1']->SeatMapDetails->CabinClass->AirRows->AirRow;
-
-                
-                $HasMealsOutboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse['0']->Meal;
-                $HasMealsInboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse['1']->Meal;
-                
-                // dump('SeatMapOutboundResponse',$SeatMapOutboundResponse);
-                // dump('SeatMapInboundResponse',$SeatMapInboundResponse);
-                // dump('HasMealsOutboundResponse',$HasMealsOutboundResponse);
-                // dump('HasMealsInboundResponse',$HasMealsInboundResponse);
-                // exit;
-                // dd(json_decode(req('flight')));
-
-                session()->put($type, req('flight'));
-                session()->put('flyjinnah'.$type, req('flight'));
-
-                session()->put(['outboundBundlerServiceId' => $FlyjinnahOutboundGettingBundleServiceId,'inboundBundlerServiceId' => $FlyjinnahInboundGettingBundleServiceId]);
-                session()->put(['outboundflyjinnahMealavailablity' => $HasMealsOutboundResponse,'outboundflyjinnahseatavailablity' => $SeatMapOutboundResponse]);
-                session()->put(['inboundflyjinnahMealavailablity' => $HasMealsInboundResponse,'inboundflyjinnahseatavailablity' => $SeatMapInboundResponse]);
-                
-                return ['status' => 1];
-            } else if($FlyjinnahOutbound->airline == 'fly-jinnah' && !empty($FlyjinnahInbound->airline) || $FlyjinnahInbound->airline == 'fly-jinnah' && !empty($FlyjinnahOutbound->airline)){
-                // echo 'second condition ReturningOn';
-                // exit;
-                // echo 'ReturningOn not same flight';
-                $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                
-                $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
-                // dd($BundledServicesIDs);
-                foreach($BundledServicesIDs->bundledService as $BundledServicesID){
-                    if($FlyjinnahOutbound->baggage->title == $BundledServicesID->bundledServiceName){
-                        $FlyjinnahOutboundGettingBundleServiceId = $BundledServicesID->bunldedServiceId;
-                    }
-                    if($FlyjinnahInbound->baggage->title == $BundledServicesID->bundledServiceName){
-                        $FlyjinnahInboundGettingBundleServiceId = $BundledServicesID->bunldedServiceId;
-                    }
-                }
-                if(empty($FlyjinnahOutboundGettingBundleServiceId)){
-                    $FlyjinnahOutboundGettingBundleServiceId = 'null';
-                }
-                if(empty($FlyjinnahInboundGettingBundleServiceId)){
-                    $FlyjinnahInboundGettingBundleServiceId = 'null';
-                }
-                
-                $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
-                // dd($PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse);
-                
-                $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                
-                $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-
-                $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                
-                if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-                    $DirectionType = 'outbound';
-                }else {
-                    $DirectionType = 'inbound';
-                }
-                session()->put($type, req('flight'));
-                session()->put('flyjinnah'.$type, req('flight'));
-        
-                session()->put([$DirectionType.'flyjinnahMealavailablity' => $HasMealsResponse, $DirectionType.'flyjinnahseatavailablity' => $SeatMapResponse]);
-
-                return ['status' => 1];
-            }
-        } else {
-            // echo 'oneway flight';
-            $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-                
+        if($type == 'outbound' && $FlyjinnahOutbound->airline == 'fly-jinnah') {
+            $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $type, $flight);
+            // dd($PRICEREQFORGETTINGBAGGAGESResponse);
             $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
-            // dd($BundledServicesIDs);
+            // dd($FlyjinnahOutbound->baggage->title);
+            // dd($BundledServicesIDs->bundledService);
             foreach($BundledServicesIDs->bundledService as $BundledServicesID){
                 if($FlyjinnahOutbound->baggage->title == $BundledServicesID->bundledServiceName){
                     $FlyjinnahOutboundGettingBundleServiceId = $BundledServicesID->bunldedServiceId;
-                }
-                if($FlyjinnahInbound->baggage->title == $BundledServicesID->bundledServiceName){
-                    $FlyjinnahInboundGettingBundleServiceId = $BundledServicesID->bunldedServiceId;
                 }
             }
             if(empty($FlyjinnahOutboundGettingBundleServiceId)){
                 $FlyjinnahOutboundGettingBundleServiceId = 'null';
             }
+
+            $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
+            $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+            $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+            $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+
+            // dump($SeatMapResponse);
+            // dd($HasMealsResponse);
+
+            $SeatMapOutboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow;
+            $HasMealsOutboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal;
+
+            // dump($SeatMapOutboundResponse);
+            // dump($HasMealsOutboundResponse);
+
+            session()->put($type, req('flight'));
+            session()->put('flyjinnah'.$type, req('flight'));
+
+            session()->put(['outboundBundlerServiceId' => $FlyjinnahOutboundGettingBundleServiceId]);
+            session()->put(['outboundflyjinnahMealavailablity' => $HasMealsOutboundResponse,'outboundflyjinnahseatavailablity' => $SeatMapOutboundResponse]);
+            return ['status' => 1];
+        }   
+
+        if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
+            $PRICEREQFORGETTINGBAGGAGESResponse = self::PRICE_REQ_FOR_GETTING_BAGGAGES($FlyjinnahOutbound, $FlyjinnahInbound, $type, $flight);
+
+            $BundledServicesIDs = $PRICEREQFORGETTINGBAGGAGESResponse->Body->OTA_AirPriceRS->PricedItineraries->PricedItinerary->AirItinerary->OriginDestinationOptions->AABundledServiceExt;
+            // dd($FlyjinnahOutbound->baggage->title);
+            // dd($BundledServicesIDs->bundledService);
+            foreach($BundledServicesIDs->bundledService as $BundledServicesID){
+                if($FlyjinnahInbound->baggage->title == $BundledServicesID->bundledServiceName){
+                    $FlyjinnahInboundGettingBundleServiceId = $BundledServicesID->bunldedServiceId;
+                }
+            }
             if(empty($FlyjinnahInboundGettingBundleServiceId)){
                 $FlyjinnahInboundGettingBundleServiceId = 'null';
             }
-            
-            $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
-            // dd($PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse);
-            
-            $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
-            
-            $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
 
-            $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight);
+            $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
+            $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+            $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+            $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+
+            $SeatMapInboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow;
+            $HasMealsInboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal;
             
-            if($FlyjinnahOutbound->airline == 'fly-jinnah'){
-                $DirectionType = 'outbound';
-            }else {
-                $DirectionType = 'inbound';
-            }
+            // dump($SeatMapInboundResponse);
+            // dump($HasMealsInboundResponse);
+
             session()->put($type, req('flight'));
             session()->put('flyjinnah'.$type, req('flight'));
-    
-            session()->put([$DirectionType.'flyjinnahMealavailablity' => $HasMealsResponse, $DirectionType.'flyjinnahseatavailablity' => $SeatMapResponse]);
 
+            session()->put(['inboundBundlerServiceId' => $FlyjinnahInboundGettingBundleServiceId]);
+            session()->put(['inboundflyjinnahMealavailablity' => $HasMealsInboundResponse,'inboundflyjinnahseatavailablity' => $SeatMapInboundResponse]);
             return ['status' => 1];
         }
-
-        // return ['status' => 1];
     }
 
     public function pdf()
