@@ -1002,82 +1002,58 @@ class FlyJinnah
         }
     }
 
-    public static function OTA_AirPriceRQ($params = [])
+    public static function OTA_AirPriceRQ($params = [], $flight)
     {
-        dd($params);
-        // dd($params['outbound']['travelers']['LocationDep']);
-        // dd($params['outbound']['flight']['TYPE']);
-        // dd(request());
-        // dd(request());
-        // dd($params['outbound']['travelers']['LocationDep']);
-        $ident = $params['outbound']['flight']['TransactionIdentifier'];
-        
+        // dd();
+        // dd(session()->get('outboundBundlerServiceId'));
+        // dd();
+        // dd($params['form']['mealbooking']['KHI-ISB']['adult-1'][0]);
+        // dd($flight->flight->ORGN);
         self::set_credential();
+
         $params = collect([
-            "Departure" => $params['outbound']['travelers']['DepartingOn'],
-            "Origin" => $params['outbound']['travelers']['LocationDep'],
-            "Destination" => $params['outbound']['travelers']['LocationArr'],
-            //"Return" => true,
-            "Returning" => $params['outbound']['travelers']['ReturningOn'],
-            "AdultNo" => $params['outbound']['travelers']['AdultNo'],
-            "ChildNo" => $params['outbound']['travelers']['ChildNo'],
-            "InfantNo" => $params['outbound']['travelers']['InfantNo']
+            "Departure" => $flight->flight->DEPARTURE_DATE,
+            "Origin" => $flight->flight->ORGN,
+            "Destination" => $flight->flight->DEST,
+            "AdultNo" => $flight->travelers->AdultNo,
+            "ChildNo" => $flight->travelers->ChildNo,
+            "InfantNo" => $flight->travelers->InfantNo
         ])->merge($params)->toArray();
         // dd($params);
         $Passengers = [
-            'ADT' => \req('AdultNo', $params['outbound']['travelers']['AdultNo']),
-            'CHD' => \req('ChildNo', $params['outbound']['travelers']['ChildNo']),
-            'INF' => \req('InfantNo', $params['outbound']['travelers']['InfantNo'])
+            'ADT' => $flight->travelers->AdultNo,
+            'CHD' => $flight->travelers->ChildNo,
+            'INF' => $flight->travelers->InfantNo,
         ];
         // dd($Passengers);
-        foreach ($Passengers as $key => $qty) {
-            if ($qty > 0) {
-                $body .= '<ns1:PassengerTypeQuantity Code="' . $key . '" Quantity="' . $qty . '" />' . "\n";
-            }
-        }
-        // dd($body);   
-        // dd($params['Origin']);
+        $DepartureDateTime = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+        $FlightRPH = $flight->flight->RPH;
+        $FlightBaggage = $flight->baggage;
+        $BaggageCode = $params['form'][$flight->type.'baggageCode'];
+        $BundlerServiceId = $params['form'][$flight->type.'BundlerServiceId'];
+        $ident = $flight->flight->TransactionIdentifier;
+        $outbounddest = $flight->flight->ORGN.'-'.$flight->flight->DEST;
 
-        $flight = $params['outbound']['flight'];
-        dump('flight',$flight);
-        // dd($flight);
-        // dd($flight['OriginDestination_XML']);
-        $xml = self::parseXML($flight['OriginDestination_XML']);
-        dump('xml',$xml);
-        $FlightDetails = json_decode(json_encode($xml), 1);
-        dump('FlightDetails',$FlightDetails);
-        $FlightRPH = json_decode(json_encode($xml), 1);
-        dump('FlightRPH',$FlightRPH);
-        $FlightRPH = $FlightRPH['FlightSegment']['@attributes']['RPH'];
-        dump('FlightRPH',$FlightRPH);
-        $FlightBaggage = $params['baggage'];
-        dd('FlightBaggage',$FlightBaggage);
-
-        if($params['outbound']['flight']['TYPE'] == 'outbound'){
-            $outbounddest = $params['Origin'].'-'.$params['Destination'];
-        }else{
-            $outbounddest = $params['Destination'].'-'.$params['Origin'];
-
-        }
-        // dd($params['form']['seatbooking']);
+        // dd($outbounddest);
+        // dd($params['form']['seatbooking'][$outbounddest]);
         $checkseatBooking = $params['form']['seatbooking'][$outbounddest];
         $HasSeatBooking = !empty(array_filter(array_column($checkseatBooking, 0)));
-
+        // dump($HasSeatBooking);
         $checkmealBooking = $params['form']['mealbooking'][$outbounddest];
         $HasMealBooking = !empty(array_filter(array_column($checkmealBooking, 0)));
-        
+        // dd($HasMealBooking);
         // dd($params['form']['seatbooking']);
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <soap:Header>
-            <wsse:Security soap:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-            <wsse:UsernameToken wsu:Id="UsernameToken-17855236" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+            <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soap:mustUnderstand="1">
+            <wsse:UsernameToken xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="UsernameToken-17855236">
                 <wsse:Username>' . self::$credential['USERNAME'] . '</wsse:Username>
                 <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' . self::$credential['PASSWORD'] . '</wsse:Password>
             </wsse:UsernameToken>
             </wsse:Security>
         </soap:Header>
         <soap:Body xmlns:ns1="http://www.opentravel.org/OTA/2003/05">
-            <ns1:OTA_AirPriceRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="' . self::$credential['Target'] . '" TransactionIdentifier="'.$ident.'" TimeStamp="' . \Carbon\Carbon::now()->format('Y-m-d\TH:i:s') . '" Version="' . self::$credential['Version'] . '">
+            <ns1:OTA_AirPriceRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" TransactionIdentifier="'.$ident.'" Version="' . self::$credential['Version'] . '">
             <ns1:POS>
                 <ns1:Source TerminalID="' . self::$credential['TerminalID'] . '">
                 <ns1:RequestorID ID="' . self::$credential['USERNAME'] . '" Type="4" />
@@ -1089,9 +1065,9 @@ class FlyJinnah
 
                 // $body .= str_replace(['<', '<ns1:/'], ['<ns1:', '</ns1:'], $flight['OriginDestination_XML']);
                 $body .= '<ns1:OriginDestinationOption>
-                    <ns1:FlightSegment ArrivalDateTime="'.$flight['ARRIVAL_DATE'].'T'.$flight['ARRIVAL_TIME'].'" DepartureDateTime="'.$flight['DEPARTURE_DATE'].'T'.$flight['DEPARTURE_TIME'].'" FlightNumber="'.$flight['FLIGHT_NO'].'" RPH="'.$flight['RPH'].'">
-                    <ns1:DepartureAirport LocationCode="'.$flight['ORGN'].'" Terminal="'.self::$credential['TerminalID'].'" />
-                    <ns1:ArrivalAirport LocationCode="'.$flight['DEST'].'" Terminal="'.self::$credential['TerminalID'].'" />
+                    <ns1:FlightSegment ArrivalDateTime="'.$flight->flight->ARRIVAL_DATE.'T'.$flight->flight->ARRIVAL_TIME.'" DepartureDateTime="'.$flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME.'" FlightNumber="'.$flight->flight->FLIGHT_NO.'" RPH="'.$flight->flight->RPH.'">
+                    <ns1:DepartureAirport LocationCode="'.$flight->flight->ORGN.'" Terminal="'.self::$credential['TerminalID'].'" />
+                    <ns1:ArrivalAirport LocationCode="'.$flight->flight->DEST.'" Terminal="'.self::$credential['TerminalID'].'" />
                     </ns1:FlightSegment>
                 </ns1:OriginDestinationOption>';
 
@@ -1121,13 +1097,13 @@ class FlyJinnah
                         if($RPH <= $params['travelers']['AdultNo']){
                             $AdultmealCode = $params['form']['mealbooking'][$outbounddest]['adult-'.$RPH][0];
                             $TotalAdult = $RPH; 
-                            $body .='<ns1:MealRequest mealCode="'.$AdultmealCode.'" mealQuantity="1" TravelerRefNumberRPHList="A'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$FlightDetails['FlightSegment']['@attributes']['DepartureDateTime'].'" FlightNumber="'.$flight['FLIGHT_NO'].'"/>';
+                            $body .='<ns1:MealRequest mealCode="'.$AdultmealCode.'" mealQuantity="1" TravelerRefNumberRPHList="A'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$DepartureDateTime.'" FlightNumber="'.$flight->flight->FLIGHT_NO.'"/>';
                         }
                         if ($RPH > $TotalAdult && $RPH <= $TotalAdult + $params['travelers']['ChildNo']) {
                             $ChildRPH++;
                             $ChildmealCode = $params['form']['mealbooking'][$outbounddest]['child-'.$ChildRPH][0];
                             $TotalChild = $RPH;
-                            $body .='<ns1:MealRequest mealCode="'.$ChildmealCode.'" mealQuantity="1" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$FlightDetails['FlightSegment']['@attributes']['DepartureDateTime'].'" FlightNumber="'.$flight['FLIGHT_NO'].'"/>';
+                            $body .='<ns1:MealRequest mealCode="'.$ChildmealCode.'" mealQuantity="1" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$DepartureDateTime.'" FlightNumber="'.$flight->flight->FLIGHT_NO.'"/>';
                         }
                     }   
                     $body .= '</ns1:MealRequests>';
@@ -1141,14 +1117,14 @@ class FlyJinnah
                             $AdultRPH++;
                             $AdultseatCode = $params['form']['seatbooking'][$outbounddest]['adult-'.$RPH][0];
                             $TotalAdultSeat = $RPH; 
-                            $body .= '<ns1:SeatRequest SeatNumber="'.$AdultseatCode.'" TravelerRefNumberRPHList="A'.$AdultRPH.'" FlightRefNumberRPHList="'.$params['flight']['RPH'].'"/>';
+                            $body .= '<ns1:SeatRequest SeatNumber="'.$AdultseatCode.'" TravelerRefNumberRPHList="A'.$AdultRPH.'" FlightRefNumberRPHList="'.$FlightRPH.'"/>';
                         }
                         
                         if ($RPH > $params['travelers']['AdultNo'] && $RPH <= $params['travelers']['AdultNo'] + $params['travelers']['ChildNo']) {
                             $ChildSeatRPH++;
                             $ChildseatCode = $params['form']['seatbooking'][$outbounddest]['child-'.$ChildSeatRPH][0];
                             $TotalChild = $RPH;
-                            $body .= '<ns1:SeatRequest SeatNumber="'.$ChildseatCode.'" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$params['flight']['RPH'].'"/>';
+                            $body .= '<ns1:SeatRequest SeatNumber="'.$ChildseatCode.'" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'"/>';
                         }
 
                     } 
@@ -1157,29 +1133,26 @@ class FlyJinnah
                     $body .= '</ns1:SeatRequests>';
                 }
 
-                // $body .= '<ns1:BaggageRequests>';
+                $body .= '<ns1:BaggageRequests>';
                 
-                // for ($RPH = 1; $RPH <= $TotalPassengers; $RPH++) {
+                for ($RPH = 1; $RPH <= $TotalPassengers; $RPH++) {
                     
-                //     if($RPH <= $params['travelers']['AdultNo']){
-                //         $AdultRPH++;
-                //         $AdultseatCode = $params['form']['seatbooking']['adult-'.$RPH][0];
-                //         $TotalAdultSeat = $RPH; 
-                //         $body .= '<ns1:BaggageRequest baggageCode="'.$BaggageCode.'" TravelerRefNumberRPHList="A'.$RPH.'" FlightRefNumberRPHList="'.$params['flight']['RPH'].'" DepartureDate="'.$FlightDetails['FlightSegment']['@attributes']['DepartureDateTime'].'" FlightNumber="'.$flight['FLIGHT_NO'].'"/>';
-                //     }
+                    if($RPH <= $params['travelers']['AdultNo']){
+                        $AdultRPH++;
+                        $AdultseatCode = $params['form']['seatbooking']['adult-'.$RPH][0];
+                        $TotalAdultSeat = $RPH; 
+                        $body .= '<ns1:BaggageRequest baggageCode="'.$BaggageCode.'" TravelerRefNumberRPHList="A'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$DepartureDateTime.'" FlightNumber="'.$flight->flight->FLIGHT_NO.'"/>';
+                    }
                     
-                //     if ($RPH > $params['travelers']['AdultNo'] && $RPH <= $params['travelers']['AdultNo'] + $params['travelers']['ChildNo']) {
-                //         $ChildSeatRPH++;
-                //         $ChildseatCode = $params['form']['seatbooking']['child-'.$ChildSeatRPH][0];
-                //         $TotalChild = $RPH;
-                //         $body .= '<ns1:BaggageRequest baggageCode="'.$BaggageCode.'" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$params['flight']['RPH'].'" DepartureDate="'.$FlightDetails['FlightSegment']['@attributes']['DepartureDateTime'].'" FlightNumber="'.$flight['FLIGHT_NO'].'"/>';
-                //     }
+                    if ($RPH > $params['travelers']['AdultNo'] && $RPH <= $params['travelers']['AdultNo'] + $params['travelers']['ChildNo']) {
+                        $ChildSeatRPH++;
+                        $ChildseatCode = $params['form']['seatbooking']['child-'.$ChildSeatRPH][0];
+                        $TotalChild = $RPH;
+                        $body .= '<ns1:BaggageRequest baggageCode="'.$BaggageCode.'" TravelerRefNumberRPHList="C'.$RPH.'" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDateTime="'.$DepartureDateTime.'" FlightNumber="'.$flight->flight->FLIGHT_NO.'"/>';
+                    }
 
-                // } 
-
-                // // $body .= '<ns1:BaggageRequest baggageCode="46 Kg Total in 2 Piece" TravelerRefNumberRPHList="A1" FlightRefNumberRPHList="'.$FlightRPH.'" DepartureDate="'.$FlightDetails['FlightSegment']['@attributes']['DepartureDateTime'].'" FlightNumber="'.$flight['FLIGHT_NO'].'"/>';
-                
-                // $body .= '</ns1:BaggageRequests>';
+                }                 
+                $body .= '</ns1:BaggageRequests>';
 
                 $body .= '</ns1:SpecialReqDetails>';
                 
@@ -1190,22 +1163,19 @@ class FlyJinnah
                 //                 <ns1:OutBoundBunldedServiceId>448</ns1:OutBoundBunldedServiceId>
                 //         </ns1:BundledServiceSelectionOptions>';
                 $body .= '<ns1:BundledServiceSelectionOptions>
-                            <ns1:OutBoundBunldedServiceId>448</ns1:OutBoundBunldedServiceId>
+                            <ns1:OutBoundBunldedServiceId>'.$BundlerServiceId.'</ns1:OutBoundBunldedServiceId>
                         </ns1:BundledServiceSelectionOptions>';
 
                 $body .= '</ns1:OTA_AirPriceRQ>
         </soap:Body>
         </soap:Envelope>';
-        dump($body);
-        exit;
-
+        // dd($body);
+                // dd(self::$credential['URL']);
         $client = new Client();
         $headers = [
-            'Cookie' => $flight['Cookie'],
+            'Cookie' => $flight->flight->Cookie,
             'Content-Type' => 'text/xml',
-            'SOAPAction' => 'getPrice'
-            // 'Cookie' => 'JSESSIONID=de281191~BADA0C4350973DCB5B9373168A73FB4C.de1191; __Secure-AAID=MTcxOTA0NzI2OF9Qb3N0bWFuUnVudGltZS83LjM5LjBfNTQuODYuNTAuMTM5XzI2ODM2'
-            //'Cookie' => 'ASP.NET_SessionId=3ct1j0ulgleikqbranmnj4qh'
+            // 'SOAPAction' => 'getPrice'
         ];
         $response = $client->request('POST', self::$credential['URL'], [
             'headers' => $headers,
@@ -1218,7 +1188,6 @@ class FlyJinnah
 
         $xml = self::parseXML($_xml);
         $json_data = json_decode(json_encode($xml), 1);
-        // dd($json_data);
         // dump('bhaggage',$json_data);
         // return $json_data;
         if (isset($json_data['Body']['OTA_AirPriceRS']['Success'])) {
@@ -1240,34 +1209,33 @@ class FlyJinnah
         }
     }
 
-    public static function OTA_AirBookRQ($params = [])
+    public static function OTA_AirBookRQ($params = [], $flight)
     {
         self::set_credential();
+        // dd(request());
+        // dd();
+        // dd();
+        $Passengers = $params['TRAVELERS_INFORMATION'];
+        
+        // dd($Passengers);
 
-        //$TRAVELERS_XML = str_ireplace(['<0', '<48', '>48'], ['&lt;0', '&lt;48', '&gt;48'], \req('TRAVELERS_XML') ?? $params['TRAVELERS_XML']);
-        //$OriginDestination_XML = \req('OriginDestination_XML') ?? $params['OriginDestination_XML'];
-        $flight = $params['flight'];
         $TRAVELERS_INFORMATION = $params['TRAVELERS_INFORMATION'];
-        /*$TRAVELERS = $params['TRAVELERS'];
-        $Passengers = [
-            'ADT' => $TRAVELERS['ADULT'],
-            'CHD' => $TRAVELERS['CHILD'],
-            'INF' => $TRAVELERS['INFANT'],
-        ];*/
-        // dd($flight);
-        $ident = $flight['TransactionIdentifier'];
-        // dump($ident);
+
+        $ident = $flight->flight->TransactionIdentifier;
+        $DepartureDateTime = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+
+
         $body = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <soap:Header>
-            <wsse:Security soap:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-                <wsse:UsernameToken wsu:Id="UsernameToken-17855236" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+            <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soap:mustUnderstand="1">
+                <wsse:UsernameToken xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="UsernameToken-17855236">
                     <wsse:Username>' . self::$credential['USERNAME'] . '</wsse:Username>
                     <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' . self::$credential['PASSWORD'] . '</wsse:Password>
                 </wsse:UsernameToken>
             </wsse:Security>
         </soap:Header>
         <soap:Body xmlns:ns1="http://www.isaaviation.com/thinair/webservices/OTA/Extensions/2003/05" xmlns:ns2="http://www.opentravel.org/OTA/2003/05">
-            <ns2:OTA_AirBookRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="' . self::$credential['Target'] . '" TimeStamp="' . \Carbon\Carbon::now()->format('Y-m-d\TH:i:s') . '" TransactionIdentifier="' . $ident . '" Version="' . self::$credential['Version'] . '">
+            <ns2:OTA_AirBookRQ EchoToken="11868765275150-1300257933" PrimaryLangID="en-us" SequenceNmbr="1" Target="' . self::$credential['Target'] . '" TransactionIdentifier="' . $ident . '" Version="' . self::$credential['Version'] . '">
                 <ns2:POS>
                     <ns2:Source TerminalID="' . self::$credential['TerminalID'] . '">
                     <ns2:RequestorID ID="' . self::$credential['USERNAME'] . '" Type="4"/>
@@ -1277,72 +1245,46 @@ class FlyJinnah
                 <ns2:AirItinerary>
                     <ns2:OriginDestinationOptions>
                     <ns2:OriginDestinationOption>
-                        <ns2:FlightSegment ArrivalDateTime="' . $flight['ARRIVAL_DATE'] . 'T' . $flight['ARRIVAL_TIME'] . '" DepartureDateTime="' . $flight['DEPARTURE_DATE'] . 'T' . $flight['DEPARTURE_TIME'] . '" FlightNumber="' . $flight['FLIGHT_NO'] . '" RPH="' . $flight['RPH'] . '">
-                            <ns2:DepartureAirport LocationCode="' . $flight['ORGN'] . '" Terminal="CHALOOJE_API"/>
-                            <ns2:ArrivalAirport LocationCode="' . $flight['DEST'] . '" Terminal="CHALOOJE_API"/>
+                        <ns2:FlightSegment ArrivalDateTime="' . $flight->flight->ARRIVAL_DATE . 'T' . $flight->flight->ARRIVAL_TIME . '" DepartureDateTime="'.$DepartureDateTime.'" FlightNumber="' . $flight->flight->FLIGHT_NO . '" RPH="'.$flight->flight->RPH.'">
+                            <ns2:DepartureAirport LocationCode="'.$flight->flight->ORGN.'" Terminal="CHALOOJE_API"/>
+                            <ns2:ArrivalAirport LocationCode="'.$flight->flight->DEST.'" Terminal="CHALOOJE_API"/>
                         </ns2:FlightSegment>
                     </ns2:OriginDestinationOption>';
 
-                /*$body .= '<ns2:OriginDestinationOption>
-                        <ns2:FlightSegment ArrivalDateTime="2015-09-26T06:20:00" DepartureDateTime="2015-09-26T04:55:00" FlightNumber="'.$flight['FLIGHT_NO'].'" RPH="'.$flight['RPH'].'">
-                            <ns2:DepartureAirport LocationCode="'.$flight['DEST'].'" Terminal="'.$flight['TERMINAL'].'"/>
-                            <ns2:ArrivalAirport LocationCode="'.$flight['ORGN'].'" Terminal="'.$flight['TERMINAL'].'"/>
-                        </ns2:FlightSegment>
-                    </ns2:OriginDestinationOption>';*/
-
                 $body .= '</ns2:OriginDestinationOptions>
                 </ns2:AirItinerary><ns2:TravelerInfo>';
-
-                $RPH = 0;
-                $INFANT = 0;
-                foreach ($TRAVELERS_INFORMATION as $type => $items) {
-                    foreach ($items as $i => $item) {
-                        $RPH++;
-                        // $PassengerType = 'ADT';
-                        if ($type === 'ADULT'){
+                $TravelerRefNumber = 1;
+                $TravelerRefNumberInfant = 0;
+                foreach($Passengers as $key => $Passenger) {
+                    foreach($Passenger as $Passenger) {
+                        // dd($key);
+                        $TravelerRefInfant = '';
+                        
+                        if($key == 'ADULT') {
                             $PassengerType = 'ADT';
-                            $PRPH = 'A';
-                            $PhoneNumber = '5088952';
-                        }
-                        else if ($type === 'CHILD'){
+                        } elseif($key == 'CHILD') {
                             $PassengerType = 'CHD';
-                            $PRPH = 'C';
-                            $PhoneNumber = '';
-                        }
-                        else if ($type === 'INFANT'){
+                        } elseif($key == 'INFANT') {
                             $PassengerType = 'INF';
-                            $PRPH = 'I';
-                            $INFANT++;
-                            $INFANTHTML = '/A' . $INFANT ;
-                            $PhoneNumber = '';
-                        }    
-
-                        $body .= '
-                            <ns2:AirTraveler BirthDate="' . \Carbon\Carbon::parse($item['Dob'])->format('Y-m-d') . 'T00:00:00" PassengerTypeCode="' . $PassengerType . '">
-                                <ns2:PersonName>
-                                    <ns2:GivenName>' . $item['Firstname'] . '</ns2:GivenName>
-                                    <ns2:Surname>' . $item['Lastname'] . '</ns2:Surname>
-                                    <ns2:NameTitle>' . $item['Title'] . '</ns2:NameTitle>
-                                </ns2:PersonName>
-                                <ns2:Telephone AreaCityCode="6" CountryAccessCode="971" PhoneNumber="'.$PhoneNumber.'" />
-                            <ns2:Document DocHolderNationality="PK"/>
-                            <ns2:TravelerRefNumber RPH="'.$PRPH.'' . $RPH . $INFANTHTML. '"/>
-                            </ns2:AirTraveler>';
+                            $NoInFant = $TravelerRefNumber - $TravelerRefNumberInfant;
+                            $TravelerRefInfant = '/A'.$NoInFant ;
+                        }
+                        $body .= '<ns2:AirTraveler BirthDate="'.$Passenger['Dob'].'T00:00:00" PassengerTypeCode="' . $PassengerType . '">
+                                    <ns2:PersonName>
+                                        <ns2:GivenName>' . $Passenger['Firstname'] . '</ns2:GivenName>
+                                        <ns2:Surname>' . $Passenger['Lastname'] . '</ns2:Surname>
+                                        <ns2:NameTitle>' . $Passenger['Title'] . '</ns2:NameTitle>
+                                    </ns2:PersonName>
+                                    <ns2:Telephone AreaCityCode="6" CountryAccessCode="971" PhoneNumber="" />
+                                <ns2:Document DocHolderNationality="PK"/>
+                            <ns2:TravelerRefNumber RPH="'.substr($PassengerType,0,1).''.$TravelerRefNumber.''.$TravelerRefInfant.'"/>
+                        </ns2:AirTraveler>';
+                        if($key == 'ADULT' || $key == 'CHILD') {
+                            $TravelerRefNumberInfant++;
+                        }
+                        $TravelerRefNumber++;
                     }
-                }
-
-            //     $body .= '<ns2:Fulfillment>
-            //         <ns2:PaymentDetails>
-            //            <ns2:PaymentDetail>
-            //               <ns2:DirectBill>
-            //                  <ns2:CompanyName Code="' . self::$credential['Payment_CompanyName'] . '"/>
-            //               </ns2:DirectBill>
-            //               <ns2:PaymentAmount Amount="' . $params['baggage']['TOTAL'] . '" CurrencyCode="' . $flight['CURRENCY'] . '" DecimalPlaces="2"/>
-            //            </ns2:PaymentDetail>
-            //         </ns2:PaymentDetails>
-            //      </ns2:Fulfillment>
-            //   </ns2:OTA_AirBookRQ>
-            //   <ns1:AAAirBookRQExt>';
+                } 
 
             $body .= '</ns2:TravelerInfo></ns2:OTA_AirBookRQ>
             <ns1:AAAirBookRQExt>';
@@ -1369,20 +1311,20 @@ class FlyJinnah
                         <ns1:CountryName>Pakistan</ns1:CountryName>
                         <ns1:CountryCode>PK</ns1:CountryCode>
                     </ns1:CountryName>
-                    <ns1:CityName>Lahore</ns1:CityName>
+                    <ns1:CityName>'.$flight->flight->ORGN.'</ns1:CityName>
                     </ns1:Address>
                 </ns1:ContactInfo>';
 
                 $body .= '</ns1:AAAirBookRQExt>
         </soap:Body>
         </soap:Envelope>';
-        dump($body);
-        exit;
+        // dump($body);
+        // exit;
         $client = new Client();
         $headers = [
-            'Cookie' => $flight['Cookie'],
+            'Cookie' => $flight->flight->Cookie,
             'Content-Type' => 'text/xml',
-            'SOAPAction' => 'book'
+            // 'SOAPAction' => 'book'
             // 'Cookie' => 'JSESSIONID=de281191~BADA0C4350973DCB5B9373168A73FB4C.de1191; __Secure-AAID=MTcxOTA0NzI2OF9Qb3N0bWFuUnVudGltZS83LjM5LjBfNTQuODYuNTAuMTM5XzI2ODM2'
             //'Cookie' => 'ASP.NET_SessionId=3ct1j0ulgleikqbranmnj4qh'
         ];
@@ -1396,7 +1338,7 @@ class FlyJinnah
         $xml = self::parseXML($_xml);
 
         $json_data = json_decode(json_encode($xml), 1);
-        dd($json_data);
+        // dd($json_data);
         if (isset($json_data['Body']['OTA_AirBookRS']['Success'])) {
             return [
                 //'data' => $response['json']['Envelope']['Body']['OTA_AirBookRQResponse']['OTA_AirBookRQResult'],

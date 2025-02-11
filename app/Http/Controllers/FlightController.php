@@ -713,24 +713,31 @@ class FlightController extends Controller
 
             $PRICE_REQ_FOR_BAGGAGE_APPLYINGResponse = self::PRICE_REQ_FOR_BAGGAGE_APPLYING($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type, $FlyjinnahOutboundGettingBundleServiceId, $FlyjinnahInboundGettingBundleServiceId);
             $BAGGAGE_DETAILS_REQUEST_GET = self::BAGGAGE_DETAILS_REQUEST_GET($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
+            // dd($BAGGAGE_DETAILS_REQUEST_GET->Body->AA_OTA_AirBaggageDetailsRS->BaggageDetailsResponses->OnDBaggageDetailsResponse->Baggage->baggageCode);
             $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
             $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
-
+            $baggageCode = $BAGGAGE_DETAILS_REQUEST_GET->Body->AA_OTA_AirBaggageDetailsRS->BaggageDetailsResponses->OnDBaggageDetailsResponse->Baggage->baggageCode;
             // dump($SeatMapResponse);
             // dd($HasMealsResponse);
+            if(empty($baggageCode)) {
+                $baggageCode = $BAGGAGE_DETAILS_REQUEST_GET->Body->AA_OTA_AirBaggageDetailsRS->BaggageDetailsResponses->OnDBaggageDetailsResponse->Baggage[0]->baggageCode;
+            }
 
             $SeatMapOutboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow;
             $HasMealsOutboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal;
 
             // dump($SeatMapOutboundResponse);
             // dump($HasMealsOutboundResponse);
-
-            session()->put($type, req('flight'));
-            session()->put('flyjinnah'.$type, req('flight'));
-
-            session()->put(['outboundBundlerServiceId' => $FlyjinnahOutboundGettingBundleServiceId]);
-            session()->put(['outboundflyjinnahMealavailablity' => $HasMealsOutboundResponse,'outboundflyjinnahseatavailablity' => $SeatMapOutboundResponse]);
-            return ['status' => 1];
+            if ($SeatMapOutboundResponse->Body && $HasMealsOutboundResponse->Body) {
+                session()->put($type, req('flight'));
+                session()->put('flyjinnah'.$type, req('flight'));
+    
+                session()->put(['outboundBundlerServiceId' => $FlyjinnahOutboundGettingBundleServiceId, $type.'baggageCode' => $baggageCode]);
+                session()->put(['outboundflyjinnahMealavailablity' => $HasMealsOutboundResponse,'outboundflyjinnahseatavailablity' => $SeatMapOutboundResponse]);
+    
+                return ['status' => 1];
+            }
+            // return ['status' => 1];
         }   
 
         if($type == 'inbound' && $FlyjinnahInbound->airline == 'fly-jinnah') {
@@ -753,18 +760,29 @@ class FlightController extends Controller
             $SeatMapResponse = self::SeatMap($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
             $HasMealsResponse = self::HasMeals($FlyjinnahOutbound, $FlyjinnahInbound, $flight, $type);
 
+            $baggageCode = $BAGGAGE_DETAILS_REQUEST_GET->Body->AA_OTA_AirBaggageDetailsRS->BaggageDetailsResponses->OnDBaggageDetailsResponse->Baggage->baggageCode;
+
+            if(empty($baggageCode)) {
+                $baggageCode = $BAGGAGE_DETAILS_REQUEST_GET->Body->AA_OTA_AirBaggageDetailsRS->BaggageDetailsResponses->OnDBaggageDetailsResponse->Baggage[0]->baggageCode;
+            }
             $SeatMapInboundResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow = $SeatMapResponse->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow;
             $HasMealsInboundResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal = $HasMealsResponse->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal;
+            // dd($HasMealsInboundResponse->Body);
+            // dd($SeatMapInboundResponse->Body);
             
             // dump($SeatMapInboundResponse);
             // dump($HasMealsInboundResponse);
 
-            session()->put($type, req('flight'));
-            session()->put('flyjinnah'.$type, req('flight'));
-
-            session()->put(['inboundBundlerServiceId' => $FlyjinnahInboundGettingBundleServiceId]);
-            session()->put(['inboundflyjinnahMealavailablity' => $HasMealsInboundResponse,'inboundflyjinnahseatavailablity' => $SeatMapInboundResponse]);
-            return ['status' => 1];
+            if ($SeatMapInboundResponse->Body && $HasMealsInboundResponse->Body) {
+                session()->put($type, req('flight'));
+                session()->put('flyjinnah'.$type, req('flight'));
+    
+                session()->put(['inboundBundlerServiceId' => $FlyjinnahInboundGettingBundleServiceId, $type.'baggageCode' => $baggageCode]);
+                session()->put(['inboundflyjinnahMealavailablity' => $HasMealsInboundResponse,'inboundflyjinnahseatavailablity' => $SeatMapInboundResponse]);
+    
+                return ['status' => 1];
+            }
+            // return ['status' => 1];
         }
     }
 

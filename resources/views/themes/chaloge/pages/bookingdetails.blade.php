@@ -811,6 +811,16 @@ $mealavail = $Mealavailablity->Body->AA_OTA_AirMealDetailsRS->MealDetailsRespons
                     <form action="#" method="post" class="row g-3 needs-validation passengers" novalidate>
                         <input type="hidden" name="outboundBundlerServiceId" value="{{session()->get('outboundBundlerServiceId')}}">
                         <input type="hidden" name="inboundBundlerServiceId" value="{{session()->get('inboundBundlerServiceId')}}">
+                        <input type="hidden" name="outboundbaggageCode" value="{{session()->get('outboundbaggageCode')}}">
+                        <input type="hidden" name="inboundbaggageCode" value="{{session()->get('inboundbaggageCode')}}">
+
+
+                        <input type="hidden" name="outboundflyjinnahseatavailablity" value="{{json_encode(session()->get('outboundflyjinnahseatavailablity'))}}">
+                        <input type="hidden" name="inboundflyjinnahseatavailablity" value="{{json_encode(session()->get('inboundflyjinnahseatavailablity'))}}">
+
+                        <input type="hidden" name="outboundflyjinnahMealavailablity" value="{{json_encode(session()->get('outboundflyjinnahMealavailablity'))}}">
+                        <input type="hidden" name="inboundflyjinnahMealavailablity" value="{{json_encode(session()->get('inboundflyjinnahMealavailablity'))}}">
+
 
                         <input type="hidden" name="totalseatbooking" id="totalseatbooking">
                         <input type="hidden" name="totalmealbooking" id="totalmealbooking">

@@ -268,303 +268,124 @@ class FlightController extends Controller
         
         $currentOrderID = "00000".$BookingOrderID;
         $newOrderID = incrementOrderID($currentOrderID);
-
-        // dump($flights['inbound']);
-        // exit;
-        // dd(json_decode(base64_decode(request('inboundFlight'))));
         $Outboundflights['outbound'] = json_decode(base64_decode(request('flight')));
         
         if(request()->has('inboundFlight')) {
             $Inboundflights['inbound'] = json_decode(base64_decode(request('inboundFlight')));
         }
-        // dd();
-        // dd($Outboundflights['outbound']->airline);
         if($Inboundflights['inbound']->airline == $Outboundflights['outbound']->airline){
-            // echo 'asdsadas';
-            // exit;
-            // dump('exit;');
             $flights['outbound'] = json_decode(base64_decode(request('flight')));
             if(request()->has('inboundFlight')) {
                 $flights['inbound'] = json_decode(base64_decode(request('inboundFlight')));
             }
             $flight = $flights['outbound'];
             
-                    $adult = arrange_array(request('adult'));
-                    $child = arrange_array(request('child'));
-                    $infant = arrange_array(request('infant'));
+            $adult = arrange_array(request('adult'));
+            $child = arrange_array(request('child'));
+            $infant = arrange_array(request('infant'));
 
-                    $adult = collect($adult)->map(function ($item, $key) {
-                        $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
-                        return $item;
-                    })->toArray();
-                    $child = collect($child)->map(function ($item, $key) {
-                        $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
-                        return $item;
-                    })->toArray();
-                    $infant = collect($infant)->map(function ($item, $key) {
-                        $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
-                        return $item;
-                    })->toArray();
+            $adult = collect($adult)->map(function ($item, $key) {
+                $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
+                return $item;
+            })->toArray();
+            $child = collect($child)->map(function ($item, $key) {
+                $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
+                return $item;
+            })->toArray();
+            $infant = collect($infant)->map(function ($item, $key) {
+                $item['FullName'] = trim($item['Firstname'] . " " . $item['Lastname']);
+                return $item;
+            })->toArray();
 
-                    $airline = $flight->flight->AIRLINE;
+            $airline = $flight->flight->AIRLINE;
 
-                    $FARE = $flight->baggage->FARE_PAX_WISE;
-                    $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
-                    $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
-                    $TOTAL_AMOUNT = $flight->baggage->TOTAL;
+            $FARE = $flight->baggage->FARE_PAX_WISE;
+            $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
+            $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
+            $TOTAL_AMOUNT = $flight->baggage->TOTAL;
 
-                    $_FARE['ADULT']['TOTAL'] = $FARE->ADULT->TOTAL;
-                    $_FARE['CHILD']['TOTAL'] = $FARE->CHILD->TOTAL;
-                    $_FARE['INFANT']['TOTAL'] = $FARE->INFANT->TOTAL;
+            $_FARE['ADULT']['TOTAL'] = $FARE->ADULT->TOTAL;
+            $_FARE['CHILD']['TOTAL'] = $FARE->CHILD->TOTAL;
+            $_FARE['INFANT']['TOTAL'] = $FARE->INFANT->TOTAL;
 
-                    if(isset($flights['inbound'])){
-                        $INB_FARE = $flights['inbound']->baggage->FARE_PAX_WISE;
+            if(isset($flights['inbound'])){
+                $INB_FARE = $flights['inbound']->baggage->FARE_PAX_WISE;
 
-                        $TAX += ($flight->travelers->AdultNo * $INB_FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->TAX);
-                        $AMOUNT += ($flight->travelers->AdultNo * $INB_FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->BASIC_FARE);
-                        $TOTAL_AMOUNT += $flights['inbound']->baggage->TOTAL;
+                $TAX += ($flight->travelers->AdultNo * $INB_FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->TAX);
+                $AMOUNT += ($flight->travelers->AdultNo * $INB_FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->BASIC_FARE);
+                $TOTAL_AMOUNT += $flights['inbound']->baggage->TOTAL;
 
-                        $_FARE['ADULT']['TOTAL'] += $INB_FARE->ADULT->TOTAL;
-                        $_FARE['CHILD']['TOTAL'] += $INB_FARE->CHILD->TOTAL;
-                        $_FARE['INFANT']['TOTAL'] += $INB_FARE->INFANT->TOTAL;
+                $_FARE['ADULT']['TOTAL'] += $INB_FARE->ADULT->TOTAL;
+                $_FARE['CHILD']['TOTAL'] += $INB_FARE->CHILD->TOTAL;
+                $_FARE['INFANT']['TOTAL'] += $INB_FARE->INFANT->TOTAL;
+            }
+
+            $booking = new \App\Booking();
+            $booking->order_id = $newOrderID;
+            $booking->airline = $airline;
+            $booking->tax = $TAX;
+            $booking->amount = $AMOUNT;
+            $booking->total_amount = $TOTAL_AMOUNT;
+            $booking->travelers = $flight->travelers;
+            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
+            $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
+            $booking->flight_summary = json_encode($flights);
+            $booking->summary = json_encode([
+                ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
+                ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
+                ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
+            ]);
+            $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
+            switch ($airline){
+                case 'Airsial':
+                    if($flights['inbound']->airline == $flights['outbound']->airline){
+                        if(request()->has('inboundFlight')){
+                            $return = true;
+                        }else{
+                            $return = false;
+                        }
                     }
-
-                    $booking = new \App\Booking();
-                    $booking->order_id = $newOrderID;
-                    $booking->airline = $airline;
-                    $booking->tax = $TAX;
-                    $booking->amount = $AMOUNT;
-                    $booking->total_amount = $TOTAL_AMOUNT;
-                    $booking->travelers = $flight->travelers;
-                    $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
-                    $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
-                    $booking->flight_summary = json_encode($flights);
-                    // dd($booking);
-                    //[{"label":"ADULT","quantity":"1","price":"18125"},{"label":"ADULT","quantity":"1","price":"19535"}]
-                    $booking->summary = json_encode([
-                        ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
-                        ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
-                        ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
-                    ]);
-                    $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
-                    // dd($booking);
-                    // dump($airline, $flight, request()->all());
-                    switch ($airline){
-                        case 'Airsial':
-                            // dd($flights);
-                            // echo 'asdasd';
-                            // exit;
-                            if($flights['inbound']->airline == $flights['outbound']->airline){
-                                if(request()->has('inboundFlight')){
-                                    $return = true;
-                                }else{
-                                    $return = false;
-                                }
-                            }
-                            
-                            $params = [
-                                "DepartureJourney" => $flight->flight->JOURNEY_CODE,
-                                "DepartureFareType" => $flight->baggage->sub_class_id,
-                                "DepartureClass" => $flight->flight->CLASS_CODE,
-                                "DepartureFlight" => $flight->flight->FLIGHT_NO,
-                                "LocationDep" => $flight->travelers->LocationDep,
-                                "LocationArr" => $flight->travelers->LocationArr,
-                                "Return" => $return,
-                                "TotalSeats" => ($flight->travelers->AdultNo + $flight->travelers->ChildNo + $flight->travelers->InfantNo)
+                    
+                    $params = [
+                        "DepartureJourney" => $flight->flight->JOURNEY_CODE,
+                        "DepartureFareType" => $flight->baggage->sub_class_id,
+                        "DepartureClass" => $flight->flight->CLASS_CODE,
+                        "DepartureFlight" => $flight->flight->FLIGHT_NO,
+                        "LocationDep" => $flight->travelers->LocationDep,
+                        "LocationArr" => $flight->travelers->LocationArr,
+                        "Return" => $return,
+                        "TotalSeats" => ($flight->travelers->AdultNo + $flight->travelers->ChildNo + $flight->travelers->InfantNo)
+                    ];
+                    if($flights['inbound']->airline == $flights['outbound']->airline){
+                        if(\request()->inboundFlight){
+                            $inboundParams = [
+                                "ReturningOn" => $flights['inbound']->travelers->ReturningOn,
+                                "ReturningJourney" => $flights['inbound']->flight->JOURNEY_CODE,
+                                "ReturningClass" => $flights['inbound']->flight->CLASS_CODE,
+                                "ReturningFlight" => $flights['inbound']->flight->FLIGHT_NO,
+                                "ReturningFareType" => $flights['inbound']->baggage->sub_class_id,
                             ];
-                            if($flights['inbound']->airline == $flights['outbound']->airline){
-                                if(\request()->inboundFlight){
-                                    $inboundParams = [
-                                        "ReturningOn" => $flights['inbound']->travelers->ReturningOn,
-                                        "ReturningJourney" => $flights['inbound']->flight->JOURNEY_CODE,
-                                        "ReturningClass" => $flights['inbound']->flight->CLASS_CODE,
-                                        "ReturningFlight" => $flights['inbound']->flight->FLIGHT_NO,
-                                        "ReturningFareType" => $flights['inbound']->baggage->sub_class_id,
-                                    ];
-                                    // Merge the arrays if inboundFlight exists
-                                    $params = array_merge($params, $inboundParams);
-                                }
-                            }
-                            // dd($params);
-                            // exit;
-                            $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
-                            // dd($params);
-                            $PNR = \App\Airsial::bookSeat($params,$flights);
-                            // dd($PNR);
-                            if(empty($PNR)){
-                                return ['status' => false, 'message' => $PNR['clientError']];
-                            }
-                            $params = [
-                                'PNR' => $PNR,
-                                'adult' => $adult,
-                                'child' => $child,
-                                'infant' => $infant,
-                                'PrimaryCell' => request('mobile'),
-                                'EmailAddress' => request('email'),
-                                'CNIC' => (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']),
-                            ];
-                            $detail = \App\Airsial::passengerInsertion($params);
-                            // dd($detail);
-                            //$booking->booking_summary = json_encode($detail);
-                            $booking->departuretime = $DepartureDateCron;
-                            $booking->pnr = $PNR;
-                            $booking->save();
-                            break;
-                        case 'Airblue':
-                        case 'airblue':
-                            // dd($flights);
-
-                                for ($x = 0; $x <= 1; $x++) {
-                                    if($x == 0){
-                                        $params = json_decode(json_encode($flight->flight), 1);
-                                        // dd($params);
-                                        // dd($flight->travelers);
-                                        // $params['inbound'] = json_decode(json_encode($flights['inbound'], 1));
-                                        $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                                        $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
-                                        $DepartureDateCron = $params['DEPARTURE_DATE'].'T'.$params['DEPARTURE_TIME'];
-                                        // dd($DepartureDateCron);
-                                        // dd($params);
-                                        // dd($RES);
-                                        $RES = \App\AirBlue::bookSeat($params);
-                                        if(!$RES['status']){
-                                            return ['status' => false, 'message' => $RES['data']];
-                                        }   
-
-                                        $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
-                                        
-                                        $PNR = $BookingReferenceID['_ID'];
-                                        $detail = $BookingReferenceID['_Instance'];
-                                        $booking->booking_summary = json_encode($RES);
-                                        $booking->departuretime = $DepartureDateCron;
-                                        $booking->pnr = $PNR;
-                                        // dump($PNR);
-                                        $booking->save();
-                                    }elseif($x == 1){
-                                        // dd($booking);
-                                        // dd($params);
-                                        // $params = json_decode(json_encode($flight->flight), 1);
-                                        // $params = json_decode(json_encode($flights['inbound']->flight, true));
-                                        $params = json_decode(json_encode($flights['inbound']->flight), true);
-                                        // dd($params);
-                                        // dd($params['DEPARTURE_DATE']);
-                                        $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                                        $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
-                                        
-                                        $DepartureDateCron = $params['DEPARTURE_DATE'].'T'.$params['DEPARTURE_TIME'];
-                                        // dd($DepartureDateCron);
-                                        // dd($params);
-                                        // dd($RES);
-                                        // dd($flight->travelers);
-                                        $RES = \App\AirBlue::bookSeat($params);
-
-                                        if(!$RES['status']){
-                                            return ['status' => false, 'message' => $RES['data']];
-                                        }   
-
-                                        $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
-                                        // dd($BookingReferenceID);
-                                        $PNR = $BookingReferenceID['_ID'];
-                                        $detail = $BookingReferenceID['_Instance'];
-                                        $booking = new \App\Booking();
-                                        $booking->airline = $airline;
-                                        $booking->order_id = $newOrderID;
-                                        $booking->tax = $TAX;
-                                        $booking->amount = $AMOUNT;
-                                        $booking->total_amount = $TOTAL_AMOUNT;
-                                        $booking->travelers = json_encode($flight->travelers);
-                                        $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
-                                        $booking->itinerary = "{$flight->travelers->LocationArr} - {$flight->travelers->LocationDep}";
-                                        $booking->flight_summary = json_encode($flights);
-                                        $booking->booking_summary = json_encode($RES);
-                                        $booking->departuretime = $DepartureDateCron;
-                                        $booking->pnr = $PNR;
-                                        $booking->save();
-                                    }
-                                
-                                }
-                            
-                            break;
-                        case 'Air Serene':
-                        case 'air-serene':
-                            // dd($flights);
-
-                            // dd($flights);
-                            // echo 'airserene n';
-                            // exit;
-                            $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
-                            // dd($DepartureDateCron);
-                            $params = ['MOBILE' => request()->mobile, 'EMAIL' => request()->email];
-                            $params['TRAVELERS_INFORMATION'] = ['ADT' => $adult, 'CHD' => $child, 'INF' => $infant];
-                            
-                            $makeSigningKeyOrderCreateRQ = \App\AirSerene::makeSigningKeyOrderCreateRQReturn($params, $flights);
-                            
-                            $OrderCreateRQ = \App\AirSerene::OrderCreateRQReturn($params, $flights, $makeSigningKeyOrderCreateRQ);
-
-                            $PNR = $OrderCreateRQ['data']->Response->Order->OrderID;
-                            $detail = $OrderCreateRQ;
-                            $booking->order_ref_id = $OrderCreateRQ['data']->Response->Order->OrderID;
-                            $booking->departuretime = $DepartureDateCron;
-                            $booking->booking_summary = json_encode($OrderCreateRQ);
-                            $booking->pnr = $OrderCreateRQ['data']->Response->Order->OrderID;
-                            // dd($booking);
-                            $booking->save();
-                            
-                            break;
-                        case 'Fly Jinnah':
-                            // dd($FARE);
-                            $params['outbound'] = json_decode(json_encode($flights['outbound']), 1);
-                            $params['inbound'] = json_decode(json_encode($flights['inbound'], 1));
-                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];            
-                            $params['form'] = request()->all();
-                            // dd($params);
-                            $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params);
-
-                            $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
-                            // dd($TAX);
-                            $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
-                            // dd($AMOUNT);
-                            $TOTAL_AMOUNT = $flight->baggage->TOTAL;
-
-                            $booking = new \App\Booking();
-                            $booking->airline = $airline;
-                            $booking->order_id = $newOrderID;
-                            $booking->tax = $TAX;
-                            $booking->amount = $AMOUNT;
-                            $booking->total_amount = $TOTAL_AMOUNT;
-                            $booking->travelers = $flight->travelers;
-                            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
-                            $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
-                            $booking->flight_summary = json_encode($flights);
-                            //[{"label":"ADULT","quantity":"1","price":"18125"},{"label":"ADULT","quantity":"1","price":"19535"}]
-                            $booking->summary = json_encode([
-                                ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
-                                ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
-                                ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
-                            ]);
-                            $booking->travelers = json_encode(['ADULT' => count($adult), 'CHILD' => count($child), 'INFANT' => count($infant)]);
-
-                            $params = json_decode(json_encode($flight), 1);
-                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant];
-                            $params['form'] = request()->all();
-
-                            $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params);
-
-                            $params['flight']['AirPrice'] = $priceRS;
-                            $RES = \App\FlyJinnah::OTA_AirBookRQ($params);
-                            if(!$RES['status']){
-                                return ['status' => false, 'message' => $RES['data']];
-                            }
-
-                            $PNR = $RES['data']['AirReservation']['BookingReferenceID']['@attributes']['ID'];
-
-                            $booking->booking_summary = json_encode($RES);
-                            $booking->pnr = $PNR;
-                            $booking->save();
-                            break;
+                            $params = array_merge($params, $inboundParams);
+                        }
                     }
+                    $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+                    $PNR = \App\Airsial::bookSeat($params,$flights);
+                    if(empty($PNR)){
+                        return ['status' => false, 'message' => $PNR['clientError']];
+                    }
+                    $params = [
+                        'PNR' => $PNR,
+                        'adult' => $adult,
+                        'child' => $child,
+                        'infant' => $infant,
+                        'PrimaryCell' => request('mobile'),
+                        'EmailAddress' => request('email'),
+                        'CNIC' => (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']),
+                    ];
+                    $detail = \App\Airsial::passengerInsertion($params);
+                    $booking->departuretime = $DepartureDateCron;
+                    $booking->pnr = $PNR;
+                    $booking->save();
 
                     if($booking->id > 0){
                         $bookingDTL = new \App\BookingDetail();
@@ -579,20 +400,218 @@ class FlightController extends Controller
                         $bookingDTL->comments = request('comments');
                         $bookingDTL->save();
                     }
+                    break;
+                case 'Airblue':
+                case 'airblue':
+                    for ($x = 0; $x <= 1; $x++) {
+                        if($x == 0){
+                            $params = json_decode(json_encode($flight->flight), 1);
+                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
+                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
+                            $DepartureDateCron = $params['DEPARTURE_DATE'].'T'.$params['DEPARTURE_TIME'];
+                            $RES = \App\AirBlue::bookSeat($params);
+                            if(!$RES['status']){
+                                return ['status' => false, 'message' => $RES['data']];
+                            }   
+
+                            $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
+                            
+                            $PNR = $BookingReferenceID['_ID'];
+                            $detail = $BookingReferenceID['_Instance'];
+                            $booking->booking_summary = json_encode($RES);
+                            $booking->departuretime = $DepartureDateCron;
+                            $booking->pnr = $PNR;
+                            $booking->save();
+
+                            if($booking->id > 0){
+                                $bookingDTL = new \App\BookingDetail();
+                                $bookingDTL->booking_id = $booking->id;
+                                $bookingDTL->order_id = $newOrderID;
+                                $bookingDTL->adult = json_encode($adult);
+                                $bookingDTL->child = json_encode($child);
+                                $bookingDTL->infant = json_encode($infant);
+                                $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+                                $bookingDTL->email = request('email');
+                                $bookingDTL->mobile = request('mobile');
+                                $bookingDTL->comments = request('comments');
+                                $bookingDTL->save();
+                            }
+                        }elseif($x == 1){
+                            $params = json_decode(json_encode($flights['inbound']->flight), true);
+                            $params['TRAVELERS'] = json_decode($booking->travelers, 1);
+                            $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
+                            $DepartureDateCron = $params['DEPARTURE_DATE'].'T'.$params['DEPARTURE_TIME'];
+                            $RES = \App\AirBlue::bookSeat($params);
+                            if(!$RES['status']){
+                                return ['status' => false, 'message' => $RES['data']];
+                            }   
+                            $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
+                            $PNR = $BookingReferenceID['_ID'];
+                            $detail = $BookingReferenceID['_Instance'];
+                            $booking = new \App\Booking();
+                            $booking->airline = $airline;
+                            $booking->order_id = $newOrderID;
+                            $booking->tax = $TAX;
+                            $booking->amount = $AMOUNT;
+                            $booking->total_amount = $TOTAL_AMOUNT;
+                            $booking->travelers = json_encode($flight->travelers);
+                            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
+                            $booking->itinerary = "{$flight->travelers->LocationArr} - {$flight->travelers->LocationDep}";
+                            $booking->flight_summary = json_encode($flights);
+                            $booking->booking_summary = json_encode($RES);
+                            $booking->departuretime = $DepartureDateCron;
+                            $booking->pnr = $PNR;
+                            $booking->save();
+
+                            if($booking->id > 0){
+                                $bookingDTL = new \App\BookingDetail();
+                                $bookingDTL->booking_id = $booking->id;
+                                $bookingDTL->order_id = $newOrderID;
+                                $bookingDTL->adult = json_encode($adult);
+                                $bookingDTL->child = json_encode($child);
+                                $bookingDTL->infant = json_encode($infant);
+                                $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+                                $bookingDTL->email = request('email');
+                                $bookingDTL->mobile = request('mobile');
+                                $bookingDTL->comments = request('comments');
+                                $bookingDTL->save();
+                            }
+                        }
+                    }
+                    break;
+                case 'Air Serene':
+                case 'air-serene':
+                    $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+                    $params = ['MOBILE' => request()->mobile, 'EMAIL' => request()->email];
+                    $params['TRAVELERS_INFORMATION'] = ['ADT' => $adult, 'CHD' => $child, 'INF' => $infant];
+                    
+                    $makeSigningKeyOrderCreateRQ = \App\AirSerene::makeSigningKeyOrderCreateRQReturn($params, $flights);
+                    
+                    $OrderCreateRQ = \App\AirSerene::OrderCreateRQReturn($params, $flights, $makeSigningKeyOrderCreateRQ);
+
+                    $PNR = $OrderCreateRQ['data']->Response->Order->OrderID;
+                    $detail = $OrderCreateRQ;
+                    $booking->order_ref_id = $OrderCreateRQ['data']->Response->Order->OrderID;
+                    $booking->departuretime = $DepartureDateCron;
+                    $booking->booking_summary = json_encode($OrderCreateRQ);
+                    $booking->pnr = $OrderCreateRQ['data']->Response->Order->OrderID;
+                    // dd($booking);
+                    $booking->save();
+                
+                break;
+                case 'Fly Jinnah':
+
+                foreach($flights as $flight){
+                    // dd($flight->type);
+                    if($flight->flight->TYPE == 'outbound'){
+                        $flight->travelers->LocationDep = $flight->flight->ORGN;
+                        $flight->travelers->LocationArr = $flight->flight->DEST;
+                    }
+                    if($flight->flight->TYPE == 'inbound'){
+                        $flight->travelers->LocationDep = $flight->flight->DEST;
+                        $flight->travelers->LocationArr = $flight->flight->ORGN;
+                    }
+
+                    // Total Seat Price Code Start
+                    $Seatavailablities = json_decode(request()->get($flight->type.'flyjinnahseatavailablity'));
+                    $Seatavailablities = $Seatavailablities->Body->OTA_AirSeatMapRS->SeatMapResponses->SeatMapResponse->SeatMapDetails->CabinClass->AirRows->AirRow;
+                    $seatbookings = request()->get('seatbooking')[$flight->flight->ORGN . '-' . $flight->flight->DEST];
+                    $SeattotalPrice = 0;
+
+                    foreach ($Seatavailablities as $RowNumberkey => $Seatavailablity) {
+                        $AirSeats = $Seatavailablity->AirSeats->AirSeat;
+                        foreach ($AirSeats as $AirSeat) {
+                            foreach ($AirSeat as $AirSeat) {
+                                $SeatNumber = ($RowNumberkey + 1) . $AirSeat->SeatNumber;
+                                foreach ($seatbookings as $passenger => $bookedSeats) {
+                                    if (in_array($SeatNumber, $bookedSeats)) {
+                                        // echo "Matched Seat: " . $SeatNumber . " - Characteristics: " . $AirSeat->SeatCharacteristics . "<br>";
+                                        $SeattotalPrice += floatval($AirSeat->SeatCharacteristics); 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // End Seat Code
+
+                    // Total Meal Price Code Start
+                    $flyjinnahMealavailablity = json_decode(request()->get($flight->type.'flyjinnahMealavailablity'));
+                    $flyjinnahMealavailablity = $flyjinnahMealavailablity->Body->AA_OTA_AirMealDetailsRS->MealDetailsResponses->MealDetailsResponse->Meal;    
+                    $mealbookings = request()->get('mealbooking')[$flight->flight->ORGN . '-' . $flight->flight->DEST];
+                    $mealtotalPrice = 0;
+
+                    foreach ($mealbookings as $person => $meals) {
+                        foreach ($meals as $meal) {
+                            foreach ($flyjinnahMealavailablity as $detail) {
+                                if ($detail->mealCode === $meal) {
+                                    $mealtotalPrice += (float) $detail->mealCharge;
+                                }
+                            }
+                        }
+                    }
+                    // End Meal Code 
+
+                    $totalMealNSeat_amount = $SeattotalPrice + $mealtotalPrice;
 
 
+                    $TAX = ($flight->travelers->AdultNo * $FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $FARE->INFANT->TAX);
+                    $AMOUNT = ($flight->travelers->AdultNo * $FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $FARE->INFANT->BASIC_FARE);
+                    $TOTAL_AMOUNT = $flight->baggage->TOTAL;
+
+                    $booking = new \App\Booking();
+                    $booking->airline = $airline;
+                    $booking->order_id = $newOrderID;
+                    $booking->tax = $TAX;
+                    $booking->amount = $AMOUNT;
+                    $booking->total_amount = $TOTAL_AMOUNT + $totalMealNSeat_amount;
+                    $booking->travelers = json_encode($flight->travelers);
+                    $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
+                    $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
+                    $booking->flight_summary = json_encode($flight);
+                    $booking->summary = json_encode([
+                        ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
+                        ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
+                        ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
+                    ]);
+
+                    $params = json_decode(json_encode($flight), 1);
+                    $params['TRAVELERS'] = json_decode($booking->travelers, 1);
+                    $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant];
+                    $params['form'] = request()->all();
+
+                    $priceRS = \App\FlyJinnah::OTA_AirPriceRQ($params, $flight);
+                    $params['flight']['AirPrice'] = $priceRS;
+                    $RES = \App\FlyJinnah::OTA_AirBookRQ($params, $flight);
+                    if(!$RES['status']){
+                        return ['status' => false, 'message' => $RES['data']];
+                    }
+
+                    $PNR = $RES['data']['AirReservation']['BookingReferenceID']['@attributes']['ID'];
+
+                    $booking->booking_summary = json_encode($RES);
+                    $booking->totalseats_amount = $SeattotalPrice;
+                    $booking->totalmeals_amount = $mealtotalPrice;
+                    $booking->pnr = $PNR;
+                    $booking->save();
+                }
+                if($booking->id > 0){
+                    $bookingDTL = new \App\BookingDetail();
+                    $bookingDTL->booking_id = $booking->id;
+                    $bookingDTL->order_id = $newOrderID;
+                    $bookingDTL->adult = json_encode($adult);
+                    $bookingDTL->child = json_encode($child);
+                    $bookingDTL->infant = json_encode($infant);
+                    $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+                    $bookingDTL->email = request('email');
+                    $bookingDTL->mobile = request('mobile');
+                    $bookingDTL->comments = request('comments');
+                    $bookingDTL->save();
+                }
+                break;
+            }
         }   
         elseif(request()->has('inboundFlight') && $Outboundflights['outbound']->airline != $Inboundflights['inbound']->airline){
             $Multipleflights = array_merge($Outboundflights,$Inboundflights);
-            // dd($Multipleflights);
-            // foreach($Multipleflights as $key => $flight){
-            //     dump($key,$flight);
-            // }
-            // exit;
-            // foreach($Multipleflights as $key => $flight){
-            //     dump($flight);
-            // }
-            // exit;
             foreach($Multipleflights as $key => $flight){
                 if($flight->type == 'outbound'){
                     $flights['outbound'] = json_decode(base64_decode(request('flight')));
@@ -605,25 +624,7 @@ class FlightController extends Controller
                     $flights['inbound'] = json_decode(base64_decode(request('inboundFlight')));
                     
                     $flight = $flights['inbound'];
-
-                    // $flight = $flights['inbound'];
-
-
-                    // dd($flights['outbound']);
-                    // dd($flights['outbound']);
-                    // dd($flight);
-
                 }
-                // dd($flight);
-                // exit;
-            
-                // dd($flight->flight->AIRLINE);
-                // dump($flights['outbound']);
-                // dd($flights['inbound']);
-
-                // $flight = $flights['outbound'];
-                // dd($flight);
-
                 $adult = arrange_array(request('adult'));
                 $child = arrange_array(request('child'));
                 $infant = arrange_array(request('infant'));
@@ -651,18 +652,6 @@ class FlightController extends Controller
                 $_FARE['ADULT']['TOTAL'] = $FARE->ADULT->TOTAL;
                 $_FARE['CHILD']['TOTAL'] = $FARE->CHILD->TOTAL;
                 $_FARE['INFANT']['TOTAL'] = $FARE->INFANT->TOTAL;
-
-                // if(isset($flights['inbound'])){
-                //     $INB_FARE = $flights['inbound']->baggage->FARE_PAX_WISE;
-
-                //     $TAX += ($flight->travelers->AdultNo * $INB_FARE->ADULT->TAX) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->TAX) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->TAX);
-                //     $AMOUNT += ($flight->travelers->AdultNo * $INB_FARE->ADULT->BASIC_FARE) + ($flight->travelers->ChildNo * $INB_FARE->CHILD->BASIC_FARE) + ($flight->travelers->InfantNo * $INB_FARE->INFANT->BASIC_FARE);
-                //     $TOTAL_AMOUNT += $flights['inbound']->baggage->TOTAL;
-
-                //     $_FARE['ADULT']['TOTAL'] += $INB_FARE->ADULT->TOTAL;
-                //     $_FARE['CHILD']['TOTAL'] += $INB_FARE->CHILD->TOTAL;
-                //     $_FARE['INFANT']['TOTAL'] += $INB_FARE->INFANT->TOTAL;
-                // }
 
                 $booking = new \App\Booking();
                 $booking->airline = $airline;
@@ -786,58 +775,13 @@ class FlightController extends Controller
                             }   
 
                             $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
-                            // dd($BookingReferenceID);
-                            // exit;
-
-                            // $params['BookingReferenceID'] = $BookingReferenceID;
-                            // $AirDemandTicket = \App\AirBlue::AirDemandTicket($params);
-                            
                             $PNR = $BookingReferenceID['_ID'];
                             $detail = $BookingReferenceID['_Instance'];
                             $booking->booking_summary = json_encode($RES);
                             $booking->departuretime = $DepartureDateCron;
                             $booking->pnr = $PNR;
-                            // dd($PNR);
-                            $booking->save();
-                            // session_start();
-                            // $lastrow = \App\Booking::latest()->first();
-                            // $id = $lastrow['id'];
-            
-                            // $booking = \App\Booking::find($id);
-                            
-                            // if($_SESSION['xml'] == ''){
-                            //     $booking->update([
-                            //         'xml' => $wherexml,
-                            //     ]);
-                            // }else{
-                            //     $xml = $_SESSION['xml'];
-                            //     $xml = str_replace('"', "'", $xml);
-                            //     $booking->update([
-                            //         'xml' => $xml,
-                            //     ]);
-                            // }
-                            // session_destroy();
-                        
+                            $booking->save();                        
                         break;
-                        // old
-                        // $params = json_decode(json_encode($flight->flight), 1);
-                        // $params['inbound'] = json_decode(json_encode($flights['inbound'], 1));
-                        // $params['TRAVELERS'] = json_decode($booking->travelers, 1);
-                        // $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant,];
-
-                        // $RES = \App\AirBlue::bookSeat($params);
-                        // if(!$RES['status']){
-                        //     return ['status' => false, 'message' => $RES['data']];
-                        // }
-
-                        // $BookingReferenceID = $RES['data']['AirReservation']['BookingReferenceID'][1];
-                        // $PNR = $BookingReferenceID['_ID'];
-                        // $detail = $BookingReferenceID['_Instance'];
-
-                        // $booking->booking_summary = json_encode($RES);
-                        // $booking->pnr = $PNR;
-                        // $booking->save();
-                        // break;
                     case 'Air Serene':
                     case 'air-serene':
                         
@@ -846,13 +790,10 @@ class FlightController extends Controller
                         $params['TRAVELERS_INFORMATION'] = ['ADT' => $adult, 'CHD' => $child, 'INF' => $infant];
                         
                         $getSingleFlight = \App\AirSerene::IfNotSamegetSingleFlight($flight);
-                        // dd($getSingleFlight);
-
                         $makeSigningKeyOrderCreateRQ = \App\AirSerene::makeSigningKeyOrderCreateIfNotRQReturn($params, $getSingleFlight);
 
 
                         $OrderCreateRQ = \App\AirSerene::OrderCreateIfNotRQReturn($params, $getSingleFlight, $makeSigningKeyOrderCreateRQ);
-                        // dd($OrderCreateRQ['data']->Response->Order->OrderID);
 
                         $PNR = $OrderCreateRQ['data']->Response->Order->OrderID;
                         $detail = $OrderCreateRQ;
@@ -860,20 +801,13 @@ class FlightController extends Controller
                         $booking->departuretime = $DepartureDateCron;
                         $booking->booking_summary = json_encode($OrderCreateRQ);
                         $booking->pnr = $OrderCreateRQ['data']->Response->Order->OrderID;
-                        // dd($booking);
                         $booking->save();
-                        
                         break;
                     case 'Fly Jinnah':
-                        // echo 'asdsadsadas';
-                        // exit;
-                        // exit;
-                        // dd($flight);
                         if($flight->flight->TYPE == 'inbound'){
                             $flight->travelers->LocationDep = $flight->flight->ORGN;
                             $flight->travelers->LocationArr = $flight->flight->DEST;
                         }
-                        // dd($flight);
                         $params = json_decode(json_encode($flight), 1);
                         $params['TRAVELERS'] = json_decode($booking->travelers, 1);
                         $params['TRAVELERS_INFORMATION'] = ['ADULT' => $adult, 'CHILD' => $child, 'INFANT' => $infant];
@@ -891,27 +825,22 @@ class FlightController extends Controller
 
                         $booking->booking_summary = json_encode($RES);
                         $booking->pnr = $PNR;
-                        // dump($PNR);
-                        // exit;
                         $booking->save();
-                        break;
+                    break;
                 }
-            
-                if($booking->id > 0){
-                    $bookingDTL = new \App\BookingDetail();
-                    $bookingDTL->booking_id = $booking->id;
-                    $bookingDTL->order_id = $newOrderID;
-                    $bookingDTL->adult = json_encode($adult);
-                    $bookingDTL->child = json_encode($child);
-                    $bookingDTL->infant = json_encode($infant);
-                    $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
-                    $bookingDTL->email = request('email');
-                    $bookingDTL->mobile = request('mobile');
-                    $bookingDTL->comments = request('comments');
-                    $bookingDTL->save();
-                }
-            
-            
+            }
+            if($booking->id > 0){
+                $bookingDTL = new \App\BookingDetail();
+                $bookingDTL->booking_id = $booking->id;
+                $bookingDTL->order_id = $newOrderID;
+                $bookingDTL->adult = json_encode($adult);
+                $bookingDTL->child = json_encode($child);
+                $bookingDTL->infant = json_encode($infant);
+                $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+                $bookingDTL->email = request('email');
+                $bookingDTL->mobile = request('mobile');
+                $bookingDTL->comments = request('comments');
+                $bookingDTL->save();
             }
               
         } 
@@ -1246,19 +1175,19 @@ class FlightController extends Controller
                         }
     
         }       
-        if($booking->id > 0){
-            $bookingDTL = new \App\BookingDetail();
-            $bookingDTL->booking_id = $booking->id;
-            $bookingDTL->order_id = $newOrderID;
-            $bookingDTL->adult = json_encode($adult);
-            $bookingDTL->child = json_encode($child);
-            $bookingDTL->infant = json_encode($infant);
-            $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
-            $bookingDTL->email = request('email');
-            $bookingDTL->mobile = request('mobile');
-            $bookingDTL->comments = request('comments');
-            $bookingDTL->save();
-        }
+        // if($booking->id > 0){
+        //     $bookingDTL = new \App\BookingDetail();
+        //     $bookingDTL->booking_id = $booking->id;
+        //     $bookingDTL->order_id = $newOrderID;
+        //     $bookingDTL->adult = json_encode($adult);
+        //     $bookingDTL->child = json_encode($child);
+        //     $bookingDTL->infant = json_encode($infant);
+        //     $bookingDTL->cnic = (request()->has('cnic') ? request('cnic') : $adult[0]['Cnic']);
+        //     $bookingDTL->email = request('email');
+        //     $bookingDTL->mobile = request('mobile');
+        //     $bookingDTL->comments = request('comments');
+        //     $bookingDTL->save();
+        // }
 
         return ['status' => true, 'PNR' => $PNR, 'id' => $booking->id, 'detail' => $detail, 'order_id' => $newOrderID];
     }
