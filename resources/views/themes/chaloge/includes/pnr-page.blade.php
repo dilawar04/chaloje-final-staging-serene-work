@@ -78,8 +78,10 @@
     //dd($pnr);
     $OrderId = $_GET['order_id'];
     //dd($pnr);
-    $bookings = \App\Booking::with('details')->where('order_id', $OrderId)->get();
-    //dd($booking[0]);
+    //$bookings = \App\Booking::with('details')->where('order_id', $OrderId)->get();
+    $bookings = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $OrderId)->get();
+
+    //dd($bookings[0]);
     //dd($booking[0]);
     if ($bookings[1]) {
         $booking = $bookings[0];
@@ -100,10 +102,13 @@
         $flight->baggage = $_flight->baggage;
     }
 
-    $detail = $booking->details->first();
-    $adults = json_decode($detail->adult);
-    $childs = json_decode($detail->child);
-    $infants = json_decode($detail->infant);
+    $detail[email] = $booking->email;
+    $detail[mobile] = $booking->mobile;
+    $detail[cnic] = $booking->cnic;
+    
+    $adults = json_decode($booking->adult);
+    $childs = json_decode($booking->child);
+    $infants = json_decode($booking->infant);
 
     $FARE = $flight->baggage->FARE_PAX_WISE;
     //dump($booking, $flight, $travelers, $detail);
@@ -348,10 +353,10 @@
                                                        <li><span>INF Name</span><span>-</span><span>{{ $infant->Title }} {{ trim($infant->Firstname . ' ' . $infant->Lastname) }}</span></li>
                                                    @endforeach
                                                @endif
-                                               <li><span>Mobile No</span><span>-</span><span>{{ $detail->mobile }}</span>
+                                               <li><span>Mobile No</span><span>-</span><span>{{ $detail['mobile'] }}</span>
                                                </li>
-                                               <li><span>CNIC</span><span>-</span><span>{{ $detail->cnic }}</span></li>
-                                               <li><span>PNR No</span><span>-</span><span>{{ $booking->pnr }}</span></li>
+                                               <li><span>CNIC</span><span>-</span><span>{{ $detail['cnic'] }}</span></li>
+                                               <!-- <li><span>PNR No</span><span>-</span><span>{{ $booking->pnr }}</span></li> -->
                                            </ul>
                                        </fieldset>
                                    </div>
@@ -478,10 +483,10 @@
                                                        <li><span>INF Name</span><span>-</span><span>{{ $infant->Title }} {{ trim($infant->Firstname . ' ' . $infant->Lastname) }}</span></li>
                                                    @endforeach
                                                @endif
-                                               <li><span>Mobile No</span><span>-</span><span>{{ $detail->mobile }}</span>
+                                               <li><span>Mobile No</span><span>-</span><span>{{ $detail['mobile'] }}</span>
                                                </li>
-                                               <li><span>CNIC</span><span>-</span><span>{{ $detail->cnic }}</span></li>
-                                               <li><span>PNR No</span><span>-</span><span>{{ $booking->pnr }}</span></li>
+                                               <li><span>CNIC</span><span>-</span><span>{{ $detail['cnic'] }}</span></li>
+                                               <!-- <li><span>PNR No</span><span>-</span><span>{{ $booking->pnr }}</span></li> -->
                                            </ul>
                                        </fieldset>
                                    </div>

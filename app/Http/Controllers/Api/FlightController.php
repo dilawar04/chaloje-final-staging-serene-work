@@ -431,14 +431,13 @@ class FlightController extends Controller
                             $booking->tax = $TAX;
                             $booking->amount = $AMOUNT;
                             $booking->total_amount = $TOTAL_AMOUNT;
-                            $booking->travelers = json_encode($flight->travelers);
                             $booking->summary = json_encode([
                                 ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
                                 ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
                                 ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
                             ]);
                             $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
-                            $booking->flight_summary = json_encode($flight);
+                            $booking->flight_summary = json_encode($flights);
                             $booking->booking_summary = json_encode($RES);
                             $booking->departuretime = $DepartureDateCron;
                             $booking->pnr = $PNR;
@@ -472,14 +471,13 @@ class FlightController extends Controller
                             $booking->tax = $TAX;
                             $booking->amount = $AMOUNT;
                             $booking->total_amount = $TOTAL_AMOUNT;
-                            $booking->travelers = json_encode($flight->travelers);
                             $booking->summary = json_encode([
                                 ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
                                 ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
                                 ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
                             ]);
                             $booking->itinerary = "{$flight->travelers->LocationArr} - {$flight->travelers->LocationDep}";
-                            $booking->flight_summary = json_encode($flight);
+                            $booking->flight_summary = json_encode($flights);
                             $booking->booking_summary = json_encode($RES);
                             $booking->departuretime = $DepartureDateCron;
                             $booking->pnr = $PNR;
@@ -582,10 +580,9 @@ class FlightController extends Controller
                         $booking->tax = $TAX;
                         $booking->amount = $AMOUNT;
                         $booking->total_amount = $TOTAL_AMOUNT + $totalMealNSeat_amount;
-                        $booking->travelers = json_encode($flight->travelers);
                         $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
                         $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
-                        $booking->flight_summary = json_encode($flight);
+                        $booking->flight_summary = json_encode($flights);
                         $booking->summary = json_encode([
                             ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
                             ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
@@ -680,7 +677,7 @@ class FlightController extends Controller
                 $booking->travelers = $flight->travelers;
                 $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
                 $booking->itinerary = "{$flight->flight->ORGN} - {$flight->flight->DEST}";
-                $booking->flight_summary = json_encode($flight);
+                $booking->flight_summary = json_encode($Multipleflights);
                 $booking->summary = json_encode([
                     ['label' => 'ADULT', 'quantity' => $flight->travelers->AdultNo, 'price' => $_FARE['ADULT']['TOTAL']],
                     ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
