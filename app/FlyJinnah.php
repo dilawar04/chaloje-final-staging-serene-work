@@ -1004,11 +1004,6 @@ class FlyJinnah
 
     public static function OTA_AirPriceRQ($params = [], $flight)
     {
-        // dd();
-        // dd(session()->get('outboundBundlerServiceId'));
-        // dd();
-        // dd($params['form']['mealbooking']['KHI-ISB']['adult-1'][0]);
-        // dd($flight->flight->ORGN);
         self::set_credential();
 
         $params = collect([
@@ -1212,13 +1207,7 @@ class FlyJinnah
     public static function OTA_AirBookRQ($params = [], $flight)
     {
         self::set_credential();
-        // dd(request());
-        // dd();
-        // dd();
         $Passengers = $params['TRAVELERS_INFORMATION'];
-        
-        // dd($Passengers);
-
         $TRAVELERS_INFORMATION = $params['TRAVELERS_INFORMATION'];
 
         $ident = $flight->flight->TransactionIdentifier;

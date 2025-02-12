@@ -762,186 +762,115 @@ class AirBlue {
 
     public static  function bookSeat($params = [])
     {
-        // dd($params);
-        // dd($params['TRAVELERS_XML']);
         self::set_credential();
-
         $RPH = 0;
         $T_XML = str_ireplace(['<0', '<48', '>48'], ['&lt;0', '&lt;48', '&gt;48'], \req('TRAVELERS_XML') ?? $params['TRAVELERS_XML']);
-        // dd($T_XML);
-        // $T_XML = '<PTC_FareBreakdowns><PTC_FareBreakdown><PassengerTypeQuantity Code="ADT" Quantity="1"/><PassengerFare><BaseFare CurrencyCode="PKR" Amount="29940"/><Taxes Amount="2145"><Tax TaxCode="P2" CurrencyCode="PKR" Amount="1500"/><Tax TaxCode="P3" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="PK" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="AD" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="SP" CurrencyCode="PKR" Amount="500"/><Tax TaxCode="XZ" CurrencyCode="PKR" Amount="100"/><Tax TaxCode="YI" CurrencyCode="PKR" Amount="20"/><Tax TaxCode="N9" CurrencyCode="PKR" Amount="25"/></Taxes><Fees Amount="5500"><Fee FeeCode="Q1" CurrencyCode="PKR" Amount="5500"/></Fees><TotalFare CurrencyCode="PKR" Amount="37585"/></PassengerFare><FareInfo><DepartureDate>2024-12-19T00:00:00</DepartureDate><DepartureAirport LocationCode="KHI"/><ArrivalAirport LocationCode="ISB"/><FareInfo FareBasisCode="EFTAOWY"/><PassengerFare><BaseFare CurrencyCode="PKR" Amount="29940"/><Taxes Amount="2145"><Tax TaxCode="P2" CurrencyCode="PKR" Amount="1500"/><Tax TaxCode="P3" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="PK" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="AD" CurrencyCode="PKR" Amount="0"/><Tax TaxCode="SP" CurrencyCode="PKR" Amount="500"/><Tax TaxCode="XZ" CurrencyCode="PKR" Amount="100"/><Tax TaxCode="YI" CurrencyCode="PKR" Amount="20"/><Tax TaxCode="N9" CurrencyCode="PKR" Amount="25"/></Taxes><Fees Amount="5500"><Fee FeeCode="Q1" CurrencyCode="PKR" Amount="5500"/></Fees><TotalFare CurrencyCode="PKR" Amount="37585"/></PassengerFare></FareInfo><FareInfo><DepartureDate>2024-12-19T00:00:00</DepartureDate><RuleInfo><ChargesRules><VoluntaryChanges><Penalty HoursBeforeDeparture="&lt;0" CurrencyCode="PKR" Amount="5500"/><Penalty HoursBeforeDeparture="&lt;48" CurrencyCode="PKR" Amount="4500"/><Penalty HoursBeforeDeparture="&gt;48" CurrencyCode="PKR" Amount="3500"/></VoluntaryChanges><VoluntaryRefunds><Penalty HoursBeforeDeparture="&lt;0" CurrencyCode="PKR" Amount="9000"/><Penalty HoursBeforeDeparture="&lt;48" CurrencyCode="PKR" Amount="6000"/><Penalty HoursBeforeDeparture="&gt;48" CurrencyCode="PKR" Amount="4500"/></VoluntaryRefunds></ChargesRules></RuleInfo><DepartureAirport LocationCode="KHI"/><ArrivalAirport LocationCode="ISB"/><PassengerFare><FareBaggageAllowance UnitOfMeasureQuantity="20" UnitOfMeasure="KGS"/></PassengerFare></FareInfo></PTC_FareBreakdown></PTC_FareBreakdowns>';
         $OriginDestination_XML = \req('OriginDestination_XML') ?? $params['OriginDestination_XML'];
-        // dd($OriginDestination_XML);
         $roundOriginDestination_XML = '';
-        // dd($roundOriginDestination_XML);
         $roundTRAVELERS_XML = '';
-        // dd($roundTRAVELERS_XML);
-        // dd($params['inbound']->flight->OriginDestination_XML);
-        // dd($params['inbound']->flight->OriginDestination_XML);
         if(!empty($params['inbound']->flight->OriginDestination_XML)) {
-            // dd($params['inbound']->flight->OriginDestination_XML);
-            // $T_XML_OBJ = simplexml_load_string($T_XML);
-            // dd($T_XML_OBJ);
-            // $TRAVELERS_XML = $T_XML_OBJ->PassengerTypeQuantity->asXML();
-            // dd($T_XML_OBJ->PassengerTypeQuantity->asXML());
-            // dd($TRAVELERS_XML);
-            // $TRAVELERS_XML .= $T_XML_OBJ->PassengerFare->asXML();
-            // dd($TRAVELERS_XML);
-            // $TRAVELERS_XML .= $T_XML_OBJ->FareInfo[1]->asXML();
-            // dd($TRAVELERS_XML);
-            //$TRAVELERS_XML = str_replace(['<PTC_FareBreakdown>', '</PTC_FareBreakdown>'], ['', ''], $T_XML_OBJ->asXML());
-
-            // dd($T_XML);
             $roundOriginDestination_XML = $params['inbound']->flight->OriginDestination_XML;
-            // dd($roundOriginDestination_XML);
             $RT_XML = str_ireplace(['<0', '<48', '>48'], ['&lt;0', '&lt;48', '&gt;48'], $params['inbound']->flight->TRAVELERS_XML);
-            
             $RemovePTCRT_XML = str_ireplace(['</PTC_FareBreakdowns>', '<PTC_FareBreakdowns>'],'', $RT_XML);
-        
             $roundTRAVELERS_XML = $RemovePTCRT_XML;
-
             $T_XML = str_ireplace(['</PTC_FareBreakdowns>', '<PTC_FareBreakdowns>'],'', $T_XML);
-
             $TRAVELERS_XML = $T_XML;
-
-
-            // dd($TRAVELERS_XML);
         } else {
-            // echo 'asdfgh';
-            //$TRAVELERS_XML = str_replace(['<PTC_FareBreakdown>', '</PTC_FareBreakdown>'], ['', ''], $T_XML);
             $TRAVELERS_XML = $T_XML;
-            // dd($TRAVELERS_XML);
         }
-        // dd($T_XML);
         $TRAVELERS = \req('TRAVELERS') ?? $params['TRAVELERS'];
-        // dd($TRAVELERS);
         $TRAVELERS_INFORMATION = \req('TRAVELERS_INFORMATION') ?? $params['TRAVELERS_INFORMATION'];
-        // dd($TRAVELERS_INFORMATION);
+        // dd(request()->get('adult')['Cnic'][0]);
         $Passengers = [
             'ADT' => $TRAVELERS['ADULT'],
             'CHD' => $TRAVELERS['CHILD'],
             'INF' => $TRAVELERS['INFANT'],
         ];
-        // dd($Passengers);
 
-        // dd($OriginDestination_XML);
-        // $OriginDestination_XML = '<OriginDestinationOption>'.'{$OriginDestination_XML}'.'</OriginDestinationOption>';
-        // $OriginDestination_XML = '<OriginDestinationOption>' . $OriginDestination_XML . '</OriginDestinationOption>';
-        // $roundOriginDestination_XML = '<OriginDestinationOption>' . $roundOriginDestination_XML . '</OriginDestinationOption>'; 
-        // dd($OriginDestination_XML);
-        // dd($roundOriginDestination_XML);
-        // dd($TRAVELERS_XML);
-        // dd($roundTRAVELERS_XML);
-        // dd($TRAVELERS_XML);
-        // dd($roundTRAVELERS_XML);
         $xml = "<Envelope xmlns='http://schemas.xmlsoap.org/soap/envelope/'>
-    <Header/>
-    <Body>
-        <AirBook xmlns='http://zapways.com/air/ota/2.0'>
-            <airBookRQ Target='". self::$credential['Target'] ."' Version='". self::$credential['Version'] ."' EchoToken='-8586704355136787339' TimeStamp='2022-02-18T00:00:00.000Z' ResStatus='Book' PriceInd='false' xmlns='http://www.opentravel.org/OTA/2003/05'>
-                <POS>
-                    <Source ERSP_UserID='". self::$credential['key'] ."'>
-                        <RequestorID Type='". self::$credential['Type'] ."' ID='". self::$credential['ID'] ."' MessagePassword='". self::$credential['Password'] ."'/>
-                    </Source>
-                </POS>
-                <AirItinerary>";
-                if($roundOriginDestination_XML == ''){
-                $xml .=  "<OriginDestinationOptions>
-                            <OriginDestinationOption>
-                                {$OriginDestination_XML}
-                            </OriginDestinationOption>
-                        </OriginDestinationOptions>
-                        </AirItinerary>";
-                }else{
-                $xml .=  "<OriginDestinationOptions>
-                            <OriginDestinationOption>
-                                {$OriginDestination_XML}
-                            </OriginDestinationOption>
-                            <OriginDestinationOption>
-                                {$roundOriginDestination_XML}
-                            </OriginDestinationOption>
-                        </OriginDestinationOptions>
-                        </AirItinerary>";
-                }
-                
-                if($roundTRAVELERS_XML == ''){
-                    $xml .= "<PriceInfo>{$TRAVELERS_XML}</PriceInfo>";
-                }else{
-                    $xml .= "<PriceInfo><PTC_FareBreakdowns>
-                        {$roundTRAVELERS_XML}
-                        {$TRAVELERS_XML}
-                    </PTC_FareBreakdowns></PriceInfo>";
-                }
-                
-                $xml .= "<TravelerInfo>";
-// dd($xml);
-        foreach ($TRAVELERS_INFORMATION as $type => $items) {
-            foreach ($items as $i => $item) {
-                $RPH++;
-                $key = '';
-                if ($type === 'ADULT') $key = 'ADT';
-                else if ($type === 'CHILD') $key = 'CHD';
-                else if ($type === 'INFANT') $key = 'INF';
-                $xml .= "
-                            <AirTraveler BirthDate='" . \Carbon\Carbon::parse($item['Dob'])->format('Y-m-d') . "'>
-                                <PersonName>
-                                    <GivenName>{$item['Firstname']}</GivenName>
-                                    <Surname>{$item['Lastname']}</Surname>";
-                                    if ($type !== 'INFANT') {
-                                        $xml .= "<NameTitle>{$item['Title']}</NameTitle>";
-                                    }
+            <Header/>
+            <Body>
+                <AirBook xmlns='http://zapways.com/air/ota/2.0'>
+                    <airBookRQ Target='". self::$credential['Target'] ."' Version='". self::$credential['Version'] ."' EchoToken='-8586704355136787339' TimeStamp='2022-02-18T00:00:00.000Z' ResStatus='Book' PriceInd='false' xmlns='http://www.opentravel.org/OTA/2003/05'>
+                        <POS>
+                            <Source ERSP_UserID='". self::$credential['key'] ."'>
+                                <RequestorID Type='". self::$credential['Type'] ."' ID='". self::$credential['ID'] ."' MessagePassword='". self::$credential['Password'] ."'/>
+                            </Source>
+                        </POS>
+                        <AirItinerary>";
+                        if($roundOriginDestination_XML == ''){
+                        $xml .=  "<OriginDestinationOptions>
+                                    <OriginDestinationOption>
+                                        {$OriginDestination_XML}
+                                    </OriginDestinationOption>
+                                </OriginDestinationOptions>
+                                </AirItinerary>";
+                        }else{
+                        $xml .=  "<OriginDestinationOptions>
+                                    <OriginDestinationOption>
+                                        {$OriginDestination_XML}
+                                    </OriginDestinationOption>
+                                    <OriginDestinationOption>
+                                        {$roundOriginDestination_XML}
+                                    </OriginDestinationOption>
+                                </OriginDestinationOptions>
+                                </AirItinerary>";
+                        }
+                        
+                        if($roundTRAVELERS_XML == ''){
+                            $xml .= "<PriceInfo>{$TRAVELERS_XML}</PriceInfo>";
+                        }else{
+                            $xml .= "<PriceInfo><PTC_FareBreakdowns>
+                                {$roundTRAVELERS_XML}
+                                {$TRAVELERS_XML}
+                            </PTC_FareBreakdowns></PriceInfo>";
+                        }
+                        
+                        $xml .= "<TravelerInfo>";
+                        foreach ($TRAVELERS_INFORMATION as $type => $items) {
+                            $MainEmail = request()->get('email');
+                            $MainNumber = substr(preg_replace('/\D/', '', request()->get('mobile')) ,1);  
+                            $MainCnic = preg_replace('/\D/', '', request()->get('adult')['Cnic'][0]);
+                            foreach ($items as $i => $item) {
+                                $RPH++;
+                                $key = '';
+                                if ($type === 'ADULT') $key = 'ADT';
+                                else if ($type === 'CHILD') $key = 'CHD';
+                                else if ($type === 'INFANT') $key = 'INF';
+                                $xml .= "
+                                            <AirTraveler BirthDate='" . \Carbon\Carbon::parse($item['Dob'])->format('Y-m-d') . "'>
+                                                <PersonName>
+                                                    <GivenName>{$item['Firstname']}</GivenName>
+                                                    <Surname>{$item['Lastname']}</Surname>";
+                                                    if ($type !== 'INFANT') {
+                                                        $xml .= "<NameTitle>{$item['Title']}</NameTitle>";
+                                                    }
 
-                $xml .= "</PersonName>
-                                <Telephone PhoneLocationType='10' CountryAccessCode='92' PhoneNumber='3223331111'/>
-                                <Email>support@zapways.com</Email>
-                                <Document DocID='3741733560' DocType='2' DocIssueCountry='PK' DocHolderNationality='PK'/>
-                                <PassengerTypeQuantity Code='{$key}' Quantity='1'/>
-                                <TravelerRefNumber RPH='{$RPH}'/>
-                            </AirTraveler>
-                        ";
-            }
-        }
-        $xml .= "</TravelerInfo></airBookRQ>
-        </AirBook>
-    </Body>
-</Envelope>";
-
+                                $xml .= "</PersonName>
+                                                <Telephone PhoneLocationType='10' CountryAccessCode='92' PhoneNumber='{$MainNumber}' />
+                                                <Email>{$MainEmail}</Email>
+                                                <Document DocID='{$MainCnic}' DocType='2' DocIssueCountry='PK' DocHolderNationality='PK'/>
+                                                <PassengerTypeQuantity Code='{$key}' Quantity='1'/>
+                                                <TravelerRefNumber RPH='{$RPH}'/>
+                                            </AirTraveler>
+                                        ";
+                            }
+                        }
+                        $xml .= "</TravelerInfo></airBookRQ>
+                        </AirBook>
+            </Body>
+        </Envelope>";
         // dd($xml);
-        // Get the referrer URL
-        $referrer = $_SERVER['HTTP_REFERER'];
-
-        // Parse the URL to extract the query string
-        $queryString = parse_url($referrer, PHP_URL_QUERY);
-
-        // Parse the query string to get the parameters as an associative array
-        parse_str($queryString, $params);
-
-        // Extract the pnr and email parameters
-        // $pnr = $params['pnr'];
-        // $email = $params['email'];
-
-        // if($TRAVELERS_INFORMATION['ADULT'] !== []){
-        //     session_start();
-        //     $_SESSION['xml'] = $xml;
-        // }else{
-        //     $lastrow = \App\Booking::where('pnr', $pnr)->first();
-        //     $xml = $lastrow['xml'];
-        // }
 
         $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
-        // dd($response);
-        // exit;
         $json = $response['json'];
-        dd($json, $json['Envelope']['Body']['AirBookResponse']['AirBookResult']);
 
         if (isset($json['Envelope']['Body']['AirBookResponse']['AirBookResult']['Success'])) {
-            // echo 'sdas';
             return [
                 'data' => $response['json']['Envelope']['Body']['AirBookResponse']['AirBookResult'],
                 'status' => true
             ];
         } else {
-            // dd($json);
             return [
                 'data' => $response['json']['Envelope']['Body']['AirBookResponse']['AirBookResult']['Errors']['Error']['_ShortText'],
                 'desc' => $response['json']['Envelope']['Body']['AirBookResponse']['AirBookResult']['Errors']['Error']['__text'],
