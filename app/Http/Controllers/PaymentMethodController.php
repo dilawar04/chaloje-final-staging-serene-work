@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Traits\Airblue;
 use App\Traits\Airsial;
 use App\Traits\Airserene;
+use App\Traits\Flyjinnah;
 
 
 class PaymentMethodController extends Controller
@@ -14,6 +15,7 @@ class PaymentMethodController extends Controller
     use Airblue;
     use Airsial;
     use Airserene;
+    use Flyjinnah;
 
     /**
      * Create a new controller instance.
@@ -44,14 +46,12 @@ class PaymentMethodController extends Controller
             foreach($bookings as $booking) {
                 // dd();
                 $response['booking_id'] = $booking->id; 
-                // dd($response);
                 $BookingParamSave = Booking::find($booking->id);
                 // dd($BookingParamSave);
                 $BookingParamSave->status = ($response['status']) ? 'paid' : 'unpaid';
                 // dd($booking->airline);
                 // exit;
                 $BookingParamSave->save();
-
                 if($booking->status){
                     if($response['code'] === '100' && $booking->airline == 'Airblue'){
                         $this->AirDemandTicket($response);
@@ -61,6 +61,9 @@ class PaymentMethodController extends Controller
                         // return view('themes.chaloge.pages.thankyou')->with(compact('response'));
                     }elseif ($response['code'] === '100' && $booking->airline == 'Air Serene') {
                         $this->SerenePaymentMethod($response);
+                        // return view('themes.chaloge.pages.thankyou')->with(compact('response'));
+                    }elseif ($response['code'] === '100' && $booking->airline == 'Fly Jinnah') {
+                        $this->OTA_AirBookModifyRQ($response);
                         // return view('themes.chaloge.pages.thankyou')->with(compact('response'));
                     }else{
                         return view('themes.chaloge.pages.payment-failed')->with(compact('response'));

@@ -71,29 +71,26 @@
 
 
  @php
-    //dd($_GET['booking_id']);
-    //dd(request());
-    //$pnr = request()->segment(2) ?? '1Q5VRG';
-    //$pnr = req('pnr', '1Q5VRG');
-    //dd($pnr);
-    $OrderId = $_GET['order_id'];
-    //dd($pnr);
-    //$bookings = \App\Booking::with('details')->where('order_id', $OrderId)->get();
+    if(request()->get('email')) {
+        //dd(request()->get('email'));
+        $OrderId = $_GET['pnr'];
+        $BookingData = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $OrderId)->first();
+        if($BookingData->email !== request()->get('email')){
+            $baseUrl = url('/');
+            echo "<script>window.location.href = '{$baseUrl}/data-were-not-found';</script>";
+        }
+    }else {
+        $OrderId = $_GET['order_id'];
+    }
     $bookings = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $OrderId)->get();
-
-    //dd($bookings[0]);
-    //dd($booking[0]);
     if ($bookings[1]) {
         $booking = $bookings[0];
     } else {
-        $bookings = \App\Booking::with('details')->where('order_id', $OrderId)->first();
+        $bookings = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $OrderId)->first();
         $booking = $bookings;
     }
-    //dd($booking);
     $travelers = json_decode($booking->travelers);
-    //dd($travelers);
     $_flight = json_decode($booking->flight_summary);
-    //dd($_flight);
     if(isset($_flight->outbound)){
         $flight = $_flight->outbound->flight;
         $flight->baggage = $_flight->outbound->baggage;
@@ -105,19 +102,11 @@
     $detail[email] = $booking->email;
     $detail[mobile] = $booking->mobile;
     $detail[cnic] = $booking->cnic;
-    
     $adults = json_decode($booking->adult);
     $childs = json_decode($booking->child);
     $infants = json_decode($booking->infant);
 
     $FARE = $flight->baggage->FARE_PAX_WISE;
-    //dump($booking, $flight, $travelers, $detail);
-
-    
-    //dd($booking);
-    //exit;
-
-//exit;
  @endphp
 
 <div id="content_wrapper">
@@ -150,7 +139,7 @@
                                    <div class="row">
                                        <div class="col-lg-3 col-md-3">
                                             <img src="https://s3.ap-south-1.amazonaws.com/st-airline-images/{{ $flight->AIRLINE_CODE }}.png" alt="airline image" width="100px" height="92px">
-                                            @if($bookings[1])
+                                            @if(count($bookings) > 1)
                                                 @php 
                                                     $RoundTripIfNotSame_flight = json_decode($bookings[1]->flight_summary);
                                                     $RoundTripIfNotSameFlight = $RoundTripIfNotSame_flight->inbound->flight;
@@ -176,7 +165,7 @@
                                </div>
                                <div class="col-lg-2 col-md-3 py-2">
                                    <div class="rupees_left" style="color: #44a8d9;">
-                                            @if($bookings[1])
+                                            @if(count($bookings) > 1)
                                                 @php 
                                                     $IfRoundTripNotSameFlight = $bookings[1];
                                                     $InboundTotal = $IfRoundTripNotSameFlight->total_amount;
@@ -242,7 +231,7 @@
                                 </div>
                             </div>
                         </div>
-                        @if($bookings[1])
+                        @if(count($bookings) > 1)
                             @php
                                 $_flight = json_decode($bookings[1]->flight_summary);
                             @endphp

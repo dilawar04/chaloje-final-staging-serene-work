@@ -55,21 +55,27 @@ class BookingController extends Controller
         \Breadcrumb::add_item($this->_info->title, admin_url('', true));
 
         /** -------- Pagination Config */
-        $config = collect(['sort' => $this->id_key, 'dir' => 'desc', 'limit' => 25, 'group' => 'booking.' . $this->id_key])->merge(request()->query())->toArray();
-
+        // $config = collect(['sort' => $this->id_key, 'dir' => 'desc', 'limit' => 25, 'group' => 'booking.' . $this->id_key])->merge(request()->query())->toArray();
+        $config = collect([
+            'sort' => $this->id_key,
+            'dir' => 'desc',
+            'limit' => 25,
+            'group' => 'booking.order_id' // Changed from booking.<id_key> to booking.order_id
+        ])->merge(request()->query())->toArray();
+        
         /** -------- Query */
-        $select = "booking.id
-, booking.airline
--- , booking.airline
-, booking.pnr
-, booking.amount
-, booking.discount
-, booking.flight_type
-, booking.total_amount
-, booking.status
-, booking.created_at
+        $select = "booking.order_id AS id
+        , booking.airline
+        -- , booking.airline
+        , booking.order_id
+        , booking.amount
+        , booking.discount
+        , booking.flight_type
+        , booking.total_amount
+        , booking.status
+        , booking.created_at
 
-    ";
+            ";
         $SQL = $this->model->select(\DB::raw($select));
 
         //$SQL = $SQL->leftJoin('booking', 'booking.id', '=', 'booking.airline');

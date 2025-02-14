@@ -436,6 +436,7 @@ class FlightController extends Controller
                                 ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
                                 ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
                             ]);
+                            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
                             $booking->itinerary = "{$flight->travelers->LocationDep} - {$flight->travelers->LocationArr}";
                             $booking->flight_summary = json_encode($flights);
                             $booking->booking_summary = json_encode($RES);
@@ -476,6 +477,8 @@ class FlightController extends Controller
                                 ['label' => 'CHILD', 'quantity' => $flight->travelers->ChildNo, 'price' => $_FARE['CHILD']['TOTAL']],
                                 ['label' => 'INFANT', 'quantity' => $flight->travelers->InfantNo, 'price' => $_FARE['INFANT']['TOTAL']]
                             ]);
+                            $booking->travelers = $flight->travelers;
+                            $booking->flight_type = ($flight->travelers->flightType ?? (empty($flight->travelers->ReturningOn) ? 'One Way' : 'Round Trip'));
                             $booking->itinerary = "{$flight->travelers->LocationArr} - {$flight->travelers->LocationDep}";
                             $booking->flight_summary = json_encode($flights);
                             $booking->booking_summary = json_encode($RES);
@@ -518,6 +521,8 @@ class FlightController extends Controller
                 break;
                 case 'Fly Jinnah':
                     foreach($flights as $flight){
+                        $DepartureDateCron = $flight->flight->DEPARTURE_DATE.'T'.$flight->flight->DEPARTURE_TIME;
+
                         if($flight->flight->TYPE == 'outbound'){
                             $flight->travelers->LocationDep = $flight->flight->ORGN;
                             $flight->travelers->LocationArr = $flight->flight->DEST;
@@ -606,6 +611,8 @@ class FlightController extends Controller
                         $booking->booking_summary = json_encode($RES);
                         $booking->totalseats_amount = $SeattotalPrice;
                         $booking->totalmeals_amount = $mealtotalPrice;
+                        $booking->departuretime = $DepartureDateCron;
+                        $booking->travelers = $flight->travelers;
                         $booking->pnr = $PNR;
                         $booking->save();
                     }

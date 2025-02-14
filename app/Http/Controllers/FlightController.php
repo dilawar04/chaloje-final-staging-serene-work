@@ -666,7 +666,7 @@ class FlightController extends Controller
 
     public function checkFlight()
     {
-        // dd(\request());
+        dd(\request());
         $referer = $_SERVER['HTTP_REFERER'];
         $urlComponents = parse_url($referer);
         parse_str($urlComponents['query'], $queryParams);

@@ -50,7 +50,7 @@ trait Airserene
         $client = new Client();
 
         // MakeSigningKey
-        $booking = Booking::find($response['Order_Ref_Number']);
+        $booking = Booking::find($response['booking_id']);
         // dd($booking);
         $json_data = json_decode($booking->flight_summary);
         $FirstTimestamp = $json_data->outbound->flight->TimeStamp;

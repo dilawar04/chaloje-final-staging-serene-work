@@ -261,7 +261,7 @@
                                         </div>
                                     </form>
                                     <div class="content-bottom">
-                                        <a name="create" onclick="location.href='/manage-booking?pnr=' + document.getElementById('PNR').value + '&email=' + document.getElementById('email').value" class="btn">Find Your Flight <i class="flaticon-flight-1"></i></a>
+                                        <a name="create" onclick="location.href='/pnr?pnr=' + document.getElementById('PNR').value + '&email=' + document.getElementById('email').value" class="btn">Find Your Flight <i class="flaticon-flight-1"></i></a>
                                     </div>
                                 </div>
                             </div>
