@@ -6,6 +6,15 @@
     $adult = json_decode($detail->adult);
     $flight = json_decode($row->flight_summary);
     $summary = json_decode($row->summary);
+    $AdultDetails = json_decode($row->adult) ?? [];
+    $ChildDetails = json_decode($row->child) ?? [];
+    $InfantDetails = json_decode($row->infant) ?? [];
+
+    $PassengersDetails = [
+        'ADULT' => is_array($AdultDetails) ? $AdultDetails : [],
+        'CHILD' => is_array($ChildDetails) ? $ChildDetails : [],
+        'INFANT' => is_array($InfantDetails) ? $InfantDetails : []
+    ];
 
 @endphp
 @extends('admin.layouts.admin')
@@ -926,38 +935,20 @@
                                                 <td class="cs-width_6"><b class="cs-primary_color">Issued By Date: </b>
                                                    {{ \Carbon\Carbon::parse($row->created_at)->format('Y-m-d') }}
                                                 </td>
-                                                <td class="cs-width_6"><b class="cs-primary_color">Booking Reference: </b>{{ $row->id }}</td>
+                                                <td class="cs-width_6"><b class="cs-primary_color">Booking Reference: </b>{{ $row->order_id }}</td>
                                             </tr>
                                             </tbody>
                                         </table>
                                         <table class="table">
                                             <thead>
                                             <tr>
-                                                <th class="cs-semi_bold cs-primary_color cs-focus_bg cs-f16 cs-border_top" colspan="4">Payment Information</th>
-                                            </tr>
-                                            <tr>
-                                                <td class="cs-width_3 cs-primary_color cs-semi_bold">Payment Gatway</td>
-                                                <td class="cs-width_3 cs-primary_color cs-semi_bold">Date</td>
-                                                <td class="cs-width_3 cs-primary_color cs-semi_bold cs-text_right">Total Amount</td>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td class="cs-width_3">{{ $payment->payment_method }}</td>
-                                                <td class="cs-width_3">
-                                                    {{ \Carbon\Carbon::parse($row->created_at)->format('Y-m-d') }}
-                                                </td>
-                                                <td class="cs-width_3 cs-text_right">{{ number_format($row->amount)  }}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                        <table class="table">
-                                            <thead>
-                                            <tr>
-                                                <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16 cs-border_top" colspan="5">Travel Information</th>
+                                                <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16 cs-border_top" colspan="8">Travel Information</th>
                                             </tr>
                                             <tr class=" cs-border_top">
                                                 <th class="cs-width_5 cs-semi_bold cs-primary_color">Flight Details</th>
+                                                <th class="cs-width_2 cs-semi_bold cs-primary_color">Full Name</th>
+                                                <th class="cs-width_2 cs-semi_bold cs-primary_color">Cnic</th>
+                                                <th class="cs-width_2 cs-semi_bold cs-primary_color">Dob</th>
                                                 <th class="cs-width_2 cs-semi_bold cs-primary_color">Class</th>
                                                 <th class="cs-width_2 cs-semi_bold cs-primary_color">Base Fare</th>
                                                 <th class="cs-width_1 cs-semi_bold cs-primary_color">Taxes</th>
@@ -965,16 +956,46 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach($summary as $travel_sumarry)
-                                            <tr>
-                                                <td class="cs-width_5">{{ $row->airline }} {{ $flight->outbound->FLIGHT_NO }} {{ $flight->outbound->ORGN }} - {{ $flight->outbound->DEST }} <br>
-                                                    Date: {{ \Carbon\Carbon::parse($flight->outbound->DEPARTURE_DATE . " " . $flight->outbound->DEPARTURE_TIME)->format('d, F Y, D h:m A') }}</td>
-                                                <td class="cs-width_2">Economy <br>Seat</td>
-                                                <td class="cs-width_2">{{ number_format($travel_sumarry->price) }}</td>
-                                                <td class="cs-width_1">0</td>
-                                                <td class="cs-width_2 cs-text_right">{{ number_format($travel_sumarry->price * $travel_sumarry->quantity) }}</td>
-                                            </tr>
+                                            @foreach($PassengersDetails as $key => $PassengersDetail)
+                                                @foreach($PassengersDetail as $PassengersDetail)
+                                                    <tr>
+                                                        <td class="cs-width_5">
+                                                            {{ $flight->outbound->flight->AIRLINE }} 
+                                                            {{ $flight->outbound->flight->FLIGHT_NO }} 
+                                                            {{ $flight->outbound->flight->ORGN }} - {{ $flight->outbound->flight->DEST }} <br>
+                                                            Date: {{ \Carbon\Carbon::parse($flight->outbound->flight->DEPARTURE_DATE . " " . $flight->outbound->flight->DEPARTURE_TIME)->format('d, F Y, D h:m A') }}
+                                                        </td>
+                                                        <td class="cs-width_2">{{$PassengersDetail->FullName}}</td>
+                                                        <td class="cs-width_2">{{$PassengersDetail->Cnic}}</td>
+                                                        <td class="cs-width_2">{{$PassengersDetail->Dob}}</td>
+                                                        <td class="cs-width_2">{{$flight->outbound->baggage->title}}</td>
+                                                        <td class="cs-width_2">{{$flight->outbound->baggage->FARE_PAX_WISE->$key->BASIC_FARE}}</td>
+                                                        <td class="cs-width_1">{{$flight->outbound->baggage->FARE_PAX_WISE->$key->TAX}}</td>
+                                                        <td class="cs-width_2 cs-text_right">{{$flight->outbound->baggage->FARE_PAX_WISE->$key->TOTAL}}</td>
+                                                    </tr>
+                                                @endforeach
                                             @endforeach
+                                            @if(isset($flight->inbound))
+                                                @foreach($PassengersDetails as $key => $PassengersDetail)
+                                                    @foreach($PassengersDetail as $PassengersDetail)
+                                                        <tr>
+                                                            <td class="cs-width_5">
+                                                                {{ $flight->inbound->flight->AIRLINE }} 
+                                                                {{ $flight->inbound->flight->FLIGHT_NO }} 
+                                                                {{ $flight->inbound->flight->ORGN }} - {{ $flight->inbound->flight->DEST }} <br>
+                                                                Date: {{ \Carbon\Carbon::parse($flight->inbound->flight->DEPARTURE_DATE . " " . $flight->inbound->flight->DEPARTURE_TIME)->format('d, F Y, D h:m A') }}
+                                                            </td>
+                                                            <td class="cs-width_2">{{$PassengersDetail->FullName}}</td>
+                                                            <td class="cs-width_2">{{$PassengersDetail->Cnic}}</td>
+                                                            <td class="cs-width_2">{{$PassengersDetail->Dob}}</td>
+                                                            <td class="cs-width_2">{{$flight->inbound->baggage->title}}</td>
+                                                            <td class="cs-width_2">{{$flight->inbound->baggage->FARE_PAX_WISE->$key->BASIC_FARE}}</td>
+                                                            <td class="cs-width_1">{{$flight->inbound->baggage->FARE_PAX_WISE->$key->TAX}}</td>
+                                                            <td class="cs-width_2 cs-text_right">{{$flight->inbound->baggage->FARE_PAX_WISE->$key->TOTAL}}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -985,12 +1006,33 @@
                                                 <tbody>
                                                 <tr class="cs-border_left">
                                                     <td class="cs-width_3 cs-semi_bold cs-primary_color cs-focus_bg">Subtoal</td>
-                                                    <td class="cs-width_3 cs-semi_bold cs-primary_color cs-focus_bg cs-primary_color cs-text_right">{{ number_format($row->total_amount) }}</td>
+                                                    <td class="cs-width_3 cs-semi_bold cs-primary_color cs-focus_bg cs-primary_color cs-text_right">{{ number_format($flight->outbound->baggage->TOTAL + $flight->inbound->baggage->TOTAL) }}</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="cs-semi_bold cs-primary_color cs-focus_bg cs-f16 cs-border_top" colspan="4">Payment Information</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="cs-width_3 cs-primary_color cs-semi_bold">Payment Gatway</td>
+                                                <td class="cs-width_3 cs-primary_color cs-semi_bold">Date</td>
+                                                <td class="cs-width_3 cs-primary_color cs-semi_bold cs-text_right">Total Amount</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td class="cs-width_3">{{ $payment->payment_method }}</td>
+                                            <td class="cs-width_3">
+                                                {{ \Carbon\Carbon::parse($row->created_at)->format('Y-m-d') }}
+                                            </td>
+                                            <td class="cs-width_3 cs-text_right">{{ number_format($flight->outbound->baggage->TOTAL + $flight->inbound->baggage->TOTAL)  }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                                 <div class="cs-invoice_footer">
                                     <div class="cs-left_footer cs-mobile_hide"></div>
@@ -999,7 +1041,7 @@
                                             <tbody>
                                             <tr class="cs-border_none">
                                                 <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color">Total Amount</td>
-                                                <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color cs-text_right">{{ number_format($row->total_amount) }}</td>
+                                                <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color cs-text_right">{{ number_format($flight->outbound->baggage->TOTAL + $flight->inbound->baggage->TOTAL) }}</td>
                                             </tr>
                                             </tbody>
                                         </table>
