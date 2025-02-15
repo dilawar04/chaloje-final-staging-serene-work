@@ -63,6 +63,24 @@
                             }
                         ]]);
 
+                        $grid->dt_column([
+                                'id' => [
+                                    'title' => 'ID',
+                                    'width' => '20',
+                                    'align' => 'center',
+                                    'th_align' => 'center',
+                                    'hide' => true
+                                ]
+                            ]);
+
+                            $grid->dt_column([
+                                'order_id' => [
+                                    'wrap' => function ($value, $field, $_row) {
+                                        return ltrim($value, '0'); // Removes leading zeros from order_id
+                                    }
+                                ]
+                            ]);
+
                         echo $grid->showGrid();
                         @endphp
                     </div>

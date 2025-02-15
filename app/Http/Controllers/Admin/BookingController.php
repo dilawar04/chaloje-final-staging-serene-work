@@ -57,7 +57,7 @@ class BookingController extends Controller
         /** -------- Pagination Config */
         // $config = collect(['sort' => $this->id_key, 'dir' => 'desc', 'limit' => 25, 'group' => 'booking.' . $this->id_key])->merge(request()->query())->toArray();
         $config = collect([
-            'sort' => $this->id_key,
+            'sort' => 'booking.order_id',
             'dir' => 'desc',
             'limit' => 25,
             'group' => 'booking.order_id' // Changed from booking.<id_key> to booking.order_id
@@ -74,7 +74,6 @@ class BookingController extends Controller
         , booking.total_amount
         , booking.status
         , booking.created_at
-
             ";
         $SQL = $this->model->select(\DB::raw($select));
 
@@ -266,8 +265,13 @@ class BookingController extends Controller
     public function view()
     {
         $id = getUri(4);
+        // dd($id);
         if ($id > 0) {
+            // $row = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $id)->first();
+            // $row = DB::table('booking')->leftJoin('booking_details', 'booking.order_id', '=', 'booking_details.order_id')->where('booking.order_id', $id)->first();
+            // dd($bookings);
             $row = $this->model->find($id);
+            // dd($row);
             if ($row->{$this->id_key} <= 0) {
                 set_notification('Access forbidden!');
                 if (request()->ajax() || request()->is('api/*')) {

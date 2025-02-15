@@ -855,6 +855,8 @@
         }
 
     </style>
+    <?php
+    ?>
 <form action="{{ admin_url('', true) }}" method="get" enctype="multipart/form-data" id="booking-form">
     @csrf
     @include('admin.layouts.inc.stickybar', compact('form_buttons'))
@@ -872,19 +874,19 @@
 
                         <div style="display: grid ;">
                             <table>
-                                <thead>
+                                <!-- <thead>
                                 <tr>
                                     <th colspan="1"><img width="400" height="300" src="https://demo.chaloje.com/assets/images/icon/chaloje.png" /></th>
                                     <th colspan="3"><h1><b>Invoice</b></h1></th>
                                 </tr>
-                                </thead>
+                                </thead> -->
                                 <tbody>
                                 <tr>
-                                    <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Invoice To:</th>
-                                    <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Pay To:</th>
+                                    <!-- <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Invoice To:</th> -->
+                                    <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Company Info:</th>
                                 </tr>
                                 <tr>
-                                    <td colspan="2">
+                                    <!-- <td colspan="2">
 {{--                                        @dump(collect($row)->all());--}}
 {{--                                        @dump($detail);--}}
 {{--                                        @dump($adult);--}}
@@ -893,7 +895,7 @@
                                         <b class="cs-primary_color">National ID#: </b><br><i>{{ $adult[0]->Cnic }}</i><br>
                                         <b class="cs-primary_color">Email#: </b><br><i>{{ $detail->email }}</i><br>
                                         <b class="cs-primary_color">Country: </b><i>Canada</i>
-                                    </td>
+                                    </td> -->
                                     <td colspan="2">
                                         <address>
                                             Chaloje Travel & Tourism<br>
@@ -912,19 +914,19 @@
                                         <table class="table">
                                             <thead>
                                             <tr>
-                                                <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Passenger & Ticket Information</th>
+                                                <th class="cs-width_6 cs-semi_bold cs-primary_color cs-focus_bg cs-f16" colspan="2">Ticket Information</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td class="cs-width_6"><b class="cs-primary_color">Passenger Name: </b>{{ $adult[0]->Title . " " . $adult[0]->FullName }}</td>
-                                                <td class="cs-width_6"><b class="cs-primary_color">Ticket Number: </b>#CH-{{ $row->id }}</td>
-                                            </tr>
+                                            <!-- <tr> -->
+                                                <!-- <td class="cs-width_6"><b class="cs-primary_color">Passenger Name: </b>{{ $adult[0]->Title . " " . $adult[0]->FullName }}</td> -->
+                                                <!-- <td class="cs-width_6"><b class="cs-primary_color">Ticket Number: </b>#CH-{{ $row->id }}</td> -->
+                                            <!-- </tr> -->
                                             <tr>
                                                 <td class="cs-width_6"><b class="cs-primary_color">Issued By Date: </b>
                                                    {{ \Carbon\Carbon::parse($row->created_at)->format('Y-m-d') }}
                                                 </td>
-                                                <td class="cs-width_6"><b class="cs-primary_color">Booking Reference: </b>{{ $row->pnr }}</td>
+                                                <td class="cs-width_6"><b class="cs-primary_color">Booking Reference: </b>{{ $row->id }}</td>
                                             </tr>
                                             </tbody>
                                         </table>
