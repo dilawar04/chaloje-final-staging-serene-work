@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+// use App\Http\Controllers\Controller;
+// use Illuminate\Support\Facades\Validator;
+
 
 class IndexController extends Controller
 {
@@ -62,12 +65,17 @@ class IndexController extends Controller
     }
 
 
-    function do_contact()
+    public function do_contact()
     {
+        // dd(request()->all());
+        // $watches = \App\Enquiry::get();
+        // dd($watches);
         $validator = \Validator::make(request()->all(), [
             'name' => "required",
             'email' => "required|email",
             //'phone' => "required",
+            'subject' => "required",
+            'phone' => "required",
             'message' => "required",
         ]);
 
@@ -77,29 +85,49 @@ class IndexController extends Controller
 
         $name = req('name');
         $email = req('email');
+        $subject = req('subject');
         $phone = req('phone');
         $message = req('message');
 
-        \App\Enquiry::create(request()->all());
+        $Enquiry = new \App\Enquiry();
+        $Enquiry->name = $name;
+        $Enquiry->email = $email;
+        $Enquiry->subject = $subject;
+        $Enquiry->phone = $phone;
+        $Enquiry->message = $message;
+        // dd($booking);
+        $Enquiry->save();
 
-        $mail_data = [
-            'to' => opt('contact_email'),
-            'from' => [$email, $name],
-            'cc' => opt('admin_cc_email'),
-            'subject' => 'Contact - From',
-            'message' => "Name: {$name}<br/>Email: {$email}<br/>Phone: {$phone}<br/><br/>{$message}",
-        ];
-        if (send_mail($mail_data)) {
-            $JSON['status'] = true;
-            set_notification('Email has been sent!', 'success');
-            //$JSON['message'] = 'Email has been sent!';
-        } else {
-            $JSON['status'] = false;
-            set_notification('Email sending failed!', 'error');
-            //$JSON['message'] = 'Email sending failed!';
-        }
+        // \App\Enquiry::create([
+        //     'name' => req('name'),
+        //     'email' => req('email'),
+        //     'subject' => req('subject'),
+        //     'phone' => req('phone'),
+        //     'message' => req('message'),
+        // ]);
+        // dd($a);
 
-        return \redirect()->back();
+        // \App\Enquiry::create(request()->all());
+
+        // $mail_data = [
+        //     'to' => opt('contact_email'),
+        //     'from' => [$email, $name],
+        //     'cc' => opt('admin_cc_email'),
+        //     'subject' => 'Contact - From',
+        //     'message' => "Name: {$name}<br/>Email: {$email}<br/>Phone: {$phone}<br/><br/>{$message}",
+        // ];
+        // if (send_mail($mail_data)) {
+        //     $JSON['status'] = true;
+        //     set_notification('Email has been sent!', 'success');
+        //     //$JSON['message'] = 'Email has been sent!';
+        // } else {
+        //     $JSON['status'] = false;
+        //     set_notification('Email sending failed!', 'error');
+        //     //$JSON['message'] = 'Email sending failed!';
+        // }
+
+        return redirect()->back()->withSuccess('IT WORKS!');
+        // return \redirect()->back();
         //return $JSON;
     }
 

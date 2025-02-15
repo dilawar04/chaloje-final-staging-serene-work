@@ -16,26 +16,27 @@
                     <h2 class="title">Write a Message</h2>
                 </div>
                 <div class="contact-form">
-                    <form action="#">
+                    <form method="post" action="{{  url('index/do_contact') }}">
+                        @csrf
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-grp">
-                                    <input type="text" placeholder="Your Name *">
+                                    <input type="text" name="name" placeholder="Your Name *">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-grp">
-                                    <input type="email" placeholder="Your Email *">
+                                    <input type="email" name="email" placeholder="Your Email *">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-grp">
-                                    <input type="text" placeholder="Subject">
+                                    <input type="text" name="subject" placeholder="Subject">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-grp">
-                                    <input type="number" placeholder="Your Mobile">
+                                    <input type="number" name="phone" placeholder="Your Mobile">
                                 </div>
                             </div>
                         </div>

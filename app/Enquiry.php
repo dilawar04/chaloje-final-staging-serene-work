@@ -13,7 +13,9 @@ class Enquiry extends Model
     //const UPDATED_AT = 'updated';
     //protected $perPage = 15;
 
-    protected $fillable = ['name', 'email', 'phone', 'message'];
+    // protected $fillable = ['name', 'email', 'phone','subject','message'];
+
+    protected $guarded = [];
 
 
 
