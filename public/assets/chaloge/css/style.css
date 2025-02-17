@@ -394,7 +394,8 @@ background:#fc7c44;
 	justify-content: flex-start;
 }
 .logo img {
-    max-width: 200px;
+    width: 80px;
+    margin: 10px 0;
 }
 .navbar-wrap {
 	display: flex;
@@ -4447,7 +4448,7 @@ background: #fc7c44 !important;
 }
 @media (max-width: 991.98px){
  .logo img {
-     margin-top: -20px !important; 
+    margin: -10px 0 0 0 !important;
 }
 }
 @media (max-width: 764px) {
@@ -4457,9 +4458,6 @@ background: #fc7c44 !important;
         background: none;
         box-shadow: none;
     }
-    .logo img {
-     margin-top: -30px !important; 
-}
 }
 @media (max-width: 425px) {
     .footer-logo a {
@@ -4475,3 +4473,14 @@ background: #fc7c44 !important;
     }
 }
 
+/* Booking Details Start */
+
+.booking-sidebar {
+    position: sticky;
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Booking Details End */

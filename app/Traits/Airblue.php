@@ -53,7 +53,7 @@ trait Airblue
             </Envelope>";
         // dd($xml);       
 
-        $xmlresponse = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
+        $xmlresponse = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
             
         $isResponseSuccess = array_key_exists('Success', $xmlresponse['json']['Envelope']['Body']['AirDemandTicketResponse']['AirDemandTicketResult']);
 

@@ -50,7 +50,7 @@
                         <nav class="menu-nav">
                             <div class="logo">
                                 <a href="{{ url("") }}" class="navbar-brand logo">
-                                    <img style="width: 129px;" src="{{ _img(asset_url('images/' . opt('logo'), 1), 200, 180, null, ['quality' => 100, 'func' => 'resize']) }}" alt="{{ opt('site_title') }}"/>
+                                    <img src="{{ _img(asset_url('images/' . opt('logo'), 1), 200, 180, null, ['quality' => 100, 'func' => 'resize']) }}" alt="{{ opt('site_title') }}"/>
                                 </a>
                             </div>
 

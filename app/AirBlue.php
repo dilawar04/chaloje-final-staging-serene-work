@@ -107,7 +107,7 @@ class AirBlue {
 
         // dd($xml);
         if(!req('c')) {
-            $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
+            $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
             // dd($response);
             file_put_contents((!empty($ReturningOn) ? 'RT-' : '') . 'AB.json', json_encode($response['json']));
             file_put_contents((!empty($ReturningOn) ? 'RT-' : '') . 'AB.xml', $response['xml']);
@@ -465,7 +465,7 @@ class AirBlue {
 
         // dd($xml);
         if(!req('c')) {
-            $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
+            $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
             // dd($response);
             file_put_contents((!empty($ReturningOn) ? 'RT-' : '') . 'AB.json', json_encode($response['json']));
             file_put_contents((!empty($ReturningOn) ? 'RT-' : '') . 'AB.xml', $response['xml']);
@@ -862,7 +862,7 @@ class AirBlue {
         </Envelope>";
         // dd($xml);
 
-        $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
+        $response = Http::withHeaders(['Content-Type' => 'application/xml'])->send('POST', 'https://api.chaloje.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
         $json = $response['json'];
 
         if (isset($json['Envelope']['Body']['AirBookResponse']['AirBookResult']['Success'])) {
@@ -903,7 +903,7 @@ class AirBlue {
 </Envelope> ";
 
         $response = Http::withHeaders(['Content-Type' => 'application/xml'])
-            ->send('POST', 'https://api.chaloje.businessfuelprovider.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
+            ->send('POST', 'https://api.chaloje.com/api?url=' . self::$credential['URL'], ['body' => $xml]);
 
         $isResponseSuccess = array_key_exists('Success', $response['json']['Envelope']['Body']['AirBookResponse']['AirBookResult']);
 
